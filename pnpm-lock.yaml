@@ -17,6 +17,9 @@ importers:
       '@types/mocha':
         specifier: ^10.0.10
         version: 10.0.10
+      '@types/node':
+        specifier: ^24.2.0
+        version: 24.2.0
       chai:
         specifier: ^5.2.1
         version: 5.2.1
@@ -26,6 +29,9 @@ importers:
       mocha:
         specifier: ^11.7.1
         version: 11.7.1
+      openai:
+        specifier: ^5
+        version: 5.12.0
       rimraf:
         specifier: ^6.0.1
         version: 6.0.1
@@ -138,6 +144,9 @@ packages:
 
   '@types/mocha@10.0.10':
     resolution: {integrity: sha512-xPyYSz1cMPnJQhl0CLMH68j3gprKZaTjG3s5Vi+fDgx+uhG9NOXwbVt52eFS8ECyXhyKcjDLCBEqBExKuiZb7Q==}
+
+  '@types/node@24.2.0':
+    resolution: {integrity: sha512-3xyG3pMCq3oYCNg7/ZP+E1ooTaGB4cG8JWRsqqOYQdbWNY4zbaV0Ennrd7stjiJEFZCaybcIgpTjJWHRfBSIDw==}
 
   '@typescript-eslint/eslint-plugin@8.39.0':
     resolution: {integrity: sha512-bhEz6OZeUR+O/6yx9Jk6ohX6H9JSFTaiY0v9/PuKT3oGK0rn0jNplLmyFUGV+a9gfYnVNwGDwS/UkLIuXNb2Rw==}
@@ -579,6 +588,18 @@ packages:
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
+  openai@5.12.0:
+    resolution: {integrity: sha512-vUdt02xiWgOHiYUmW0Hj1Qu9OKAiVQu5Bd547ktVCiMKC1BkB5L3ImeEnCyq3WpRKR6ZTaPgekzqdozwdPs7Lg==}
+    hasBin: true
+    peerDependencies:
+      ws: ^8.18.0
+      zod: ^3.23.8
+    peerDependenciesMeta:
+      ws:
+        optional: true
+      zod:
+        optional: true
+
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
@@ -740,6 +761,9 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  undici-types@7.10.0:
+    resolution: {integrity: sha512-t5Fy/nfn+14LuOc2KNYg75vZqClpAiqscVvMygNnlsHBFpSXdJaYtXMcdNLpl/Qvc3P2cB3s6lOV51nqsFq4ag==}
+
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
 
@@ -883,6 +907,10 @@ snapshots:
   '@types/json-schema@7.0.15': {}
 
   '@types/mocha@10.0.10': {}
+
+  '@types/node@24.2.0':
+    dependencies:
+      undici-types: 7.10.0
 
   '@typescript-eslint/eslint-plugin@8.39.0(@typescript-eslint/parser@8.39.0(eslint@9.32.0)(typescript@5.9.2))(eslint@9.32.0)(typescript@5.9.2)':
     dependencies:
@@ -1357,6 +1385,8 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
+  openai@5.12.0: {}
+
   optionator@0.9.4:
     dependencies:
       deep-is: 0.1.4
@@ -1497,6 +1527,8 @@ snapshots:
       - supports-color
 
   typescript@5.9.2: {}
+
+  undici-types@7.10.0: {}
 
   uri-js@4.4.1:
     dependencies:

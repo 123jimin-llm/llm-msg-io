@@ -14,15 +14,25 @@ Currently, `llm-msg-io` supports the following formats:
 - `simple`: Custom text-based format (described below)
   - Note: the identifier for the custom format may be changed later.
 
+### String I/O
+
 ```js
 import msgIO from '@123jimin/llm-msg-io';
 
-msgIO.toString(message, {format: 'simple'});
-msgIO.parse(message, {format: 'simple'});
+// Converts a message, or an array of messages, to a string.
+msgIO.toString(message, {format: 'json'});
 
-await msgIO.save("foo.txt", message, {format: 'simple'});
-await msgIO.load("foo.txt", {format: 'simple'});
+// Parses a string into a message, or an array of messages.
+msgIO.parse(str, {format: 'json'});
+```
 
+### File I/O
+
+```js
+import msgIO from '@123jimin/llm-msg-io';
+
+await msgIO.save("foo.txt", message, {format: 'json'});
+await msgIO.load("foo.txt", {format: 'json'});
 ```
 
 ## Simple Text Format
@@ -37,7 +47,7 @@ Hi! Who are you?
 Hello, I'm an AI, based on a large language model.
 ```
 
-For the full specification of the format, refer to (TODO).
+Refer to [the specification document](./doc/simple.md) for more details.
 
 ## Development
 
