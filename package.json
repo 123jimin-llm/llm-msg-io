@@ -1,13 +1,14 @@
 {
-  "name": "placeholder-name",
+  "name": "llm-msg-io",
   "version": "0.0.1",
-  "description": "placeholder-description",
+  "description": "A small library for serializing and deserializing LLM messages.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist",
-    "!dist/**/*.spec.*"
+    "!dist/**/*.spec.*",
+    "!**/*.tsbuildinfo"
   ],
   "scripts": {
     "clean": "npx rimraf dist",
@@ -19,16 +20,16 @@
     "test": "npx mocha \"dist/**/*.spec.js\""
   },
   "keywords": [],
-  "author": "placeholder-author",
-  "license": "UNLICENSED",
+  "author": "Jimin Park",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.invalid/placeholder/placeholder.git"
+    "url": "git+https://github.com/123jimin-llm/llm-msg-io.git"
   },
   "bugs": {
-    "url": "https://github.invalid/placeholder/placeholder/issues"
+    "url": "https://github.com/123jimin-llm/llm-msg-io/issues"
   },
-  "homepage": "https://github.invalid/placeholder/placeholder",
+  "homepage": "https://github.com/123jimin-llm/llm-msg-io",
   "devDependencies": {
     "@eslint/js": "^9.32.0",
     "@types/chai": "^5.2.2",
