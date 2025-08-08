@@ -9,10 +9,10 @@ A small library for serializing and deserializing LLM messages.
 
 Currently, `llm-msg-io` supports the following formats:
 
-- `json`: JSON
+- `json`: JSON (as an array of messages)
+  - `ndjson`: Newline-delimited JSON (one message per line)
 - `toml`: TOML
-- `simple`: Custom text-based format (described below)
-  - Note: the identifier for the custom format may be changed later.
+- `simple`: [Simple Text Format](./doc/simple.md)
 
 ### String I/O
 
@@ -34,20 +34,6 @@ import msgIO from '@123jimin/llm-msg-io';
 await msgIO.save("foo.txt", message, {format: 'json'});
 await msgIO.load("foo.txt", {format: 'json'});
 ```
-
-## Simple Text Format
-
-JSON, or even TOML formats are quite cumbersome to edit manually.
-To simplify manual editing of chat history, llm-msg-io specifies and implements a custom format for chat messages.
-
-```text
-@user
-Hi! Who are you?
-@ai
-Hello, I'm an AI, based on a large language model.
-```
-
-Refer to [the specification document](./doc/simple.md) for more details.
 
 ## Development
 
