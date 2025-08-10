@@ -1,8 +1,17 @@
-// TODO: Make this more compatible to OpenAI, supporting tool calls and etc....
-export interface Message {
-    role: string;
-    content: string;
-};
+import { type } from 'arktype';
+
+export const ContentPart = type({
+    type: 'string',
+});
+
+export type ContentPart = typeof ContentPart.infer;
+
+export const Message = type({
+    role: 'string',
+    content: type("string").or(ContentPart.array()),
+});
+
+export type Message = typeof Message.infer;
 
 /** Objects that can be converted to an array of messages. */
 export type MessageArrayLike = Message | Array<Message>;
