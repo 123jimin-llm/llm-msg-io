@@ -38,12 +38,15 @@
     "chai": "^5.2.1",
     "eslint": "^9.32.0",
     "mocha": "^11.7.1",
+    "openai": "^5",
     "rimraf": "^6.0.1",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.39.0",
-    "openai": "^5"
+    "typescript-eslint": "^8.39.0"
   },
   "peerDependencies": {
     "openai": "^5"
+  },
+  "dependencies": {
+    "arktype": "^2.1.20"
   }
 }
