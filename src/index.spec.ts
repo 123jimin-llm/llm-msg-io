@@ -1,4 +1,6 @@
 import { assert } from 'chai';
 
-describe("PLACEHOLDER", function() {
+describe("serialize", function() {
 });
+
+describe("deserialize", function() {});

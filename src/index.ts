@@ -1,17 +1,15 @@
-export * from "./message";
+export * from "./message.js";
 
-import { type Message, type MessageArrayLike, isMessageArray, asMessageArray } from "./message";
+import { type Message, type MessageArrayLike, isMessageArray, asMessageArray } from "./message.js";
 
-export type Format = 'json' | 'ndjson' | 'toml' | 'simple';
+export interface SerializeOptions {}
 
-export interface ToStringOptions {
-    format: Format;
+export interface DeserializeOptions {}
+
+export function serialize(message: MessageArrayLike, options: Partial<SerializeOptions> = {}): string {
+    messages = asMessageArray(message);
 }
 
-export interface ParseOptions {
-    format: Format;
+export function deserialize(source: string, options?: Partial<DeserializeOptions>): Message[] {
+    
 }
-
-export function toString(messages: MessageArrayLike, options?: Partial<ToStringOptions>): string {}
-
-export function parse(str: string, options?: Partial<ParseOptions>): Array<Message> {}
