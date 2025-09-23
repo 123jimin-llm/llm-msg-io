@@ -1,6 +1,6 @@
-import { type Message } from "@/message.js";
+import type { MessageSerializer, MessageDeserializer } from "@/message/index.js";
 
-export interface FileCodec<SerializeOptions=object, DeserializeOptions=object> {
-    serialize(messages: Message[], options?: Partial<SerializeOptions>): string;
-    deserialize(source: string, options?: Partial<DeserializeOptions>): Message[];
+export interface FileCodec<SerializeOptions=object, DeserializeOptions=object, MetadataType=unknown> {
+    createSerializer(options?: Partial<SerializeOptions>): MessageSerializer<MetadataType>;
+    createDeserializer(options?: Partial<DeserializeOptions>): MessageDeserializer<MetadataType>;
 }

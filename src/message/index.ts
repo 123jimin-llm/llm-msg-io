@@ -13,6 +13,20 @@ export const Message = type({
 
 export type Message = typeof Message.infer;
 
+export function validateMessage(value: unknown): Message {
+    const res = Message(value);
+    if(res instanceof type.errors) {
+        throw res;
+    }
+
+    return res;
+}
+
+export function validateMessageArray(value: unknown): Message[] {
+    if(!Array.isArray(value)) throw new Error(`Value of type ${typeof value} is not an array!`);
+    return value.map((v) => validateMessage(v));
+}
+
 /** Objects that can be converted to an array of messages. */
 export type MessageArrayLike = Message | Array<Message>;
 
@@ -33,3 +47,6 @@ export function isMessageArray(obj: MessageArrayLike): obj is Array<Message> {
 export function asMessageArray(obj: MessageArrayLike): Array<Message> {
     return isMessageArray(obj) ? obj : [obj];
 }
+
+export type MessageSerializer<MetadataType = unknown> = (messages: Message[], metadata?: MetadataType) => string;
+export type MessageDeserializer<MetadataType = unknown> = (source: string) => {metadata?: MetadataType, messages: Message[]};

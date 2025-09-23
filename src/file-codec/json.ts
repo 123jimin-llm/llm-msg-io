@@ -1,14 +1,19 @@
 /// JSON support
 
+import { validateMessageArray } from "@/message/index.js";
 import type { FileCodec } from "./type.js";
 
 export const codec: FileCodec = {
-    serialize(messages, options) {
-        return JSON.stringify(messages);
+    createSerializer() {
+        return (message) => {
+            return JSON.stringify(message);
+        };
     },
-
-    deserialize(source, options) {
-        // TODO: use arktype
-        return JSON.parse(source);
+    createDeserializer() {
+        return (source) => {
+            return {
+                messages: validateMessageArray(JSON.parse(source)),
+            };
+        };
     },
 };
