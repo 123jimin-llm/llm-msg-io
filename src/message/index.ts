@@ -48,5 +48,43 @@ export function asMessageArray(obj: MessageArrayLike): Array<Message> {
     return isMessageArray(obj) ? obj : [obj];
 }
 
-export type MessageSerializer<MetadataType = unknown> = (messages: Message[], metadata?: MetadataType) => string;
-export type MessageDeserializer<MetadataType = unknown> = (source: string) => {metadata?: MetadataType, messages: Message[]};
+export type DeserializedData<MetadataType=unknown> = {metadata?: MetadataType, messages: Message[]};
+
+export function asDeserializedData(obj: unknown): DeserializedData<unknown> {
+    if(obj == null) {
+        throw new TypeError("`asDeserializedData` expected an object or an array of messages.");
+    }
+
+    if(Array.isArray(obj)) {
+        return {
+            messages: validateMessageArray(obj),
+        };
+    }
+
+    if(typeof obj !== 'object') {
+        throw new TypeError("`asDeserializedData` expected an object or an array of messages.");
+    }
+
+    if('messages' in obj) {
+        const messages = validateMessageArray(obj.messages);
+
+        if('metadata' in obj) {
+            return {
+                metadata: obj.metadata,
+                messages,
+            };
+        } else {
+            return {
+                messages,
+            };
+        }
+    }
+
+    return {
+        messages: [validateMessage(obj)],
+    };
+}
+
+export type MessageSerializer<MetadataType=unknown> = (messages: Message[], metadata?: MetadataType) => string;
+export type MessageDeserializer<MetadataType=unknown> = (source: string) => DeserializedData<MetadataType>;
+export type RawMessageDeserializer = (source: string) => unknown;

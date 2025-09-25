@@ -1,6 +1,16 @@
-import type { MessageSerializer, MessageDeserializer } from "@/message/index.js";
+import type { MessageSerializer, RawMessageDeserializer } from "@/message/index.js";
 
-export interface FileCodec<SerializeOptions=object, DeserializeOptions=object, MetadataType=unknown> {
-    createSerializer(options?: Partial<SerializeOptions>): MessageSerializer<MetadataType>;
-    createDeserializer(options?: Partial<DeserializeOptions>): MessageDeserializer<MetadataType>;
-}
+export type FileCodecSerializer<SerializeOptions=object, MetadataType=unknown> = (options?: Partial<SerializeOptions>) => MessageSerializer<MetadataType>;
+export type FileCodecDeserializer<DeserializeOptions=object> = (options?: Partial<DeserializeOptions>) => RawMessageDeserializer;
+
+export interface WithCreateSerializer<SerializeOptions=object, MetadataType=unknown> {
+    createSerializer: FileCodecSerializer<SerializeOptions, MetadataType>;
+};
+
+export interface WithCreateDeserializer<DeserializeOptions=object> {
+    createDeserializer: FileCodecDeserializer<DeserializeOptions>;
+};
+
+export type FileCodec<SerializeOptions=object, DeserializeOptions=object, MetadataType=unknown>
+    = WithCreateSerializer<SerializeOptions, MetadataType>
+    & WithCreateDeserializer<DeserializeOptions>;
