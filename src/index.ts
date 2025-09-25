@@ -1,4 +1,5 @@
 export * from "@/message/index.js";
+export * from "@/file-codec/index.js";
 
 import { type MessageArrayLike, asDeserializedData, asMessageArray } from "@/message/index.js";
 
