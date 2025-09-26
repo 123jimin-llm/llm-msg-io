@@ -1,14 +1,21 @@
 # llm-msg-io
 
-A small library for serializing and deserializing LLM messages.
+`llm-msg-io` is a small library for serializing and deserializing LLM messages, together with an optional metadata.
 
 > [!CAUTION]
 > This project is currently in active development.
 
+## Features
+
+## Installation
+
+`npm install @jiminp/llm-msg-io`
+
 ## Usage
 
 ```ts
-import { serialize, deserialize, JSONCodec } from "@jiminp/llm-msg-io";
+import { serialize, deserialize } from "@jiminp/llm-msg-io";
+import { JSONCodec } from "@jiminp/llm-msg-io";
 import type { Message } from "@jiminp/llm-msg-io";
 
 const messages: Message[] = [
