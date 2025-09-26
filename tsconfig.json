@@ -9,9 +9,7 @@
         "moduleResolution": "nodenext",
         "isolatedModules": true,
         "incremental": true,
-        "paths": {
-            "@/*": ["./src/*"]
-        }
+        "paths": {}
     },
     "include": ["src/**/*.ts"]
 }

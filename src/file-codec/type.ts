@@ -1,4 +1,4 @@
-import type { MessageSerializer, RawMessageDeserializer } from "@/message/index.js";
+import type { MessageSerializer, RawMessageDeserializer } from "../message/index.js";
 
 export type FileCodecSerializer<SerializeOptions=object, MetadataType=unknown> = (options?: Partial<SerializeOptions>) => MessageSerializer<MetadataType>;
 export type FileCodecDeserializer<DeserializeOptions=object> = (options?: Partial<DeserializeOptions>) => RawMessageDeserializer;

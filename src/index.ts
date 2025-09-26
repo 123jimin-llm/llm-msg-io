@@ -1,9 +1,9 @@
-export * from "@/message/index.js";
-export * from "@/file-codec/index.js";
+export * from "./message/index.js";
+export * from "./file-codec/index.js";
 
-import { type MessageArrayLike, asDeserializedData, asMessageArray } from "@/message/index.js";
+import { type MessageArrayLike, asDeserializedData, asMessageArray } from "./message/index.js";
 
-import type { FileCodecDeserializer, FileCodecSerializer, WithCreateDeserializer, WithCreateSerializer } from "@/file-codec/type.js";
+import type { FileCodecDeserializer, FileCodecSerializer, WithCreateDeserializer, WithCreateSerializer } from "./file-codec/type.js";
 
 export function serialize<SerializeOptions=object, MetadataType=unknown>(
     codec: FileCodecSerializer<SerializeOptions, MetadataType> | WithCreateSerializer<SerializeOptions, MetadataType>,
