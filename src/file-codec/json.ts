@@ -16,8 +16,8 @@ export const codec: FileCodec = {
         };
     },
     createDeserializer() {
-        return (source) => {
-            return JSON.parse(source) as unknown;
+        return (source: unknown) => {
+            return (typeof source === 'string' ? JSON.parse(source) : source) as unknown;
         };
     },
 };
