@@ -8,11 +8,19 @@ A small library for serializing and deserializing LLM messages.
 ## Usage
 
 ```ts
-import { serialize, deserialize } from "@jiminp/llm-msg-io";
+import { serialize, deserialize, JSONCodec } from "@jiminp/llm-msg-io";
+import type { Message } from "@jiminp/llm-msg-io";
 
-const message = [];
-const serialized = serialize(message, {});
-const deserialized = deserialize(serialized, {});
+const messages: Message[] = [
+  {role: 'user', content: "Hello!"},
+  {role: 'assistant', content: "Hi! What's up?"},
+];
+
+const serialized = serialize(JSONCodec, message);
+console.log(serialized);
+
+const {messages: deserialized} = deserialize(JSONCodec, serialized);
+console.log(deserialized);
 
 ```
 
