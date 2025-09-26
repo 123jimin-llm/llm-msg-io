@@ -1,10 +1,32 @@
-# Specification for Simple Text Format
+# Simple Text Format
 
-This is a specification for Simple Text Format, a text-based format for storing LLM messages.
+Simple Text Format (STF) is a text-based format for storing LLM messages.
 
-The purpose for creating a text format is to simplify manual editing of chat history.
+## Goals
 
-## Examples
+STF aims to:
+
+- Be a text-based format that's intuitive to understand, including for non-programmers.
+- Easy to edit by a human with a text editor, without much hassle.
+- Easy chat history management, potentially with external attached assets.
+- Flexible format that enables (mostly) lossless roundtrip between memory and disk.
+
+STF is expected to be used for the following scenarios:
+
+- Chat UI, for the user to input and edit multiple messages in a text-based manner.
+- Prompt library for LLM applications, to be used in/as templates.
+- Chat history archive which can be easily browsed by a human.
+
+### Non-Goals
+
+STF does not handle message validation, such as checking for valid role types.
+
+STF is **not** a template language by itself.
+A template language, such as Jinja, may be used in conjunction with STF.
+
+Be aware that it is currently not a goal to prevent injection attacks when templates are used.
+
+## Example
 
 ```text
 @user
@@ -13,19 +35,30 @@ Hi! Who are you?
 Hello, I'm an AI, based on a large language model.
 ```
 
-## File Structure
+## Specification
 
-The Simple Text Format is a text file containing a sequence of lines.
+### Encoding
 
-- While the encoding of the file is not specified, UTF-8 is recommended.
-- Either `\r\n` or `\n` can be used as a line separator. `\n` is strongly recommended.
+An STF file is a text file, written and read (mostly) line-by-line.
 
-Interpretation of the Simple Text Format is done line-by-line.
+- An STF file shall use UTF-8 encoding, with `\n` as line separators.
+- An STF file may end with an empty line, which will be ignored.
 
-- If a line is not prefixed with `@`, then it's a *data* line.
-- If a line is prefixed with `@`, then it's a *command* line.
-  - There may be blanks (`[ \t]*`) between `@` and others.
-- If a line is prefixed with `@@`, then it's a data line, but initial `@@` should be interpreted as a single `@`.
+### Line Types
+
+- If a line is not prefixed with `@`, then it's a **data line**.
+- If a line is prefixed with `@`, then it's a **command line**.
+  - There may be blanks (`[ \t]*`) between the prefix `@` and the rest.
+- If a line is prefixed with `@@`, then it's a **data line**, where the initial `@@` is interpreted as a single `@`.
+
+
+### Comment
+
+### Command
+
+--------
+
+TODO: Improve spec text.
 
 ## Comment
 
