@@ -134,4 +134,4 @@ dist
 v8-compile-cache*/
 node-compile-cache/
 
-example/history.txt
+/history.txt
