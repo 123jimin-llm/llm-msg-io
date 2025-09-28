@@ -1,23 +1,22 @@
 export * from "./message/index.js";
 export * from "./file-codec/index.js";
 
-import { type MessageArrayLike, asDeserializedData, asMessageArray } from "./message/index.js";
+import type { MessageArrayLike, CodecSerializer, CodecDeserializer, WithCreateSerializer, WithCreateDeserializer } from "./message/index.js";
+import { asDeserializedData, asMessageArray } from "./message/index.js";
 
-import type { FileCodecDeserializer, FileCodecSerializer, WithCreateDeserializer, WithCreateSerializer } from "./file-codec/type.js";
-
-export function serialize<SerializeOptions=object, MetadataType=unknown>(
-    codec: FileCodecSerializer<SerializeOptions, MetadataType> | WithCreateSerializer<SerializeOptions, MetadataType>,
+export function serialize<SerializedType=string, SerializeOptions=object, MetadataType=unknown>(
+    codec: CodecSerializer<SerializedType, SerializeOptions, MetadataType> | WithCreateSerializer<SerializedType, SerializeOptions, MetadataType>,
     messages: MessageArrayLike,
     metadata?: MetadataType,
     options?: Partial<SerializeOptions>,
-): string {
+): SerializedType {
     const serializer = typeof codec === "function" ? codec(options) : codec.createSerializer(options);
     return serializer(asMessageArray(messages), metadata);
 }
 
-export function deserialize<DeserializeOptions=object>(
-    codec: FileCodecDeserializer<DeserializeOptions> | WithCreateDeserializer<DeserializeOptions>,
-    source: string,
+export function deserialize<SerializedType=string, DeserializeOptions=object>(
+    codec: CodecDeserializer<SerializedType, DeserializeOptions> | WithCreateDeserializer<SerializedType, DeserializeOptions>,
+    source: SerializedType,
     options?: Partial<DeserializeOptions>,
 ) {
     const deserializer = typeof codec === "function" ? codec(options) : codec.createDeserializer(options);

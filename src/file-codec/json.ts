@@ -1,8 +1,8 @@
 /// JSON support
 
-import type { FileCodec } from "./type.js";
+import type { Codec } from "../message/codec.js";
 
-export const codec: FileCodec = {
+export const codec: Codec<unknown> = {
     createSerializer() {
         return (messages, metadata) => {
             if(metadata === (void 0)) {
@@ -16,7 +16,7 @@ export const codec: FileCodec = {
         };
     },
     createDeserializer() {
-        return (source: unknown) => {
+        return (source) => {
             return (typeof source === 'string' ? JSON.parse(source) : source) as unknown;
         };
     },
