@@ -6,7 +6,7 @@ import * as readline from "node:readline/promises";
 import { stdin, stdout } from "node:process";
 import * as fs from "node:fs/promises";
 
-import { serialize, deserialize, JSONCodec } from "../dist/index.js";
+import { serialize, deserialize, OpenAIChatInputCodec, NDJSONCodec } from "../dist/index.js";
 import { OpenAI } from "openai";
 
 const HISTORY_PATH = "history.txt";
@@ -15,7 +15,7 @@ const openai = new OpenAI();
 async function loadHistory() {
     try {
         const data = await fs.readFile(HISTORY_PATH, 'utf-8');
-        return deserialize(JSONCodec, data).messages;
+        return deserialize({msg: OpenAIChatInputCodec, file: NDJSONCodec}, data).messages;
     } catch(err) {
         if((/** @type{{code?: unknown}} */ (err)).code === 'ENOENT') {
             return [{role: "system", content: "You are a helpful assistant."}];
@@ -25,11 +25,8 @@ async function loadHistory() {
     }
 }
 
-/**
- * @param {MessageArrayLike} messages 
- */
 async function saveHistory(messages) {
-    await fs.writeFile(HISTORY_PATH, serialize(JSONCodec, messages));
+    await fs.writeFile(HISTORY_PATH, serialize({msg: OpenAIChatInputCodec, file: NDJSONCodec}, messages));
 }
 
 async function main() {
