@@ -10,7 +10,7 @@ const ContentPartFileBase = type({
     "file_id?": 'string',
     "name?": 'string',
     "url?": 'string',
-    "data?": 'ArrayBuffer',
+    "data?": 'string|ArrayBuffer',
 });
 
 export const ContentPartImage = ContentPartFileBase.and({
@@ -19,6 +19,7 @@ export const ContentPartImage = ContentPartFileBase.and({
 
 export const ContentPartAudio = ContentPartFileBase.and({
     type: '"audio"',
+    format: 'string',
 });
 
 export const ContentPartFile = ContentPartFileBase.and({

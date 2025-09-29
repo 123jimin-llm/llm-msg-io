@@ -1,3 +1,3 @@
 // Supports for each file format.
 
-export { codec as JSONCodec } from "./json.js";
+export * from "./json.js";
