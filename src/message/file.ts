@@ -1,1 +1,4 @@
-import { Message } from "./codec.js";
+// TODO
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { Message } from "./schema.js";
