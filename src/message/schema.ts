@@ -39,3 +39,38 @@ export const Message = type({
 });
 
 export type Message = typeof Message.infer;
+
+export function validateMessage(value: unknown): Message {
+    const res = Message(value);
+    if(res instanceof type.errors) {
+        throw res;
+    }
+
+    return res;
+}
+
+export function validateMessageArray(value: unknown): Message[] {
+    if(!Array.isArray(value)) throw new Error(`Value of type ${typeof value} is not an array!`);
+    return value.map((v) => validateMessage(v));
+}
+
+/** Objects that can be converted to an array of messages. */
+export type MessageArrayLike = Message | Array<Message>;
+
+/**
+ * Returns whether the given object is an array of messages.
+ * @param obj The object to check.
+ * @returns Whether `obj` is an array of messages.
+ */
+export function isMessageArray(obj: MessageArrayLike): obj is Array<Message> {
+    return Array.isArray(obj);
+}
+
+/**
+ * Converts the given object to an array of messages.
+ * @param obj Either a message or an array of messages.
+ * @returns Either `obj` or `[obj]`, depending on whether `obj` is an array of messages.
+ */
+export function asMessageArray(obj: MessageArrayLike): Array<Message> {
+    return isMessageArray(obj) ? obj : [obj];
+}

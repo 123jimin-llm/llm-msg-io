@@ -1,7 +1,4 @@
-
-import { type } from 'arktype';
-
-import { Message } from "./schema.js";
+import { type Message, validateMessage, validateMessageArray } from "./schema.js";
 
 export type DeserializedData<MetadataType=unknown> = {metadata?: MetadataType, messages: Message[]};
 
@@ -9,55 +6,20 @@ export type MessageSerializer<SerializedType=string, MetadataType=unknown> = (me
 export type MessageDeserializer<SerializedType=string, MetadataType=unknown> = (serialized: SerializedType) => DeserializedData<MetadataType>;
 export type RawMessageDeserializer<SerializedType=string> = (serialized: SerializedType) => unknown;
 
-export type CodecSerializer<SerializedType=string, SerializeOptions=object, MetadataType=unknown> = (options?: Partial<SerializeOptions>) => MessageSerializer<SerializedType, MetadataType>;
-export type CodecDeserializer<SerializedType=string, DeserializeOptions=object> = (options?: Partial<DeserializeOptions>) => RawMessageDeserializer<SerializedType>;
+export type CodecSerializer<SerializedType=string, SerializeOptions extends object=object, MetadataType=unknown> = (options?: Partial<SerializeOptions>) => MessageSerializer<SerializedType, MetadataType>;
+export type CodecDeserializer<SerializedType=string, DeserializeOptions extends object=object> = (options?: Partial<DeserializeOptions>) => RawMessageDeserializer<SerializedType>;
 
-export interface WithCreateSerializer<SerializedType=string, SerializeOptions=object, MetadataType=unknown> {
+export interface WithCreateSerializer<SerializedType=string, SerializeOptions extends object=object, MetadataType=unknown> {
     createSerializer: CodecSerializer<SerializedType, SerializeOptions, MetadataType>;
 };
 
-export interface WithCreateDeserializer<SerializedType=string, DeserializeOptions=object> {
+export interface WithCreateDeserializer<SerializedType=string, DeserializeOptions extends object=object> {
     createDeserializer: CodecDeserializer<SerializedType, DeserializeOptions>;
 };
 
-export type Codec<SerializedType=string, SerializeOptions=object, DeserializeOptions=object, MetadataType=unknown>
+export type Codec<SerializedType=string, SerializeOptions extends object=object, DeserializeOptions extends object=object, MetadataType=unknown>
     = WithCreateSerializer<SerializedType, SerializeOptions, MetadataType>
     & WithCreateDeserializer<SerializedType, DeserializeOptions>;
-
-export function validateMessage(value: unknown): Message {
-    const res = Message(value);
-    if(res instanceof type.errors) {
-        throw res;
-    }
-
-    return res;
-}
-
-export function validateMessageArray(value: unknown): Message[] {
-    if(!Array.isArray(value)) throw new Error(`Value of type ${typeof value} is not an array!`);
-    return value.map((v) => validateMessage(v));
-}
-
-/** Objects that can be converted to an array of messages. */
-export type MessageArrayLike = Message | Array<Message>;
-
-/**
- * Returns whether the given object is an array of messages.
- * @param obj The object to check.
- * @returns Whether `obj` is an array of messages.
- */
-export function isMessageArray(obj: MessageArrayLike): obj is Array<Message> {
-    return Array.isArray(obj);
-}
-
-/**
- * Converts the given object to an array of messages.
- * @param obj Either a message or an array of messages.
- * @returns Either `obj` or `[obj]`, depending on whether `obj` is an array of messages.
- */
-export function asMessageArray(obj: MessageArrayLike): Array<Message> {
-    return isMessageArray(obj) ? obj : [obj];
-}
 
 export function asDeserializedData(obj: unknown): DeserializedData<unknown> {
     if(obj == null) {
@@ -91,5 +53,37 @@ export function asDeserializedData(obj: unknown): DeserializedData<unknown> {
 
     return {
         messages: [validateMessage(obj)],
+    };
+}
+
+export type CodecSerializerLike<SerializedType=string, SerializeOptions extends object=object, MetadataType=unknown> = CodecSerializer<SerializedType, SerializeOptions, MetadataType> | WithCreateSerializer<SerializedType, SerializeOptions, MetadataType>;
+export type CodecDeserializerLike<SerializedType=string, DeserializeOptions extends object=object> = CodecDeserializer<SerializedType, DeserializeOptions> | WithCreateDeserializer<SerializedType, DeserializeOptions>;
+
+export function createSerializer<SerializedType=string, SerializeOptions extends object=object, MetadataType=unknown>(
+    codec: CodecSerializerLike<SerializedType, SerializeOptions, MetadataType>,
+    options?: SerializeOptions,
+): MessageSerializer<SerializedType, MetadataType> {
+    return (typeof codec === 'function' ? codec : codec.createSerializer)(options);
+}
+
+export function createRawDeserializer<SerializedType=string, DeserializeOptions extends object=object>(
+    codec: CodecDeserializerLike<SerializedType, DeserializeOptions>,
+    options?: DeserializeOptions,
+): RawMessageDeserializer<SerializedType> {
+    return (typeof codec === 'function' ? codec : codec.createDeserializer)(options);
+}
+
+export function compose<FromType, FromOptions extends object, ToType, ToOptions extends object, MetadataType=unknown>(
+    from_codec: CodecDeserializerLike<FromType, FromOptions>,
+    to_codec: CodecSerializerLike<ToType, ToOptions, MetadataType>,
+    from_options?: FromOptions,
+    to_options?: ToOptions,
+) {
+    return (from_data: FromType, metadata?: MetadataType) => {
+        const deserialized_data = asDeserializedData(createRawDeserializer(from_codec, from_options)(from_data));
+        return {
+            value: createSerializer(to_codec, to_options)(deserialized_data.messages, metadata),
+            metadata: deserialized_data.metadata,
+        };
     };
 }

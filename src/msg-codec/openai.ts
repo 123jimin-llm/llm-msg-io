@@ -1,0 +1,1 @@
+import type { Codec } from "../message/codec.js";
