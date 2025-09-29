@@ -3,6 +3,7 @@
         "arktype",
         "dotenv",
         "eslintcache",
+        "genai",
         "Jimin",
         "jiminp",
         "jscoverage",
