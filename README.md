@@ -38,7 +38,7 @@ console.log(deserialized);
 
 ### File Types
 
-- JSON
+- [JSON, NDJSON](./doc/json.md)
 - TOML
 - [Simple Text Format](./doc/simple.md)
 
