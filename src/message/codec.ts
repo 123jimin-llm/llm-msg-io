@@ -73,6 +73,20 @@ export function createRawDeserializer<SerializedType=string, DeserializeOptions 
     return (typeof codec === 'function' ? codec : codec.createDeserializer)(options);
 }
 
+export function createDeserializer<SerializedType=string, DeserializeOptions extends object=object, MetadataType=unknown>(
+    codec: CodecDeserializerLike<SerializedType, DeserializeOptions>,
+    options?: DeserializeOptions,
+    validateMetadata?: (metadata: unknown) => MetadataType,
+): MessageDeserializer<SerializedType, MetadataType> {
+    return (serialized: SerializedType) => {
+        const {messages, metadata} = asDeserializedData(createRawDeserializer(codec, options)(serialized));
+        return {
+            metadata: validateMetadata ? validateMetadata(metadata) : (validateMetadata as MetadataType),
+            messages,
+        };
+    };
+}
+
 export function compose<FromType, FromOptions extends object, ToType, ToOptions extends object, MetadataType=unknown>(
     from_codec: CodecDeserializerLike<FromType, FromOptions>,
     to_codec: CodecSerializerLike<ToType, ToOptions, MetadataType>,
