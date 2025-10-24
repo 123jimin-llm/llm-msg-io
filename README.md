@@ -33,14 +33,14 @@ console.log(deserialized);
 
 ### Message Types
 
-- OpenAI Chat Request Message
-- OpenAI Chat Response Message
+- [ ] OpenAI Chat Request Message
+- [ ] OpenAI Chat Response Message
 
 ### File Types
 
-- [JSON, NDJSON](./doc/json.md)
-- TOML
-- [Simple Text Format](./doc/simple.md)
+- [ ] [JSON, NDJSON](./doc/json.md)
+- [ ] TOML
+- [ ] [Simple Text Format](./doc/simple.md)
 
 ## Development
 
