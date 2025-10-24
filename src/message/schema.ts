@@ -1,9 +1,10 @@
 import { type } from 'arktype';
+import { exportType } from '../util/type.js';
 
-export const ContentPartText = type({
+export const ContentPartText = exportType(type({
     type: '"text"',
     text: 'string',
-});
+}));
 
 const ContentPartFileBase = type({
     type: 'string',
@@ -13,31 +14,32 @@ const ContentPartFileBase = type({
     "data?": 'string|ArrayBuffer',
 });
 
-export const ContentPartImage = ContentPartFileBase.and({
+export const ContentPartImage = exportType(ContentPartFileBase.and({
     type: '"image"',
-});
+}));
 
-export const ContentPartAudio = ContentPartFileBase.and({
+export const ContentPartAudio = exportType(ContentPartFileBase.and({
     type: '"audio"',
     format: 'string',
-});
+}));
 
-export const ContentPartFile = ContentPartFileBase.and({
+export const ContentPartFile = exportType(ContentPartFileBase.and({
     type: '"file"',
-});
+}));
 
-export const ContentPart = ContentPartText
+export const ContentPart = exportType(ContentPartText
     .or(ContentPartImage)
     .or(ContentPartAudio)
-    .or(ContentPartFile);
+    .or(ContentPartFile)
+);
 
 export type ContentPart = typeof ContentPart.infer;
 
-export const Message = type({
+export const Message = exportType(type({
     "id?": 'string',
     role: 'string',
     content: type("string").or(ContentPart.array()),
-});
+}));
 
 export type Message = typeof Message.infer;
 
