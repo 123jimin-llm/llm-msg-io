@@ -1,42 +1,42 @@
 import { type Message, validateMessage, validateMessageArray } from "./schema.js";
 
-/** Deserialized list of messages with metadata. */
-export type DeserializedData<MetadataType=unknown> = {metadata?: MetadataType, messages: Message[]};
+/** Decoded list of messages with metadata. */
+export type DecodedData<MetadataType=unknown> = {metadata?: MetadataType, messages: Message[]};
 
-/** Serialize a list of messages together with arbitrary metadata. */
-export type MessageSerializer<SerializedType=string, MetadataType=unknown> = (messages: Message[], metadata?: MetadataType) => SerializedType;
+/** Encode a list of messages together with arbitrary metadata. */
+export type MessageEncoder<EncodedType=string, MetadataType=unknown> = (messages: Message[], metadata?: MetadataType) => EncodedType;
 
-/** Deserialize serialized data into a list of messages together with metadata. */
-export type MessageDeserializer<SerializedType=string, MetadataType=unknown> = (serialized: SerializedType) => DeserializedData<MetadataType>;
+/** Decode encoded data into a list of messages together with metadata. */
+export type MessageDecoder<EncodedType=string, MetadataType=unknown> = (encoded: EncodedType) => DecodedData<MetadataType>;
 
-/** Deserialize serialized data without validation. */
-export type RawMessageDeserializer<SerializedType=string> = (serialized: SerializedType) => unknown;
+/** Decode encoded data without validation. */
+export type RawMessageDecoder<EncodedType=string> = (encoded: EncodedType) => unknown;
 
-/** A function that returns a serializer. */
-export type CodecSerializer<SerializedType=string, SerializeOptions extends object=object, MetadataType=unknown> = (options?: Partial<SerializeOptions>) => MessageSerializer<SerializedType, MetadataType>;
+/** A function that returns an encoder. */
+export type CodecEncoder<EncodedType=string, EncodeOptions extends object=object, MetadataType=unknown> = (options?: Partial<EncodeOptions>) => MessageEncoder<EncodedType, MetadataType>;
 
-/** A function that returns a deserializer. */
-export type CodecDeserializer<SerializedType=string, DeserializeOptions extends object=object> = (options?: Partial<DeserializeOptions>) => RawMessageDeserializer<SerializedType>;
+/** A function that returns a decoder. */
+export type CodecDecoder<EncodedType=string, DecodeOptions extends object=object> = (options?: Partial<DecodeOptions>) => RawMessageDecoder<EncodedType>;
 
-/** An object that provides serializer. */
-export interface WithCreateSerializer<SerializedType=string, SerializeOptions extends object=object, MetadataType=unknown> {
-    createSerializer: CodecSerializer<SerializedType, SerializeOptions, MetadataType>;
+/** An object that provides an encoder. */
+export interface WithCreateEncoder<EncodedType=string, EncodeOptions extends object=object, MetadataType=unknown> {
+    createEncoder: CodecEncoder<EncodedType, EncodeOptions, MetadataType>;
 };
 
-/** An object that provides deserializer. */
-export interface WithCreateDeserializer<SerializedType=string, DeserializeOptions extends object=object> {
-    createDeserializer: CodecDeserializer<SerializedType, DeserializeOptions>;
+/** An object that provides a decoder. */
+export interface WithCreateDecoder<EncodedType=string, DecodeOptions extends object=object> {
+    createDecoder: CodecDecoder<EncodedType, DecodeOptions>;
 };
 
-/** An object that provides both serializer and deserializer. */
-export type Codec<SerializedType=string, SerializeOptions extends object=object, DeserializeOptions extends object=object, MetadataType=unknown>
-    = WithCreateSerializer<SerializedType, SerializeOptions, MetadataType>
-    & WithCreateDeserializer<SerializedType, DeserializeOptions>;
+/** An object that provides both an encoder and a decoder. */
+export type Codec<EncodedType=string, EncodeOptions extends object=object, DecodeOptions extends object=object, MetadataType=unknown>
+    = WithCreateEncoder<EncodedType, EncodeOptions, MetadataType>
+    & WithCreateDecoder<EncodedType, DecodeOptions>;
 
 /** Checks whether a given object is a list of messages, or an object with message and metadata. */
-export function asDeserializedData(obj: unknown): DeserializedData<unknown> {
+export function asDecodedData(obj: unknown): DecodedData<unknown> {
     if(obj == null) {
-        throw new TypeError("`asDeserializedData` expected an object or an array of messages.");
+        throw new TypeError("`asDecodedData` expected an object or an array of messages.");
     }
 
     if(Array.isArray(obj)) {
@@ -46,7 +46,7 @@ export function asDeserializedData(obj: unknown): DeserializedData<unknown> {
     }
 
     if(typeof obj !== 'object') {
-        throw new TypeError("`asDeserializedData` expected an object or an array of messages.");
+        throw new TypeError("`asDecodedData` expected an object or an array of messages.");
     }
 
     if('messages' in obj) {
@@ -69,36 +69,36 @@ export function asDeserializedData(obj: unknown): DeserializedData<unknown> {
     };
 }
 
-/** Either a function that returns a serializer, or a codec with createSerializer. */
-export type CodecSerializerLike<SerializedType=string, SerializeOptions extends object=object, MetadataType=unknown> = CodecSerializer<SerializedType, SerializeOptions, MetadataType> | WithCreateSerializer<SerializedType, SerializeOptions, MetadataType>;
+/** Either a function that returns an encoder, or a codec with createEncoder. */
+export type CodecEncoderLike<EncodedType=string, EncodeOptions extends object=object, MetadataType=unknown> = CodecEncoder<EncodedType, EncodeOptions, MetadataType> | WithCreateEncoder<EncodedType, EncodeOptions, MetadataType>;
 
-/** Either a function that returns a deserializer, or a codec with createDeserializer. */
-export type CodecDeserializerLike<SerializedType=string, DeserializeOptions extends object=object> = CodecDeserializer<SerializedType, DeserializeOptions> | WithCreateDeserializer<SerializedType, DeserializeOptions>;
+/** Either a function that returns a decoder, or a codec with createDecoder. */
+export type CodecDecoderLike<EncodedType=string, DecodeOptions extends object=object> = CodecDecoder<EncodedType, DecodeOptions> | WithCreateDecoder<EncodedType, DecodeOptions>;
 
-/** Invokes the function that returns a serializer. */
-export function createSerializer<SerializedType=string, SerializeOptions extends object=object, MetadataType=unknown>(
-    codec: CodecSerializerLike<SerializedType, SerializeOptions, MetadataType>,
-    options?: SerializeOptions,
-): MessageSerializer<SerializedType, MetadataType> {
-    return (typeof codec === 'function' ? codec : codec.createSerializer)(options);
+/** Invokes the function that returns an encoder. */
+export function createEncoder<EncodedType=string, EncodeOptions extends object=object, MetadataType=unknown>(
+    codec: CodecEncoderLike<EncodedType, EncodeOptions, MetadataType>,
+    options?: EncodeOptions,
+): MessageEncoder<EncodedType, MetadataType> {
+    return (typeof codec === 'function' ? codec : codec.createEncoder)(options);
 }
 
 /** Invokes the function that returns a raw deserializer. */
-export function createRawDeserializer<SerializedType=string, DeserializeOptions extends object=object>(
-    codec: CodecDeserializerLike<SerializedType, DeserializeOptions>,
-    options?: DeserializeOptions,
-): RawMessageDeserializer<SerializedType> {
-    return (typeof codec === 'function' ? codec : codec.createDeserializer)(options);
+export function createRawDecoder<EncodedType=string, DecodeOptions extends object=object>(
+    codec: CodecDecoderLike<EncodedType, DecodeOptions>,
+    options?: DecodeOptions,
+): RawMessageDecoder<EncodedType> {
+    return (typeof codec === 'function' ? codec : codec.createDecoder)(options);
 }
 
-/** Invokes the function that returns a deserializer. */
-export function createDeserializer<SerializedType=string, DeserializeOptions extends object=object, MetadataType=unknown>(
-    codec: CodecDeserializerLike<SerializedType, DeserializeOptions>,
-    options?: DeserializeOptions,
+/** Invokes the function that returns a decoder. */
+export function createDecoder<EncodedType=string, DecodeOptions extends object=object, MetadataType=unknown>(
+    codec: CodecDecoderLike<EncodedType, DecodeOptions>,
+    options?: DecodeOptions,
     validateMetadata?: (metadata: unknown) => MetadataType,
-): MessageDeserializer<SerializedType, MetadataType> {
-    return (serialized: SerializedType) => {
-        const {messages, metadata} = asDeserializedData(createRawDeserializer(codec, options)(serialized));
+): MessageDecoder<EncodedType, MetadataType> {
+    return (encoded: EncodedType) => {
+        const {messages, metadata} = asDecodedData(createRawDecoder(codec, options)(encoded));
         return {
             metadata: validateMetadata ? validateMetadata(metadata) : (validateMetadata as MetadataType),
             messages,
