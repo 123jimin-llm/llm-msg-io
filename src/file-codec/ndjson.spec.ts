@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
 import { NDJSONCodec } from "./ndjson.js";
-import { type Message, asDeserializedData } from "../index.js";
+import { type Message, asDecodedData } from "../index.js";
 
 const messages: Message[] = [
     {
@@ -15,37 +15,37 @@ const messages: Message[] = [
 ];
 
 describe("NDJSONCodec", function() {
-    describe("createSerializer()", function() {
-        it("serializes a message array into NDJSON text", function() {
-            const result = NDJSONCodec.createSerializer()(messages);
+    describe("createEncoder()", function() {
+        it("encodes a message array into NDJSON text", function() {
+            const result = NDJSONCodec.createEncoder()(messages);
             const expected = messages.map((message) => JSON.stringify(message)).join("\n");
 
             assert.strictEqual(result, expected);
         });
 
-        it("serializes metadata on the first line when provided", function() {
+        it("encodes metadata on the first line when provided", function() {
             const metadata = {foo: "bar"};
-            const result = NDJSONCodec.createSerializer()(messages, metadata);
+            const result = NDJSONCodec.createEncoder()(messages, metadata);
             const expected = [JSON.stringify({metadata}), ...messages.map((message) => JSON.stringify(message))];
 
             assert.strictEqual(result, expected.join("\n"));
         });
     });
 
-    describe("createDeserializer()", function() {
-        it("deserializes NDJSON text into messages", function() {
+    describe("createDecoder()", function() {
+        it("decodes NDJSON text into messages", function() {
             const serialized = messages.map((message) => JSON.stringify(message)).join("\n");
-            const {messages: result, metadata} = asDeserializedData(NDJSONCodec.createDeserializer()(serialized));
+            const {messages: result, metadata} = asDecodedData(NDJSONCodec.createDecoder()(serialized));
 
             assert.isUndefined(metadata);
             assert.deepStrictEqual(result, messages);
         });
 
-        it("deserializes NDJSON text with metadata", function() {
+        it("decodes NDJSON text with metadata", function() {
             const metadata = {foo: "bar"};
             const lines = [JSON.stringify({metadata}), ...messages.map((message) => JSON.stringify(message))];
             const serialized = lines.join("\n");
-            const {messages: result, metadata: result_metadata} = asDeserializedData(NDJSONCodec.createDeserializer()(serialized));
+            const {messages: result, metadata: result_metadata} = asDecodedData(NDJSONCodec.createDecoder()(serialized));
 
             assert.deepStrictEqual(result, messages);
             assert.deepStrictEqual(result_metadata, metadata);
@@ -53,7 +53,7 @@ describe("NDJSONCodec", function() {
 
         it("ignores empty lines", function() {
             const serialized = `\n${JSON.stringify(messages[0])}\n\n${JSON.stringify(messages[1])}\n`;
-            const {messages: result, metadata} = asDeserializedData(NDJSONCodec.createDeserializer()(serialized));
+            const {messages: result, metadata} = asDecodedData(NDJSONCodec.createDecoder()(serialized));
 
             assert.isUndefined(metadata);
             assert.deepStrictEqual(result, messages);

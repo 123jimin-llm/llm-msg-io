@@ -1,6 +1,6 @@
 import { Codec, MessageArrayLike } from "../message/index.js";
 
 export const NullCodec = {
-    createSerializer: () => (messages) => messages,
-    createDeserializer: () => (messages) => messages,
+    createEncoder: () => (messages) => messages,
+    createDecoder: () => (messages) => messages,
 } satisfies Codec<MessageArrayLike>;

@@ -37,7 +37,7 @@ function fromChatCompletionContent(content: OpenAIChatInputMessage['content']|nu
 }
 
 export const OpenAIChatInputCodec = {
-    createSerializer: () => (messages) => {
+    createEncoder: () => (messages) => {
         return messages.map((message): OpenAIChatInputMessage => {
             return {
                 role: message.role as OpenAIChatInputMessage['role'],
@@ -45,7 +45,7 @@ export const OpenAIChatInputCodec = {
             } as OpenAIChatInputMessage;
         });
     },
-    createDeserializer: () => (api_messages) => {
+    createDecoder: () => (api_messages) => {
         return api_messages.map((api_message): Message => {
             return {
                 role: api_message.role,

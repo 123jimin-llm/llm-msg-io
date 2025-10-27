@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { JSONCodec } from "./json.js"
 
-import { type Message, asDeserializedData } from "../index.js";
+import { type Message, asDecodedData } from "../index.js";
 
 const messages: Message[] = [
     {
@@ -15,32 +15,32 @@ const messages: Message[] = [
 ];
 
 describe("JSONCodec", function() {
-    describe("createSerializer()", function() {
-        it("serializes a message array into JSON text", function() {
-            const result = JSONCodec.createSerializer()(messages);
+    describe("createEncoder()", function() {
+        it("encodes a message array into JSON text", function() {
+            const result = JSONCodec.createEncoder()(messages);
             assert.deepStrictEqual(JSON.parse(result), messages);
         });
 
-        it("serializes metadata when provided", function() {
+        it("encodes metadata when provided", function() {
             const metadata = {foo: "bar"};
-            const result = JSONCodec.createSerializer()(messages, metadata);
+            const result = JSONCodec.createEncoder()(messages, metadata);
             assert.deepStrictEqual(JSON.parse(result), {metadata, messages});
         });
     });
     
-    describe("createDeserializer()", function() {
-        it("deserializes JSON text into messages", function() {
+    describe("createDecoder()", function() {
+        it("decodes JSON text into messages", function() {
             const serialized = JSON.stringify(messages);
-            const {messages: result, metadata} = asDeserializedData(JSONCodec.createDeserializer()(serialized));
+            const {messages: result, metadata} = asDecodedData(JSONCodec.createDecoder()(serialized));
 
             assert.isUndefined(metadata);
             assert.deepStrictEqual(result, messages);
         });
         
-        it("deserializes JSON text with metadata", function() {
+        it("decodes JSON text with metadata", function() {
             const metadata = {foo: "bar"};
             const serialized = JSON.stringify({metadata, messages});
-            const {messages: result, metadata: result_metadata} = asDeserializedData(JSONCodec.createDeserializer()(serialized));
+            const {messages: result, metadata: result_metadata} = asDecodedData(JSONCodec.createDecoder()(serialized));
 
             assert.deepStrictEqual(result, messages);
             assert.deepStrictEqual(result_metadata, metadata);

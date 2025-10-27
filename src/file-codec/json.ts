@@ -3,7 +3,7 @@
 import type { Codec } from "../message/codec.js";
 
 export const JSONCodec = {
-    createSerializer: () => (messages, metadata?) => {
+    createEncoder: () => (messages, metadata?) => {
         if(metadata === (void 0)) {
             return JSON.stringify(messages);
         }
@@ -13,7 +13,7 @@ export const JSONCodec = {
             messages,
         });
     },
-    createDeserializer: () => (source) => {
+    createDecoder: () => (source) => {
         return (typeof source === 'string' ? JSON.parse(source) : source) as unknown;
     },
 } satisfies Codec<unknown>;

@@ -11,7 +11,7 @@ function assertJsonObject(value: unknown): asserts value is JsonObject {
 }
 
 export const NDJSONCodec = {
-    createSerializer: () => (messages, metadata?) => {
+    createEncoder: () => (messages, metadata?) => {
         const lines: string[] = [];
 
         if(metadata) {
@@ -24,7 +24,7 @@ export const NDJSONCodec = {
 
         return lines.join("\n");
     },
-    createDeserializer: () => (source) => {
+    createDecoder: () => (source) => {
         if(typeof source !== 'string') {
             throw new TypeError("`NDJSONCodec` expected serialized data to be a string.");
         }
