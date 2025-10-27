@@ -1,7 +1,12 @@
-import { type Message, validateMessage, validateMessageArray } from "./schema.js";
+import { Message, MessageArray } from "./schema.js";
 
 /** Decoded list of messages with metadata. */
 export type DecodedData<MetadataType=unknown> = {metadata?: MetadataType, messages: Message[]};
+
+export type RawDecodedData<MetadataType=unknown> = Message[] | {
+    metadata?: MetadataType,
+    messages: Message[],
+};
 
 /** Encode a list of messages together with arbitrary metadata. */
 export type MessageEncoder<EncodedType=string, MetadataType=unknown> = (messages: Message[], metadata?: MetadataType) => EncodedType;
@@ -41,7 +46,7 @@ export function asDecodedData(obj: unknown): DecodedData<unknown> {
 
     if(Array.isArray(obj)) {
         return {
-            messages: validateMessageArray(obj),
+            messages: MessageArray.assert(obj),
         };
     }
 
@@ -50,7 +55,7 @@ export function asDecodedData(obj: unknown): DecodedData<unknown> {
     }
 
     if('messages' in obj) {
-        const messages = validateMessageArray(obj.messages);
+        const messages = MessageArray.assert(obj.messages);
 
         if('metadata' in obj) {
             return {
@@ -65,7 +70,7 @@ export function asDecodedData(obj: unknown): DecodedData<unknown> {
     }
 
     return {
-        messages: [validateMessage(obj)],
+        messages: [Message.assert(obj)],
     };
 }
 
