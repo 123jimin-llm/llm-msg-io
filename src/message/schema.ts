@@ -35,6 +35,14 @@ export const ContentPart = exportType(ContentPartText
 
 export type ContentPart = typeof ContentPart.infer;
 
+export function textToContentPart(text: string): ContentPart {
+    return {type: 'text', text};
+}
+
+export function textToContentPartArray(text: string): ContentPart[] {
+    return text ? [textToContentPart(text)] : [];
+}
+
 export const Message = exportType(type({
     "id?": 'string',
     role: 'string',
