@@ -8,6 +8,7 @@ export const ContentPartText = exportType(type({
 
 const ContentPartFileBase = type({
     type: 'string',
+    "format?": 'string',
     "file_id?": 'string',
     "name?": 'string',
     "url?": 'string',
@@ -20,7 +21,6 @@ export const ContentPartImage = exportType(ContentPartFileBase.and({
 
 export const ContentPartAudio = exportType(ContentPartFileBase.and({
     type: '"audio"',
-    format: 'string',
 }));
 
 export const ContentPartFile = exportType(ContentPartFileBase.and({
