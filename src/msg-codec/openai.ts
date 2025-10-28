@@ -1,4 +1,8 @@
-import { ChatCompletionMessageParam as OpenAIChatInputMessage, ChatCompletionContentPart } from "openai/resources/chat";
+import {
+    ChatCompletionMessageParam as OpenAIChatInputMessage,
+    ChatCompletionMessage as OpenAIChatOutputMessage,
+    ChatCompletionContentPart,
+} from "openai/resources/chat";
 
 import type { Codec, Message, ContentPart } from "../message/index.js";
 
@@ -55,7 +59,19 @@ export const OpenAIChatInputCodec = {
     },
 } satisfies Codec<OpenAIChatInputMessage[]>;
 
-export const OpenAIChatOutputCodec = {};
+export const OpenAIChatOutputCodec = {
+    createEncoder: () => () => {
+        throw new Error("Not yet implemented!");
+    },
+    createDecoder: () => (api_messages) => {
+        return api_messages.map((api_message): Message => {
+            return {
+                role: api_message.role,
+                content: fromChatCompletionContent(api_message.content),
+            };
+        });
+    },
+} satisfies Codec<OpenAIChatOutputMessage[]>;
 
 export const OpenAIResponsesInputCodec = {};
 
