@@ -4,7 +4,7 @@ import {
     ChatCompletionContentPart,
 } from "openai/resources/chat";
 
-import type { Codec, Message, ContentPart } from "../message/index.js";
+import type { Message, ContentPart, WithCreateEncoder, WithCreateDecoder } from "../message/index.js";
 
 function toChatCompletionContent(content: Message['content']|null|undefined): OpenAIChatInputMessage['content'] {
     if(content == null) return null;
@@ -49,20 +49,9 @@ export const OpenAIChatInputCodec = {
             } as OpenAIChatInputMessage;
         });
     },
-    createDecoder: () => (api_messages) => {
-        return api_messages.map((api_message): Message => {
-            return {
-                role: api_message.role,
-                content: fromChatCompletionContent(api_message.content),
-            };
-        });
-    },
-} satisfies Codec<OpenAIChatInputMessage[]>;
+} satisfies WithCreateEncoder<OpenAIChatInputMessage[]>;
 
 export const OpenAIChatOutputCodec = {
-    createEncoder: () => () => {
-        throw new Error("Not yet implemented!");
-    },
     createDecoder: () => (api_messages) => {
         return api_messages.map((api_message): Message => {
             return {
@@ -71,7 +60,7 @@ export const OpenAIChatOutputCodec = {
             };
         });
     },
-} satisfies Codec<OpenAIChatOutputMessage[]>;
+} satisfies WithCreateDecoder<OpenAIChatOutputMessage[]>;
 
 export const OpenAIResponsesInputCodec = {};
 
