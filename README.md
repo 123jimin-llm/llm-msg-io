@@ -1,11 +1,25 @@
 # llm-msg-io
 
-`llm-msg-io` is a small library for serializing and deserializing LLM messages, together with an optional metadata.
-
 > [!CAUTION]
 > This project is currently in active development.
 
+`llm-msg-io` is a small library for converting LLM messages to various formats.
+
 ## Features
+
+- Converting to/from various API message formats.
+- Converting to/from various serialization formats.
+- [STF](./doc/stf/README.md) format for simple text representation of LLM messages.
+
+### Supported API Message Types
+
+- `OpenAIChatInputCodec`: to OpenAI chat completion parameters
+- `OpenAIChatOutputCodec`: from OpenAI chat completion responses
+
+### Supported Serialization Types
+
+- `JSONCodec`: to/from [JSON](./doc/json.md)
+- `NDJSONCodec`: to/from [NDJSON](./doc/json.md)
 
 ## Installation
 
@@ -14,33 +28,35 @@
 ## Usage
 
 ```ts
-import { serialize, deserialize } from "@jiminp/llm-msg-io";
-import { JSONCodec } from "@jiminp/llm-msg-io";
-import type { Message } from "@jiminp/llm-msg-io";
+import {
+  // A generic type for storing messages in-memory.
+  type Message,
+
+  // Helper functions for creating encoder and decoder functions from a codec.
+  createEncoder, createDecoder,
+
+  // JSON format support.
+  JSONCodec
+} from "@jiminp/llm-msg-io";
 
 const messages: Message[] = [
   {role: 'user', content: "Hello!"},
   {role: 'assistant', content: "Hi! What's up?"},
 ];
 
-const serialized = serialize(JSONCodec, message);
-console.log(serialized);
+// Messages to JSON
+const encodeMessages = createEncoder(JSONCodec);
 
-const {messages: deserialized} = deserialize(JSONCodec, serialized);
-console.log(deserialized);
+// JSON to messages
+const decodeMessages = createDecoder(JSONCodec);
+
+const encoded = encodeMessages(messages);
+console.log(encoded);
+
+const {messages: decoded} = decodeMessages(messages);
+console.log(decoded);
 
 ```
-
-### Message Types
-
-- [ ] OpenAI Chat Request Message
-- [ ] OpenAI Chat Response Message
-
-### File Types
-
-- [ ] [JSON, NDJSON](./doc/json.md)
-- [ ] TOML
-- [ ] [Simple Text Format](./doc/stf/README.md)
 
 ## Development
 
