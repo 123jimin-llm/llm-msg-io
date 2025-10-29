@@ -40,7 +40,7 @@ console.log(deserialized);
 
 - [ ] [JSON, NDJSON](./doc/json.md)
 - [ ] TOML
-- [ ] [Simple Text Format](./doc/simple.md)
+- [ ] [Simple Text Format](./doc/stf/README.md)
 
 ## Development
 

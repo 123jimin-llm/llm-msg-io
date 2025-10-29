@@ -8,9 +8,11 @@
         "jiminp",
         "jscoverage",
         "Microbundle",
+        "niladic",
         "nodenext",
         "Nuxt",
         "pids",
+        "polyadic",
         "stylelintcache",
         "vuepress",
         "wscript"
