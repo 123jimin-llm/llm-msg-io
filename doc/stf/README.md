@@ -25,12 +25,14 @@ STF is expected to be used for the following scenarios:
 
 ### Non-Goals
 
-STF does not handle message validation, such as checking for valid role types.
-
-STF is **not** a template language by itself.
+STF is not a template language by itself.
 A template language, such as Jinja, may be used in conjunction with STF.
 
-Be aware that preventing accidental injection attack vulnerabilities is currently not a goal of STF.
+STF does not attempt to parse or translate special tokens (such as `<|start|>` or `<|end|>` a tokenizer may use).
+
+STF does not handle message validation, such as checking for valid role types.
+
+STF's design is not intended to be resistant to accidental injection attacks (like SQLi).
 
 ### Terminology
 
@@ -56,11 +58,24 @@ An STF file is a text file, written and read (mostly) line-by-line.
   - Some command lines specify comments, as described later.
 - If a line is prefixed with `;;`, then it's a **data line**, where the initial `;;` is interpreted as a single `;`.
 
+### Message State
+
+When an STF file is being read, it maintains a **message state**, which is either a nil or a message.
+
+When the message state is nil:
+
+- An empty data line, including data line with only blanks, will be ignored.
+- A non-empty data line, or a command line that expects a non-nil message, results in an error.
+
+When the message state is a message:
+
+- Data lines append a string value to the message's content, as specified below.
+
 ## Data Line
 
 A continuous chunk of data lines specify a string value, which is the concatenation of the lines with a single line feed `\n` between them.
 
-The last line's line feed shall be removed. To specify a string value with a trailing line feed, the last line should be followed by an empty line.
+The last line's line feed will be ignored. To specify a string value with a trailing line feed, the last line should be followed by an empty line.
 
 ## Comments
 
@@ -98,6 +113,8 @@ A command line consists of three part: the **header** `;`, the **name**, and the
 
 Blanks may present between the header and the name.
 
+For a complete list of commands, [see this document](./command.md).
+
 ### Command Name
 
 The command name is identified by its name `[a-z][a-z0-9]*` following the header.
@@ -106,7 +123,8 @@ The command name is identified by its name `[a-z][a-z0-9]*` following the header
 
 There are two ways to supply arguments to a command.
 
-Note that some special commands (such as `end`) may receive a different form of arguments.
+> [!NOTE]
+> Some special commands, such as `end`, may use a different way of providing arguments.
 
 #### by `key=value`
 
@@ -131,49 +149,3 @@ It must stay on a single line, and the top-level object must be an object litera
 ```
 ;msg {role:'user', name:"John Doe"}
 ```
-
-### Classification
-
-Commands can be classified into different modes based on how they consume following data lines.
-
-- `niladic`: The command does not consume any data line.
-- `monadic`: The command consumes a single data line as its argument.
-- `polyadic`: The command consumes multiple data lines as its argument.
-
-For a polyadic command, a special command line with name `end` is used to mark the end of the argument.
-
-Moreover, the command can be classified into different modes based on how it modifies the current message.
-
-- `start`: The command starts a new message.
-- `modify`: The command modifies the current message.
-- `other`: The command does not directly modify a message.
-
-
-
---------
-
-(old guide)
-
-### List
-
-Here are every commands currently supported:
-
-| Name | Mode | Description | Alias |
-|------|------|-------------|-------|
-| `message` | message | Starts a new message. | `msg` |
-| `user` | message | Starts a new message with role `user`. | |
-| `assistant` | message | Starts a new message with role `assistant`. | `ai` |
-| `system` | message | Starts a new message with role `system`. | `sys` |
-| `developer` | message | Starts a new message with role `developer`. | `dev` |
-| `tool` | message | Starts a new message with role `tool`. | |
-| `raw` | message, block | Includes a raw message. | |
-| `call` | line | Invokes a tool. | |
-| `embed` | line | Embeds a resource. | |
-
-## `message` command
-
-## `raw` command
-
-## `call` command
-
-## `embed` command
