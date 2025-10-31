@@ -1,4 +1,4 @@
-# JSON serialization
+# JSON Serialization
 
 The JSON codec emits a single JSON value that contains every message and an optional metadata object.
 
@@ -15,3 +15,7 @@ Either format can be used for deserialization.
 
 For deserialization, each line (after trimming) must either be empty, or a JSON object.
 If the first value contains the unique key `metadata`, it will be treated as metadata. Otherwise, it will be treated as a message.
+
+## TOML
+
+The TOML codec uses the exact same structure, but output is always an object `{metadata: ..., messages: [...]}`.

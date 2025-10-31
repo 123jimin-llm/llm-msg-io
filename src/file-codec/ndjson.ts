@@ -1,6 +1,6 @@
 /// ND-JSON format
 
-import { Codec } from "../message/codec.js";
+import type { Codec } from "../message/codec.js";
 
 type JsonObject = Record<string, unknown>;
 

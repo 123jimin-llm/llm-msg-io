@@ -11,6 +11,9 @@
 - Converting to/from various serialization formats.
 - [STF](./doc/stf/README.md) format for simple text representation of LLM messages.
 
+> [!WARNING]
+> This library does not perform any validations, which must be done by the user.
+
 ### Supported API Message Types
 
 - `OpenAIChatInputCodec`: to OpenAI chat completion parameters
@@ -20,6 +23,7 @@
 
 - `JSONCodec`: to/from [JSON](./doc/json.md)
 - `NDJSONCodec`: to/from [NDJSON](./doc/json.md)
+- `TOMLCodec`: to/from TOML, using the same format as `JSONCodec` does.
 
 ## Installation
 

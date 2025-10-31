@@ -2,3 +2,5 @@
 
 export * from "./json.js";
 export * from "./ndjson.js";
+
+export * from "./toml.js";

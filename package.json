@@ -49,6 +49,7 @@
     "openai": "^5"
   },
   "dependencies": {
-    "arktype": "^2.1.22"
+    "arktype": "^2.1.22",
+    "smol-toml": "^1.4.2"
   }
 }
