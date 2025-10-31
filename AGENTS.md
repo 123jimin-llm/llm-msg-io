@@ -18,6 +18,12 @@
 - `/doc`: Documentation for the project.
   - `/doc/stf`: Specification for the STF format.
 - `/src`: Source code for the library.
+  - `/src/util`: Utilities.
+  - `/src/message`: Codec type definitions and message utilities.
+  - `/src/msg-codec`: Codecs for API message formats.
+  - `/src/file-codec`: Codecs for file formats.
 - `/example`: Example usage of `llm-msg-io`.
 
 ## Architecture
+
+## Testing
