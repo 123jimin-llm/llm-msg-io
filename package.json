@@ -50,6 +50,7 @@
   },
   "dependencies": {
     "arktype": "^2.1.22",
+    "json5": "^2.2.3",
     "smol-toml": "^1.4.2"
   }
 }
