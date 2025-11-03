@@ -1,23 +1,13 @@
-import type { Message, CodecDecoder } from "../../message/index.js";
-
-function finalizeMessageContent(message: Message|null, lines: string[]): void {
-    if(message) {
-        message.content = lines.join('\n');
-    }
-}
+import type { CodecDecoder } from "../../message/index.js";
+import { createDecodeState, finalizeDecodeState } from "./decode-state.js";
 
 export const createDecoder: CodecDecoder<string> = () => (source) => {
         if(typeof source !== 'string') {
             throw new TypeError("`STFCodec` expected serialized data to be a string.");
         }
 
-        const messages: Message[] = [];
-        let curr_message: Message|null = null;
-        let curr_lines: string[] = [];
-        let prev_role: string|null = null;
+        const state = createDecodeState();
         let comment_depth = 0;
-
-        const startMessage = (role_value?: unknown, line_no?: number) => {};
 
         const lines = source.split('\n');
         line_loop: for(let line_no = 0; line_no < lines.length; ++line_no) {
@@ -32,20 +22,23 @@ export const createDecoder: CodecDecoder<string> = () => (source) => {
 
             // STF data line
             if(data_line != null) {
+                state.curr_data_line_no = line_no;
+
                 if(comment_depth > 0) {
                     continue line_loop;
                 }
 
-                if(curr_message == null && !/^[ \t]*$/.test(data_line)) {
+                if(state.curr_message == null && !/^[ \t]*$/.test(data_line)) {
                     throw new SyntaxError(`Line ${line_no + 1}: Unexpected data line before a message.`);
                 }
 
-                curr_lines.push(data_line);
+                state.curr_lines.push(data_line);
                 continue line_loop;
             }
 
             // STF command line
             const command_line = raw_line.slice(1).trimStart();
+            state.curr_command_line_no = line_no;
 
             // line comments
             if(command_line.startsWith('#') || command_line.startsWith('//')) {
@@ -74,7 +67,9 @@ export const createDecoder: CodecDecoder<string> = () => (source) => {
             throw new SyntaxError(`Unterminated block comment.`);
         }
 
-        finalizeMessageContent(curr_message, curr_lines);
+        finalizeDecodeState(state);
 
-        return {messages};
+        return {
+            messages: state.messages,
+        };
 };

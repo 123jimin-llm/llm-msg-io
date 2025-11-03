@@ -2,7 +2,7 @@ import type { Codec } from "../../message/index.js";
 import { createDecoder } from "./decoder.js";
 
 export const STFCodec = {
-    createEncoder: () => (messages, metadata?) => {
+    createEncoder: () => () => {
         throw new Error("Not yet implemented!");
     },
     createDecoder,
