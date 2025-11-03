@@ -1,3 +1,5 @@
+import { startNewMessage, type DecodeState } from "./decode-state.js";
+
 export const CommandParamType = Object.freeze({
     NILADIC: 0,
     MONADIC: 1,
@@ -6,18 +8,32 @@ export const CommandParamType = Object.freeze({
 
 export type CommandParamType = typeof CommandParamType[keyof typeof CommandParamType];
 
-export const CommandMessageMode = Object.freeze({
-    OTHER: 0,
-    START: 1,
-    MODIFY: 2,
-} as const);
-
-export type CommandMessageMode = typeof CommandMessageMode[keyof typeof CommandMessageMode];
-
 export interface Command {
     param_type: CommandParamType;
-    message_mode: CommandMessageMode;
-
+    
     name: string;
     alias_list?: string[];
+
+    execute(state: DecodeState, args: Record<string, unknown>, param_lines: string[]): void;
 }
+
+export function createRoleCommand(name: string, alias_list?: string[]): Command {
+    return {
+        param_type: CommandParamType.NILADIC,
+
+        name,
+        alias_list,
+
+        execute(state: DecodeState) {
+            startNewMessage(state, {role: name});
+        },
+    };
+}
+
+export const COMMANDS: Command[] = [
+    createRoleCommand("system", ["sys"]),
+    createRoleCommand("developer", ["dev"]),
+    createRoleCommand("user"),
+    createRoleCommand("assistant", ["ai"]),
+    createRoleCommand("tool"),
+];
