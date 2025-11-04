@@ -1,5 +1,7 @@
 import { concatContentsTo, type Message } from "../../message/index.js";
 
+import type { Command } from "./command/index.js";
+
 export interface DecodeState {
     /** List of messages. */
     readonly messages: Message[];
@@ -13,6 +15,9 @@ export interface DecodeState {
     /** Line number of last seen data line. */
     curr_data_line_no: number;
 
+    /** Current command to feed arguments. */
+    invoked_command: Command|null;
+
     /** List of buffered data lines. */
     curr_lines: string[];
 }
@@ -25,6 +30,8 @@ export function createDecodeState(): DecodeState {
         
         curr_command_line_no: 0,
         curr_data_line_no: 0,
+
+        invoked_command: null,
 
         curr_lines: [],
     };
@@ -61,18 +68,25 @@ export function startNewMessage(state: DecodeState, params: Partial<NewMessagePa
     return message;
 }
 
-export function flushDecodeState(state: DecodeState) {
+export function flushCurrLines(state: DecodeState) {
     const { curr_lines } = state;
-    if(curr_lines.some((v) => !v.match(/^[ \t]*$/))) {
-        let curr_message = state.curr_message;
-        if(curr_message == null) {
-            curr_message = startNewMessage(state, { line_no: state.curr_data_line_no });
+    if(curr_lines.length === 0) return;
+
+    let curr_message = state.curr_message;
+    if(curr_message == null) {
+        if(curr_lines.every((v) => v.match(/^[ \t]*$/))) {
+            curr_lines.length = 0;
+            return;
         }
 
-        curr_message.content = concatContentsTo(curr_message.content, curr_lines.join('\n'));
+        curr_message = startNewMessage(state, { line_no: state.curr_data_line_no });
     }
-    
-    curr_lines.length = 0;
 
+    curr_message.content = concatContentsTo(curr_message.content, curr_lines.join('\n'));
+    curr_lines.length = 0;
+}
+
+export function flushDecodeState(state: DecodeState) {
+    flushCurrLines(state);
     state.curr_message = null;
 }

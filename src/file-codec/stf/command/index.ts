@@ -1,4 +1,5 @@
 export * from "./args.js";
+export type * from "./type.js";
 
 import type { Command } from "./type.js";
 
