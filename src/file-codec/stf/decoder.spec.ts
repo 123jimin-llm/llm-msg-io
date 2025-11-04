@@ -21,5 +21,48 @@ describe("file-codec/stf", () => {
                 {role: 'assistant', content: "Hi there!"},
             ] satisfies Message[]);
         });
+
+        it("should decode messages with attributes and escaped data lines", () => {
+            const serialized = [
+                "",
+                ";msg role=user name=\"Jane Doe\" id='123'",
+                "Hello,",
+                ";;Important notice",
+                "",
+            ].join('\n');
+
+            const { messages } = decoder(serialized);
+            assert.deepStrictEqual(messages, [
+                {
+                    role: 'user',
+                    name: 'Jane Doe',
+                    id: '123',
+                    content: "Hello,\n;Important notice\n",
+                },
+            ] satisfies Message[]);
+        });
+
+        it("should ignore line and block comments", () => {
+            const serialized = [
+                ";# this is a comment",
+                ";/* block comment start",
+                ";developer",
+                ";*/",
+                ";user",
+                "Hello",
+                ";assistant",
+                "; // comment ignored",
+                "Hi",
+                ";developer",
+                "Howdy",
+            ].join('\n');
+
+            const { messages } = decoder(serialized);
+            assert.deepStrictEqual(messages, [
+                {role: 'user', content: "Hello"},
+                {role: 'assistant', content: "Hi"},
+                {role: 'developer', content: "Howdy"},
+            ] satisfies Message[]);
+        });
     });
 });

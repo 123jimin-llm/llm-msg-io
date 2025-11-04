@@ -43,12 +43,17 @@ export function startNewMessage(state: DecodeState, params: Partial<NewMessagePa
     const role = params.role ?? state.curr_message?.role ?? null;
     if(role == null) throw new SyntaxError(`Line ${line_no+1}: Attempt to create a new message without a role.`);
 
-    const message = {
-        role,
-        id: params.id,
-        name: params.name,
-        content: "",
-    } satisfies Message;
+    const message: Message = {
+        role, content: "",
+    };
+
+    if(params.id !== (void 0)) {
+        message.id = params.id;
+    }
+
+    if(params.name !== (void 0)) {
+        message.name = params.name;
+    }
 
     state.curr_message = message;
     state.messages.push(message);
@@ -56,14 +61,17 @@ export function startNewMessage(state: DecodeState, params: Partial<NewMessagePa
     return message;
 }
 
-export function finalizeDecodeState(state: DecodeState) {
+export function flushDecodeState(state: DecodeState) {
     const { curr_lines } = state;
-    if(curr_lines.length === 0) return;
+    if(curr_lines.length > 0) {
+        let curr_message = state.curr_message;
+        if(curr_message == null) {
+            curr_message = startNewMessage(state, { line_no: state.curr_data_line_no });
+        }
 
-    let curr_message = state.curr_message;
-    if(curr_message == null) {
-        curr_message = startNewMessage(state, { line_no: state.curr_data_line_no });
+        curr_message.content = concatContentsTo(curr_message.content, curr_lines.join('\n'));
+        curr_lines.length = 0;
     }
 
-    curr_message.content = concatContentsTo(curr_message.content, curr_lines.join('\n'));
+    state.curr_message = null;
 }

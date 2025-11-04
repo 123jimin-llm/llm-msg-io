@@ -1,6 +1,6 @@
 import type { CodecDecoder } from "../../message/index.js";
 import { parseCommandArgs } from "./command/index.js";
-import { createDecodeState, finalizeDecodeState } from "./decode-state.js";
+import { createDecodeState, flushDecodeState } from "./decode-state.js";
 
 export const createDecoder: CodecDecoder<string> = () => (source) => {
         if(typeof source !== 'string') {
@@ -68,7 +68,7 @@ export const createDecoder: CodecDecoder<string> = () => (source) => {
             throw new SyntaxError(`Unterminated block comment.`);
         }
 
-        finalizeDecodeState(state);
+        flushDecodeState(state);
 
         return {
             messages: state.messages,
