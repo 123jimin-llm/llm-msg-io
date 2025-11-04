@@ -107,6 +107,8 @@ This line is not ignored.
 
 It is an error to put an unmatched `/*` or `*/` comment line.
 
+Excluding comments, a command line will be ignored, even when it's an `end` command.
+
 ## Command Line
 
 A command line consists of three part: the **header** `;`, the **name**, and the **arguments**.

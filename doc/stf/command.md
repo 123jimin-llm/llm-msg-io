@@ -9,7 +9,7 @@ Commands can be classified into different modes based on how they consume follow
 - `polyadic`: The command consumes multiple data lines as its argument.
 
 For a polyadic command, a special command line with name `end` is used to mark the end of the argument.
-It is an error to put a command between a polyadic command and the matching `end` command.
+It is an error to put a non-comment command between a polyadic command and the matching `end` command.
 
 Moreover, the command can be classified into different modes based on how it modifies the current message.
 
