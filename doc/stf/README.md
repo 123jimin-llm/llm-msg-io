@@ -130,7 +130,7 @@ There are two ways to supply arguments to a command.
 
 The first way of providing arguments is to provide them as a list of `key=value`s separated by blanks.
 
-- All keys should match `^[a-z][a-z0-9]+$`, all in lowercase.
+- All keys should match `^[a-z][a-z0-9]*$`.
 - All values should be one of the followings:
   - An arbitrary string without any blank characters, and neither starts nor ends with `'` or `"`.
   - A quoted string (like a JSON5 string), with either `'` or `"` as the quote character.

@@ -59,7 +59,6 @@ console.log(encoded);
 
 const {messages: decoded} = decodeMessages(messages);
 console.log(decoded);
-
 ```
 
 ## Development
