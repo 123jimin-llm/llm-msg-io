@@ -27,4 +27,6 @@ export const COMMAND_LOOKUP = (() => {
             }
         }
     }
+
+    return lookup;
 })();
