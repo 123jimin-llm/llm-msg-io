@@ -1,6 +1,6 @@
 import type { CodecDecoder } from "../../message/index.js";
-import { parseCommandArgs } from "./command/index.js";
-import { createDecodeState, flushDecodeState } from "./decode-state.js";
+import { COMMAND_LOOKUP, CommandMode, parseCommandArgs } from "./command/index.js";
+import { createDecodeState, flushBufferedLines, flushDecodeState } from "./decode-state.js";
 
 const BLANK_LINE_PATTERN = /^[ \t]*$/;
 const COMMAND_LINE_PATTERN = /^;[ \t]*(\/\/|\/\*|\*\/|#|[a-z][a-z0-9]*)/i;
@@ -37,11 +37,23 @@ export const createDecoder: CodecDecoder<string> = () => (source) => {
                 continue line_loop;
             }
 
+            if(state.invoked?.command.mode === CommandMode.MONADIC) {
+                if(state.buffered_lines.length > 0) throw new Error(`Line ${line_no + 1}: Internal error; buffer not empty.`);
+
+                state.buffered_lines.push(data_line);
+                state.invoked.command.execute(state, state.invoked.args);
+
+                state.invoked = null;
+                state.buffered_lines.length = 0;
+
+                continue line_loop;
+            }
+
             if(state.curr_message == null && !BLANK_LINE_PATTERN.test(data_line)) {
                 throw new SyntaxError(`Line ${line_no + 1}: Unexpected data line before a message.`);
             }
 
-            state.curr_lines.push(data_line);
+            state.buffered_lines.push(data_line);
             continue line_loop;
         }
 
@@ -76,11 +88,51 @@ export const createDecoder: CodecDecoder<string> = () => (source) => {
 
         // `end` command
 
+        if(command_name === "end") {
+            if(!state.invoked) throw new SyntaxError(`Line ${line_no + 1}: Unexpected 'end' command.`);
+
+            const { command, args: command_args } = state.invoked;
+            if(command.mode !== CommandMode.POLYADIC) {
+                throw new SyntaxError(`Line ${line_no + 1}: Unexpected 'end' command for a command '${command.name}'.`);
+            }
+
+            command.execute(state, command_args);
+
+            state.invoked = null;
+            state.buffered_lines.length = 0;
+
+            continue line_loop;
+        }
+
         // other commands
+
+        if(state.invoked) {
+            throw new SyntaxError(`Line ${line_no + 1}: Unexpected command '${command_name}' while a command '${state.invoked.command}' is being invoked.`);
+        }
+
+        flushBufferedLines(state);
+
+        const command_args = parseCommandArgs(raw_line.slice(command_match[0].length), line_no);
+
+        const command = COMMAND_LOOKUP.get(command_name);
+        if(command == null) throw new SyntaxError(`Line ${line_no + 1}: Unknown command '${command_name}'.`);
+
+        if(command.mode === CommandMode.NILADIC) {
+            command.execute(state, command_args);
+        } else {
+            state.invoked = {
+                command,
+                args: command_args,
+            };
+        }
     }
 
     if(comment_depth !== 0) {
         throw new SyntaxError(`Unterminated block comment.`);
+    }
+
+    if(state.invoked) {
+        throw new SyntaxError(`Unterminated '${state.invoked.command.name}' command.`)
     }
 
     flushDecodeState(state);

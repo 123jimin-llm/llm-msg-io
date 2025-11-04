@@ -42,6 +42,14 @@ const COMMAND_MESSAGE: Command = {
     },
 };
 
+const COMMAND_RAW: Command = {
+    mode: CommandMode.POLYADIC,
+    name: "raw",
+    execute(state, raw_args) {
+        // TODO
+    },
+};
+
 export const MESSAGE_COMMANDS = [
     createRoleCommand("system", ["sys"]),
     createRoleCommand("developer", ["dev"]),
@@ -50,4 +58,5 @@ export const MESSAGE_COMMANDS = [
     createRoleCommand("tool"),
 
     COMMAND_MESSAGE,
+    COMMAND_RAW,
 ];

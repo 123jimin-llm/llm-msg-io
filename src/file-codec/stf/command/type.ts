@@ -16,5 +16,5 @@ export interface Command {
     name: string;
     alias_list?: string[];
 
-    execute(state: DecodeState, args: CommandArgs, param_lines: string[]): void;
+    execute(state: DecodeState, args: CommandArgs): void;
 }
