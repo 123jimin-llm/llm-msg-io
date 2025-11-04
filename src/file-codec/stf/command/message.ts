@@ -14,6 +14,8 @@ function createRoleCommand(name: string, alias_list?: string[]): Command {
 
 const MessageArgs = type({
     role: "string?",
+    id: "string?",
+    name: "string?",
 });
 
 const COMMAND_MESSAGE: Command = {
@@ -21,13 +23,12 @@ const COMMAND_MESSAGE: Command = {
     name: "message", alias_list: ["msg"],
     execute(state, raw_args) {
         const args = MessageArgs.assert(raw_args);
+        startNewMessage(state, {
+            role: args.role,
+            id: args.id,
+            name: args.name,
+        });
     },
-};
-
-const COMMAND_RAW: Command = {
-    param_type: CommandParamType.POLYADIC,
-    name: "raw",
-    execute(state, raw_args) {},
 };
 
 export const MESSAGE_COMMANDS = [
@@ -38,5 +39,4 @@ export const MESSAGE_COMMANDS = [
     createRoleCommand("tool"),
 
     COMMAND_MESSAGE,
-    COMMAND_RAW,
 ];

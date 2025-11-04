@@ -32,7 +32,10 @@ export function createDecodeState(): DecodeState {
 
 export interface NewMessageParams {
     line_no: number;
+
     role: string;
+    id: string;
+    name: string;
 }
 
 export function startNewMessage(state: DecodeState, params: Partial<NewMessageParams>): Message {
@@ -42,6 +45,8 @@ export function startNewMessage(state: DecodeState, params: Partial<NewMessagePa
 
     const message = {
         role,
+        id: params.id,
+        name: params.name,
         content: "",
     } satisfies Message;
 

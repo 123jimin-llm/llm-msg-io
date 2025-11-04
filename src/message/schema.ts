@@ -44,7 +44,8 @@ export function textToContentPartArray(text: string): ContentPart[] {
 }
 
 export const Message = exportType(type({
-    "id?": 'string',
+    id: "string?",
+    name: "string?",
     role: 'string',
     content: type('string').or(ContentPart.array()),
 }));
