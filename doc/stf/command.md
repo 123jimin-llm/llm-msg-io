@@ -9,6 +9,7 @@ Commands can be classified into different modes based on how they consume follow
 - `polyadic`: The command consumes multiple data lines as its argument.
 
 For a polyadic command, a special command line with name `end` is used to mark the end of the argument.
+It is an error to put a command between a polyadic command and the matching `end` command.
 
 Moreover, the command can be classified into different modes based on how it modifies the current message.
 
@@ -85,3 +86,5 @@ This command clears the message state.
 ### `end`
 
 `end` is a special command, marking end of data line arguments for a polyadic argument.
+
+Arguments for `end` does not follow the same syntax; any string following `end` is allowed, as long as the first character is not `[0-9a-zA-Z]`.
