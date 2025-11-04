@@ -1,4 +1,5 @@
 import type { CodecDecoder } from "../../message/index.js";
+import { parseCommandArgs } from "./command/index.js";
 import { createDecodeState, finalizeDecodeState } from "./decode-state.js";
 
 export const createDecoder: CodecDecoder<string> = () => (source) => {

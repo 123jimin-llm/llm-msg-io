@@ -46,7 +46,7 @@ export function textToContentPartArray(text: string): ContentPart[] {
 export const Message = exportType(type({
     "id?": 'string',
     role: 'string',
-    content: type("string").or(ContentPart.array()),
+    content: type('string').or(ContentPart.array()),
 }));
 
 export type Message = typeof Message.infer;
