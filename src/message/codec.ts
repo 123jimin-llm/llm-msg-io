@@ -57,7 +57,7 @@ export function asDecodedData(obj: unknown): DecodedData<unknown> {
     if('messages' in obj) {
         const messages = MessageArray.assert(obj.messages);
 
-        if('metadata' in obj) {
+        if('metadata' in obj && obj.metadata !== (void 0)) {
             return {
                 metadata: obj.metadata,
                 messages,
@@ -104,9 +104,11 @@ export function createDecoder<EncodedType=string, DecodeOptions extends object=o
 ): MessageDecoder<EncodedType, MetadataType> {
     return (encoded: EncodedType) => {
         const {messages, metadata} = asDecodedData(createRawDecoder(codec, options)(encoded));
-        return {
-            metadata: validateMetadata ? validateMetadata(metadata) : (validateMetadata as MetadataType),
-            messages,
-        };
+        const validated_metadata: MetadataType = validateMetadata ? validateMetadata(metadata) : (validateMetadata as MetadataType);
+
+        const decoded_data: DecodedData<MetadataType> = {messages};
+        if(validated_metadata !== (void 0)) decoded_data.metadata = validated_metadata;
+
+        return decoded_data;
     };
 }

@@ -63,15 +63,16 @@ export function startNewMessage(state: DecodeState, params: Partial<NewMessagePa
 
 export function flushDecodeState(state: DecodeState) {
     const { curr_lines } = state;
-    if(curr_lines.length > 0) {
+    if(curr_lines.some((v) => !v.match(/^[ \t]*$/))) {
         let curr_message = state.curr_message;
         if(curr_message == null) {
             curr_message = startNewMessage(state, { line_no: state.curr_data_line_no });
         }
 
         curr_message.content = concatContentsTo(curr_message.content, curr_lines.join('\n'));
-        curr_lines.length = 0;
     }
+    
+    curr_lines.length = 0;
 
     state.curr_message = null;
 }
