@@ -1,17 +1,17 @@
 import { type DecodeState } from "../decode-state.js";
 
-export const CommandParamType = Object.freeze({
+export const CommandMode = Object.freeze({
     NILADIC: 0,
     MONADIC: 1,
     POLYADIC: -1,
 } as const);
 
-export type CommandParamType = typeof CommandParamType[keyof typeof CommandParamType];
+export type CommandMode = typeof CommandMode[keyof typeof CommandMode];
 
 export type CommandArgs = Record<string, unknown>;
 
 export interface Command {
-    param_type: CommandParamType;
+    mode: CommandMode;
     
     name: string;
     alias_list?: string[];

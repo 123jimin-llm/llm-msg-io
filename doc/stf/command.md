@@ -25,15 +25,19 @@ It is an error to attempt to use a value from the previous message if it is nil.
 
 ### `message`
 
+- Mode: **niladic**
+
 The `message` (`msg` for alias) command starts a new message.
 
 The command accepts following optional argument:
 
-- `role`: The role of the message. If not provided, the role of previous message is used.
-
-### `raw`
+- `role`: The role of the message. If not provided, role of the previous message is used.
+- `name`: The name of the sender of the message.
+- `id`: Unique ID for a message.
 
 ### Role Commands
+
+- Mode: **niladic**
 
 For commonly used roles (taken from OpenAI Harmony Response Format), the following commands are provided.
 
@@ -47,10 +51,37 @@ For commonly used roles (taken from OpenAI Harmony Response Format), the followi
 
 For example, `;assistant` and `;ai` both are equivalent to `;msg role=assistant`.
 
+These commands accept the same set of arguments as the `message` command, excluding `role`.
+
+### `raw`
+
+- Mode: **polyadic**
+
+To provide a raw message in JSON5 format, use this command.
+
+```
+;raw
+{
+    "role": "user",
+    "content": "Hello, world!",
+}
+;end
+```
+
 ### Channel Commands
+
+- Mode: **niladic**
 
 ## Appending Message Parts
 
 ## Miscellaneous
 
+### `flush`
+
+- Mode: **niladic**
+
+This command clears the message state.
+
 ### `end`
+
+`end` is a special command, marking end of data line arguments for a polyadic argument.
