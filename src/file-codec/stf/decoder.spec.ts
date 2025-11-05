@@ -23,6 +23,65 @@ describe("file-codec/stf", () => {
                 ] satisfies Message[]);
             });
 
+            it("should handle multiline content", () => {
+                const serialized = [
+                    ";user",
+                    "Line 1",
+                    "Line 2",
+                    "Line 3",
+                ].join('\n');
+
+                const { messages } = decoder(serialized);
+                assert.deepStrictEqual(messages, [
+                    {role: 'user', content: "Line 1\nLine 2\nLine 3"},
+                ] satisfies Message[]);
+            });
+
+            it("should handle content with a trailing newline", () => {
+                const serialized = [
+                    ";user",
+                    "Hello",
+                    "",
+                ].join('\n');
+
+                const { messages } = decoder(serialized);
+                assert.deepStrictEqual(messages, [
+                    {role: 'user', content: "Hello\n"},
+                ] satisfies Message[]);
+            });
+
+            it("should handle content with blank lines", () => {
+                const serialized = [
+                    ";user",
+                    "Line 1",
+                    "",
+                    "Line 3",
+                ].join('\n');
+                const { messages } = decoder(serialized);
+                assert.deepStrictEqual(messages, [
+                    {role: 'user', content: "Line 1\n\nLine 3"},
+                ]);
+            });
+
+            it("should ignore leading and trailing blank data lines when message state is nil", () => {
+                const serialized = [
+                    "",
+                    "  ",
+                    "\t",
+                    ";user",
+                    "Hello!",
+                    ";assistant",
+                    "Hi there!",
+                    "  ",
+                    "",
+                ].join('\n');
+                const { messages } = decoder(serialized);
+                assert.deepStrictEqual(messages, [
+                    {role: 'user', content: "Hello!"},
+                    {role: 'assistant', content: "Hi there!\n  \n"},
+                ]);
+             });
+
             it("should decode an empty STF file as an empty array", () => {
                 for(const serialized of ["", " ", "\t", "\n", " \n "]) {
                     assert.deepStrictEqual(decoder(serialized), { messages: []});
@@ -52,7 +111,9 @@ describe("file-codec/stf", () => {
                     {role: 'user', content: ";this is not a command"},
                 ] satisfies Message[]);
             });
+        });
 
+        context("comments", () => {
             it("should ignore line and block comments", () => {
                 const serialized = [
                     ";# this is a comment",
@@ -73,6 +134,25 @@ describe("file-codec/stf", () => {
                     {role: 'user', content: "Hello"},
                     {role: 'assistant', content: "Hi"},
                     {role: 'developer', content: "Howdy"},
+                ] satisfies Message[]);
+            });
+
+            it("should handle nested block comments", () => {
+                const serialized = [
+                    ";user",
+                    ";/* start level 1",
+                    "this should be ignored",
+                    ";/* start level 2",
+                    "this should also be ignored",
+                    ";*/ end level 2",
+                    "still ignored",
+                    ";*/ end level 1",
+                    "Hello!",
+                ].join('\n');
+
+                const { messages } = decoder(serialized);
+                assert.deepStrictEqual(messages, [
+                    { role: 'user', content: "Hello!" },
                 ] satisfies Message[]);
             });
         });
@@ -180,6 +260,11 @@ describe("file-codec/stf", () => {
 
             it("should throw an error for using role inheritance without a previous message", () => {
                 assert.throws(() => decoder(";msg"));
+            });
+
+            it("should throw an error for invalid key-value argument syntax", () => {
+                assert.throws(() => decoder(";msg =user"));
+                assert.throws(() => decoder(";msg 'role=user'"));
             });
 
             it("should throw an error for an unexpected 'end' command", () => {
