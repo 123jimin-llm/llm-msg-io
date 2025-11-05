@@ -49,7 +49,7 @@ export const createDecoder: CodecDecoder<string> = () => (source) => {
                 continue line_loop;
             }
 
-            if(state.curr_message == null && !BLANK_LINE_PATTERN.test(data_line)) {
+            if(state.curr_message == null && state.invoked == null && !BLANK_LINE_PATTERN.test(data_line)) {
                 throw new SyntaxError(`Line ${line_no + 1}: Unexpected data line before a message.`);
             }
 
