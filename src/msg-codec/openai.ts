@@ -62,6 +62,11 @@ export const OpenAIChatOutputCodec = {
     },
 } satisfies WithCreateDecoder<OpenAIChatOutputMessage[]>;
 
+export const OpenAIChatCodec = {
+    createEncoder: OpenAIChatInputCodec.createEncoder,
+    createDecoder: OpenAIChatOutputCodec.createDecoder,
+};
+
 export const OpenAIResponsesInputCodec = {};
 
 export const OpenAIResponsesOutputCodec = {};
