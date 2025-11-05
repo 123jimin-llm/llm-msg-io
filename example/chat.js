@@ -1,3 +1,4 @@
+/* eslint-env node */
 //@ts-check
 
 /** @import {Message} from "../dist/index.js" */
@@ -6,10 +7,10 @@ import * as readline from "node:readline/promises";
 import { stdin, stdout } from "node:process";
 import * as fs from "node:fs/promises";
 
-import { OpenAIChatInputCodec, TOMLCodec, createEncoder, createDecoder, OpenAIChatOutputCodec } from "../dist/index.js";
+import { OpenAIChatInputCodec, STFCodec, createEncoder, createDecoder, OpenAIChatOutputCodec } from "../dist/index.js";
 import { OpenAI } from "openai";
 
-const HISTORY_PATH = "history.txt";
+const HISTORY_PATH = "history.stf";
 const openai = new OpenAI();
 
 /**
@@ -18,7 +19,7 @@ const openai = new OpenAI();
 async function loadHistory() {
     try {
         const data = await fs.readFile(HISTORY_PATH, 'utf-8');
-        return createDecoder(TOMLCodec)(data).messages;
+        return createDecoder(STFCodec)(data).messages;
     } catch(err) {
         if((/** @type{{code?: unknown}} */ (err)).code === 'ENOENT') {
             return [{role: "system", content: "You are a helpful assistant."}];
@@ -32,7 +33,7 @@ async function loadHistory() {
  * @param {Message[]} messages 
  */
 async function saveHistory(messages) {
-    await fs.writeFile(HISTORY_PATH, TOMLCodec.createEncoder()(messages));
+    await fs.writeFile(HISTORY_PATH, createEncoder(STFCodec)(messages));
 }
 
 async function main() {

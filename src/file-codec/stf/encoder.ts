@@ -1,6 +1,8 @@
 import { CodecEncoder } from "../../message/codec.js";
 
 export const createEncoder: CodecEncoder<string> = () => (messages): string => {
-    // TODO
-    return "";
+    return messages.map((message) => {
+        // TODO
+        return ";raw\n;end";
+    }).join('\n');
 };
