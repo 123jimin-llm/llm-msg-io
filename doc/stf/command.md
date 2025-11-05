@@ -11,12 +11,6 @@ Commands can be classified into different modes based on how they consume follow
 For a polyadic command, a special command line with name `end` is used to mark the end of the argument.
 It is an error to put a non-comment command between a polyadic command and the matching `end` command.
 
-Moreover, the command can be classified into different modes based on how it modifies the current message.
-
-- `start`: The command starts a new message.
-- `modify`: The command modifies the current message.
-- `other`: The command does not directly modify a message.
-
 ## Starting a New Message
 
 These commands create a new message, replacing the message state.
@@ -81,7 +75,7 @@ To provide a raw message in JSON5 format, use this command.
 
 - Mode: **niladic**
 
-This command clears the message state.
+This command clears the message state, setting it to the nil value.
 
 ### `end`
 

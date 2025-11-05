@@ -1,4 +1,6 @@
 import { type } from "arktype";
+import JSON5 from "json5";
+import { Message } from "../../../message/index.js";
 import { NewMessageParams, startNewMessage } from "../decode-state.js";
 import { Command, CommandMode } from "./type.js";
 
@@ -45,12 +47,13 @@ const COMMAND_MESSAGE: Command = {
 const COMMAND_RAW: Command = {
     mode: CommandMode.POLYADIC,
     name: "raw",
-    execute(state, raw_args) {
-        // TODO
+    execute(state) {
+        state.curr_message = null;
+        state.messages.push(Message.assert(JSON5.parse(state.buffered_lines.join('\n'))));
     },
 };
 
-export const MESSAGE_COMMANDS = [
+export const MESSAGE_COMMANDS: Command[] = [
     createRoleCommand("system", ["sys"]),
     createRoleCommand("developer", ["dev"]),
     createRoleCommand("user"),

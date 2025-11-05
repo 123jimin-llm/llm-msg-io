@@ -4,9 +4,11 @@ export * from "./type.js";
 import type { Command } from "./type.js";
 
 import { MESSAGE_COMMANDS } from "./message.js";
+import { MISC_COMMANDS } from "./misc.js";
 
 export const COMMANDS: Command[] = [
     ...MESSAGE_COMMANDS,
+    ...MISC_COMMANDS,
 ];
 
 export const COMMAND_LOOKUP = (() => {
