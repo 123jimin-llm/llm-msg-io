@@ -7,22 +7,22 @@ const decoder = createDecoder(createSTFDecoder);
 
 describe("file-codec/stf", () => {
     describe("STFCodec.createDecoder", () => {
-        it("should decode a simple STF file", () => {
-            const serialized = [
-                ";user",
-                "Hello!",
-                ";assistant",
-                "Hi there!",
-            ].join('\n');
+        context("basics", () => {
+            it("should decode a simple STF file", () => {
+                const serialized = [
+                    ";user",
+                    "Hello!",
+                    ";assistant",
+                    "Hi there!",
+                ].join('\n');
 
-            const { messages } = decoder(serialized);
-            assert.deepStrictEqual(messages, [
-                {role: 'user', content: "Hello!"},
-                {role: 'assistant', content: "Hi there!"},
-            ] satisfies Message[]);
-        });
+                const { messages } = decoder(serialized);
+                assert.deepStrictEqual(messages, [
+                    {role: 'user', content: "Hello!"},
+                    {role: 'assistant', content: "Hi there!"},
+                ] satisfies Message[]);
+            });
 
-        context("line handling", () => {
             it("should decode an empty STF file as an empty array", () => {
                 for(const serialized of ["", " ", "\t", "\n", " \n "]) {
                     assert.deepStrictEqual(decoder(serialized), { messages: []});
