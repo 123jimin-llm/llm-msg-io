@@ -30,6 +30,9 @@ The command accepts following optional argument:
 - `name`: The name of the sender of the message.
 - `id`: Unique ID for a message.
 
+> [!NOTE]
+> STF does *not* enforce uniqueness of a message ID.
+
 ### Role Commands
 
 - Mode: **niladic**
@@ -81,4 +84,5 @@ This command clears the message state, setting it to the nil value.
 
 `end` is a special command, marking end of data line arguments for a polyadic argument.
 
-Arguments for `end` does not follow the same syntax; any string following `end` is allowed, as long as the first character is not `[0-9a-zA-Z]`.
+Arguments for `end` does not follow the syntax for other commands.
+Any string following `end` is allowed, as long as the first character is not `[0-9a-zA-Z]`.
