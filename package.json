@@ -31,25 +31,25 @@
   },
   "homepage": "https://github.com/123jimin-llm/llm-msg-io",
   "devDependencies": {
-    "@eslint/js": "^9.36.0",
-    "@google/genai": "^1.21.0",
-    "@types/chai": "^5.2.2",
+    "@eslint/js": "^9.39.1",
+    "@google/genai": "^1.28.0",
+    "@types/chai": "^5.2.3",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.5.2",
-    "chai": "^6.0.1",
-    "eslint": "^9.36.0",
-    "mocha": "^11.7.2",
-    "openai": "^5.23.0",
-    "rimraf": "^6.0.1",
-    "typescript": "^5.9.2",
-    "typescript-eslint": "^8.44.1"
+    "@types/node": "^24.10.0",
+    "chai": "^6.2.0",
+    "eslint": "^9.39.1",
+    "mocha": "^11.7.5",
+    "openai": "^6.8.1",
+    "rimraf": "^6.1.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.3"
   },
   "peerDependencies": {
     "@google/genai": "^1",
     "openai": "^5"
   },
   "dependencies": {
-    "arktype": "^2.1.22",
+    "arktype": "^2.1.25",
     "json5": "^2.2.3",
     "smol-toml": "^1.4.2"
   }

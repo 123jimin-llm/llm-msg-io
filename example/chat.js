@@ -7,7 +7,7 @@ import * as readline from "node:readline/promises";
 import { stdin, stdout } from "node:process";
 import * as fs from "node:fs/promises";
 
-import { OpenAIChatInputCodec, STFCodec, createEncoder, createDecoder, OpenAIChatOutputCodec } from "../dist/index.js";
+import { OpenAIChatCodec, STFCodec, createEncoder, createDecoder } from "../dist/index.js";
 import { OpenAI } from "openai";
 
 const HISTORY_PATH = "history.stf";
@@ -40,8 +40,8 @@ async function main() {
     const messages = await loadHistory();
     const rl = readline.createInterface({input: stdin, output: stdout});
 
-    const encoder = createEncoder(OpenAIChatInputCodec);
-    const decoder = createDecoder(OpenAIChatOutputCodec);
+    const encoder = createEncoder(OpenAIChatCodec);
+    const decoder = createDecoder(OpenAIChatCodec);
 
     while(true) {
         const user_input = await rl.question("You> ");
