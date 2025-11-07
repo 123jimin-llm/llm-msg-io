@@ -1,4 +1,4 @@
-import { Message, MessageArray } from "./schema.js";
+import { Message, MessageArray } from "./schema/index.js";
 
 /** Decoded list of messages with metadata. */
 export type DecodedData<MetadataType=unknown> = {metadata?: MetadataType, messages: Message[]};

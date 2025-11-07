@@ -8,5 +8,8 @@ export type PublicType<T, $ = {}> = Type<(In: unknown) => Out<T>, $> & {
 };
 
 export function exportType<T extends Type>(t: T) {
-  return t as unknown as PublicType<T['inferOut']>;
+    return t as unknown as PublicType<T['inferOut']>;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function assertEqualType<T, U extends T>(..._: [T] extends [U] ? [] : [never]): void {}
