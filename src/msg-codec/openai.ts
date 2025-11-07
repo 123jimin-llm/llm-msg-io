@@ -4,9 +4,9 @@ import {
     ChatCompletionContentPart,
 } from "openai/resources/chat";
 
-import type { Message, ContentPart, WithCreateEncoder, WithCreateDecoder } from "../message/index.js";
+import type { Message, MessageContent, ContentPart, WithCreateEncoder, WithCreateDecoder } from "../message/index.js";
 
-function toChatCompletionContent(content: Message['content']|null|undefined): OpenAIChatInputMessage['content'] {
+function toChatCompletionContent(content: MessageContent|null|undefined): OpenAIChatInputMessage['content'] {
     if(content == null) return null;
 
     if(typeof content === 'string') {
@@ -21,7 +21,7 @@ function toChatCompletionContent(content: Message['content']|null|undefined): Op
     });
 }
 
-function fromChatCompletionContent(content: OpenAIChatInputMessage['content']|null|undefined): Message['content'] {
+function fromChatCompletionContent(content: OpenAIChatInputMessage['content']|null|undefined): MessageContent {
     if(!content) return "";
 
     if(typeof content === 'string') {

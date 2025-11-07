@@ -51,6 +51,7 @@ export const Message = exportType(type({
 }));
 
 export type Message = typeof Message.infer;
+export type MessageContent = Message['content'];
 
 export const MessageArray = exportType(Message.array());
 export type MessageArray = typeof MessageArray.infer;

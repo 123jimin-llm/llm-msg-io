@@ -1,9 +1,9 @@
-export type { MessageArrayLike, ContentPart } from "./schema.js";
+export type { MessageContent, MessageArrayLike, ContentPart } from "./schema.js";
 export { Message, MessageArray, isMessageArray, asMessageArray } from "./schema.js";
 
 export * from "./codec.js";
 
-import { Message, textToContentPart, textToContentPartArray, type ContentPart } from "./schema.js";
+import { MessageContent, textToContentPart, textToContentPartArray, type ContentPart } from "./schema.js";
 
 /**
  * Concatenates multiple message contents into a single message content.
@@ -11,7 +11,7 @@ import { Message, textToContentPart, textToContentPartArray, type ContentPart } 
  * @param contents - An array of message contents to concatenate.
  * @returns A single value representing the concatenated content.
  */
-export function concatContents(...contents: Array<Message['content']>): Message['content'] {
+export function concatContents(...contents: MessageContent[]): MessageContent {
     if(contents.length === 0) return "";
     if(contents.length === 1) return contents[0];
 
@@ -38,7 +38,7 @@ export function concatContents(...contents: Array<Message['content']>): Message[
  * @param contents 
  * @returns 
  */
-export function concatContentsTo(target: Message['content'], ...contents: Array<Message['content']>): Message['content'] {
+export function concatContentsTo(target: MessageContent, ...contents: MessageContent[]): MessageContent {
     if(contents.length === 0) {
         return target;
     }
