@@ -40,8 +40,8 @@ async function main() {
     const messages = await loadHistory();
     const rl = readline.createInterface({input: stdin, output: stdout});
 
-    const encoder = createEncoder(OpenAIChatCodec);
-    const decoder = createDecoder(OpenAIChatCodec);
+    const encode = createEncoder(OpenAIChatCodec);
+    const decode = createDecoder(OpenAIChatCodec);
 
     while(true) {
         const user_input = await rl.question("You> ");
@@ -51,12 +51,12 @@ async function main() {
 
         const completion = await openai.chat.completions.create({
             model: 'gpt-5-nano',
-            messages: encoder(messages),
+            messages: encode(messages),
         });
 
         const response = completion.choices[0].message;
 
-        messages.push(...decoder([response]).messages);
+        messages.push(...decode([response]).messages);
 
         console.log(`Assistant> ${response.content}`);
         await saveHistory(messages);

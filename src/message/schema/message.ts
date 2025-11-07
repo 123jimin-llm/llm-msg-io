@@ -4,9 +4,7 @@ import { exportType, type PublicType } from "../../util/type.js";
 import { concatContentsTo, MessageContent } from "./content.js";
 
 export const ToolCall = exportType(type({
-    "id?": "string",
-    "call_id?": "string",
-    
+    "id?": "string",    
     name: "string",
     arguments: "string",
 }));
