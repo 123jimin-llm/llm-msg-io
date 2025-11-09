@@ -91,11 +91,16 @@ export const OpenAIChatInputCodec = {
 export const OpenAIChatOutputCodec = {
     createDecoder: () => (api_messages) => {
         return api_messages.map((api_message): Message => {
-            return {
+            const msg: Message = {
                 role: api_message.role,
                 content: fromChatCompletionContent(api_message.content),
-                tool_calls: api_message.tool_calls?.map((tool_call) => fromChatCompletionToolCall(tool_call)),
             };
+
+            if(api_message.tool_calls?.length) {
+                msg.tool_calls = api_message.tool_calls.map((tool_call) => fromChatCompletionToolCall(tool_call));
+            }
+
+            return msg;
         });
     },
 } satisfies WithCreateDecoder<OpenAIChatOutputMessage[]>;
