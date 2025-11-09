@@ -29,7 +29,7 @@ export const Message: PublicType<Message> = exportType(type({
     content: MessageContent,
     "reasoning?": MessageContent,
 
-    "tool_calls?": ToolCall.array(),
+    tool_calls: ToolCall.array().optional(),
 }));
 
 export const MessageArray = exportType(Message.array());
