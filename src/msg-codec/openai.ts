@@ -73,12 +73,17 @@ function fromChatCompletionToolCall(tool_call: ChatCompletionMessageToolCall): T
 export const OpenAIChatInputCodec = {
     createEncoder: () => (messages) => {
         return messages.map((message): OpenAIChatInputMessage => {
-            return {
+            const msg: OpenAIChatInputMessage = {
                 role: message.role as OpenAIChatInputMessage['role'],
                 name: message.name,
                 content: toChatCompletionContent(message.content),
-                tool_calls: message.tool_calls?.map((tool_call) => toChatCompletionToolCall(tool_call)),
             } as OpenAIChatInputMessage;
+
+            if(message.tool_calls?.length) {
+                (msg as {tool_calls: ChatCompletionMessageToolCall[]}).tool_calls = message.tool_calls.map((tool_call) => toChatCompletionToolCall(tool_call));
+            }
+
+            return msg;
         });
     },
 } satisfies WithCreateEncoder<OpenAIChatInputMessage[]>;
