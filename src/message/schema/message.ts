@@ -22,14 +22,14 @@ export interface Message {
 }
 
 export const Message: PublicType<Message> = exportType(type({
-    "id?": "string",
-    "name?": "string",
+    "id?": "string|undefined",
+    "name?": "string|undefined",
     role: 'string',
 
     content: MessageContent,
-    "reasoning?": MessageContent,
+    "reasoning?": MessageContent.or("undefined"),
 
-    tool_calls: ToolCall.array().optional(),
+    "tool_calls?": ToolCall.array().or("undefined"),
 }));
 
 export const MessageArray = exportType(Message.array());
