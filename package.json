@@ -35,21 +35,21 @@
     "@google/genai": "^1.29.0",
     "@types/chai": "^5.2.3",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.10.0",
-    "chai": "^6.2.0",
+    "@types/node": "^24.10.1",
+    "chai": "^6.2.1",
     "eslint": "^9.39.1",
     "mocha": "^11.7.5",
     "openai": "^6.8.1",
     "rimraf": "^6.1.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.46.3"
+    "typescript-eslint": "^8.46.4"
   },
   "peerDependencies": {
     "@google/genai": "^1",
     "openai": "^6"
   },
   "dependencies": {
-    "arktype": "^2.1.25",
+    "arktype": "^2.1.26",
     "json5": "^2.2.3",
     "smol-toml": "^1.4.2"
   }

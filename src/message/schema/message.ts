@@ -1,7 +1,7 @@
 import { type } from "arktype";
 import { exportType, type PublicType } from "../../util/type.js";
 
-import { concatContentsTo, MessageContent } from "./content.js";
+import { MessageContent } from "./content.js";
 
 export const ToolCall = exportType(type({
     "id?": "string",    
@@ -54,30 +54,4 @@ export function isMessageArray(obj: MessageArrayLike): obj is MessageArray {
  */
 export function asMessageArray(obj: MessageArrayLike): MessageArray {
     return isMessageArray(obj) ? obj : [obj];
-}
-
-/**
- * Merges the delta to the given message, modifying the original.
- * @param message 
- * @param delta 
- */
-export function mergeMessageDeltaTo(message: Message, delta: Partial<Message>): Message {
-    if(delta.id != null) message.id = delta.id;
-    if(delta.name != null) message.name = delta.name;
-    if(delta.role != null) message.role = delta.role;
-
-    if(delta.content != null) {
-        message.content = concatContentsTo(message.content, delta.content);
-    }
-
-    if(delta.reasoning != null) {
-        message.reasoning = concatContentsTo(message.reasoning ?? "", delta.reasoning);
-    }
-
-    if(delta.tool_calls != null) {
-        if(message.tool_calls == null) message.tool_calls = [];
-        message.tool_calls.push(...delta.tool_calls);
-    }
-
-    return message;
 }
