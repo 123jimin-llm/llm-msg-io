@@ -6,6 +6,8 @@
         "outDir": "dist",
         "sourceMap": false,
         "strict": true,
+        "skipLibCheck": true,
+        "exactOptionalPropertyTypes": true,
         "moduleResolution": "nodenext",
         "isolatedModules": true,
         "incremental": true,

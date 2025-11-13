@@ -34,7 +34,15 @@ function fromChatCompletionContent(content: OpenAIChatInputMessage['content']|nu
         switch(part.type) {
             case 'text': return { type: 'text', text: part.text };
             case 'refusal': return { type: 'text', text: part.refusal };
-            case 'file': return { type: 'file', file_id: part.file.file_id, name: part.file.filename, data: part.file.file_data };
+            case 'file': {
+                const ret: ContentPart = { type: 'file' };
+                
+                if(part.file.file_id) ret.file_id = part.file.file_id;
+                if(part.file.filename) ret.name = part.file.filename;
+                if(part.file.file_data) ret.data = part.file.file_data;
+                
+                return ret;
+            }
             case 'image_url': return { type: 'image', url: part.image_url.url };
             case 'input_audio': return { type: 'audio', data: part.input_audio.data, format: part.input_audio.format };
             default: throw new Error(`Unknown type: '${(part as {type: string}).type}'`);

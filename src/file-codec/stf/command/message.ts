@@ -14,17 +14,19 @@ const MessageArgs = RoleCommandArgs.merge({
 });
 
 function createNewMessageParams(args: typeof MessageArgs.infer): Partial<NewMessageParams> {
-    return {
-        role: args.role,
-        id: args.id,
-        name: args.name,
-    };
+    const ret: Partial<NewMessageParams> = {};
+
+    if(args.role != null) ret.role = args.role;
+    if(args.id != null) ret.id = args.id;
+    if(args.name != null) ret.name = args.name;
+
+    return ret;
 }
 
 function createRoleCommand(name: string, alias_list?: string[]): Command {
-    return {
+    const command: Command ={
         mode: CommandMode.NILADIC,
-        name, alias_list,
+        name,
         execute(state, raw_args) {
             const args = RoleCommandArgs.assert(raw_args);
             startNewMessage(state, createNewMessageParams({
@@ -33,6 +35,10 @@ function createRoleCommand(name: string, alias_list?: string[]): Command {
             }));
         },
     };
+
+    if(alias_list?.length) command.alias_list = alias_list;
+
+    return command;
 }
 
 const COMMAND_MESSAGE: Command = {

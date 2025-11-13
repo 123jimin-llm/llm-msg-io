@@ -11,14 +11,14 @@ export const ToolCall = exportType(type({
 export type ToolCall = typeof ToolCall.infer;
 
 export interface Message {
-    id?: string;
-    name?: string;
+    id?: string|undefined;
+    name?: string|undefined;
     role: string;
 
     content: MessageContent;
-    reasoning?: MessageContent;
+    reasoning?: MessageContent|undefined;
 
-    tool_calls?: ToolCall[];
+    tool_calls?: ToolCall[]|undefined;
 }
 
 export const Message: PublicType<Message> = exportType(type({
