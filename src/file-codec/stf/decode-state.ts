@@ -5,6 +5,9 @@ import type { Command, CommandArgs } from "./command/index.js";
 export interface DecodeState {
     /** List of messages. */
     readonly messages: Message[];
+
+    /** Default role for a new message without role. */
+    default_role: string|null;
     
     /** Current message to process. */
     curr_message: Message|null;
@@ -29,6 +32,7 @@ export function createDecodeState(): DecodeState {
     return {
         messages: [],
         
+        default_role: null,
         curr_message: null,
         
         curr_command_line_no: 0,
@@ -50,7 +54,7 @@ export interface NewMessageParams {
 
 export function startNewMessage(state: DecodeState, params: Partial<NewMessageParams>): Message {
     const line_no = params.line_no ?? Math.max(state.curr_command_line_no, state.curr_data_line_no);
-    const role = params.role ?? state.curr_message?.role ?? null;
+    const role = params.role ?? state.curr_message?.role ?? state.default_role;
     if(role == null) throw new SyntaxError(`Line ${line_no+1}: Attempt to create a new message without a role.`);
 
     const message: Message = {

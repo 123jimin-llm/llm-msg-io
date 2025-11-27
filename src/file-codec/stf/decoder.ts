@@ -17,12 +17,18 @@ function parseDataLine(raw_line: string): string|null {
     return null;
 }
 
-export const createDecoder: CodecDecoder<string> = () => (source) => {
+export interface STFDecoderOptions {
+    default_role: string|null;
+}
+
+export const createDecoder: CodecDecoder<string, Partial<STFDecoderOptions>> = (options?) => (source) => {
     if(typeof source !== 'string') {
         throw new TypeError("`STFCodec` expected serialized data to be a string.");
     }
 
     const state = createDecodeState();
+    state.default_role = options?.default_role ?? null;
+    
     let comment_depth = 0;
 
     const lines = source.split('\n');
@@ -50,7 +56,9 @@ export const createDecoder: CodecDecoder<string> = () => (source) => {
             }
 
             if(state.curr_message == null && state.invoked == null && !BLANK_LINE_PATTERN.test(data_line)) {
-                throw new SyntaxError(`Line ${line_no + 1}: Unexpected data line before a message.`);
+                if(state.default_role == null) {
+                    throw new SyntaxError(`Line ${line_no + 1}: Unexpected data line before a message.`);
+                }
             }
 
             state.buffered_lines.push(data_line);

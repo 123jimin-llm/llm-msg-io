@@ -111,6 +111,14 @@ describe("file-codec/stf", () => {
                     {role: 'user', content: ";this is not a command"},
                 ] satisfies Message[]);
             });
+            
+            it("should use default_role for initial data lines", () => {
+                const serialized = "Hello, world!";
+                const { messages } = createDecoder(createSTFDecoder, {default_role: 'user'})(serialized);
+                assert.deepStrictEqual(messages, [
+                    { role: 'user', content: "Hello, world!" },
+                ] satisfies Message[]);
+            });
         });
 
         context("comments", () => {
