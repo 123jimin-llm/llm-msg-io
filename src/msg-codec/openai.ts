@@ -5,8 +5,9 @@ import {
     ChatCompletionMessageToolCall,
 } from "openai/resources/chat";
 
-import type { Message, MessageContent, ContentPart, WithCreateEncoder, WithCreateDecoder } from "../message/index.js";
+import { Message, MessageContent, ContentPart, WithCreateEncoder, WithCreateDecoder } from "../message/index.js";
 import { ToolCall } from "../message/index.js";
+import { ResponseInput, ResponseInputItem, ResponseInputText, ResponseInputContent, ResponseInputMessageContentList, ResponseOutputMessage, Response } from "openai/resources/responses/responses.js";
 
 function toChatCompletionContent(content: MessageContent|null|undefined): OpenAIChatInputMessage['content'] {
     if(content == null) return null;
@@ -18,6 +19,26 @@ function toChatCompletionContent(content: MessageContent|null|undefined): OpenAI
     return content.map((part): ChatCompletionContentPart => {
         switch(part.type) {
             case 'text': return { type: 'text', text: part.text };
+            // TODO
+            default: throw new Error(`Unknown type: '${(part as {type: string}).type}'`);
+        }
+    });
+}
+
+function toResponseInputContent(content: MessageContent|null|undefined): ResponseInputMessageContentList {
+    if(!content) return [];
+
+    if(typeof content === 'string') {
+        return [{
+            type: 'input_text',
+            text: content,
+        } satisfies ResponseInputText];
+    }
+
+    return content.map((part): ResponseInputContent => {
+        switch(part.type) {
+            case 'text': return { type: 'input_text', text: part.text };
+            // TODO
             default: throw new Error(`Unknown type: '${(part as {type: string}).type}'`);
         }
     });
@@ -28,6 +49,11 @@ function fromChatCompletionContent(content: OpenAIChatInputMessage['content']|nu
 
     if(typeof content === 'string') {
         return content;
+    }
+
+    if(content.length === 1) {
+        const [part] = content;
+        if(part.type === 'text') return part.text;
     }
 
     return content.map((part): ContentPart => {
@@ -45,7 +71,24 @@ function fromChatCompletionContent(content: OpenAIChatInputMessage['content']|nu
             }
             case 'image_url': return { type: 'image', url: part.image_url.url };
             case 'input_audio': return { type: 'audio', data: part.input_audio.data, format: part.input_audio.format };
+            // TODO
             default: throw new Error(`Unknown type: '${(part as {type: string}).type}'`);
+        }
+    });
+}
+
+function fromResponseOutputContent(content: ResponseOutputMessage['content']|null|undefined): MessageContent {
+    if(!content) return "";
+
+    if(content.length === 1) {
+        const [part] = content;
+        if(part.type === 'output_text' && !(part.annotations?.length)) return part.text;
+    }
+
+    return content.map((part): ContentPart => {
+        switch(part.type) {
+            case 'output_text': return { type: 'text', text: part.text };
+            case 'refusal': return { type: 'text', text: part.refusal };
         }
     });
 }
@@ -81,7 +124,7 @@ function fromChatCompletionToolCall(tool_call: ChatCompletionMessageToolCall): T
 export const OpenAIChatInputCodec = {
     createEncoder: () => (messages) => {
         return messages.map((message): OpenAIChatInputMessage => {
-            const msg: OpenAIChatInputMessage = {
+            const msg = {
                 role: message.role as OpenAIChatInputMessage['role'],
                 name: message.name,
                 content: toChatCompletionContent(message.content),
@@ -118,6 +161,30 @@ export const OpenAIChatCodec = {
     createDecoder: OpenAIChatOutputCodec.createDecoder,
 };
 
-export const OpenAIResponsesInputCodec = {};
+export const OpenAIResponsesInputCodec = {
+    createEncoder: () => (messages) => {
+        return messages.map((message): ResponseInputItem => {
+            const msg = {
+                type: 'message',
+                role: message.role as ResponseInputItem.Message['role'],
+                content: toResponseInputContent(message.content),
+            } as ResponseInputItem.Message;
 
-export const OpenAIResponsesOutputCodec = {};
+            return msg;
+        });
+    },
+} satisfies WithCreateEncoder<ResponseInput>;
+
+export const OpenAIResponsesOutputCodec = {
+    createDecoder: () => (response) => {
+        return response.output.map((_api_message): Message => {
+            // TODO
+            throw new Error("Not yet implemented!");
+        });
+    },
+} satisfies WithCreateDecoder<Response>;
+
+export const OpenAIResponsesCodec = {
+    createEncoder: OpenAIResponsesInputCodec.createEncoder,
+    createDecoder: OpenAIResponsesOutputCodec.createDecoder,
+};
