@@ -7,7 +7,7 @@ import * as readline from "node:readline/promises";
 import { stdin, stdout } from "node:process";
 import * as fs from "node:fs/promises";
 
-import { OpenAIChatCodec, STFCodec, createEncoder, createDecoder } from "../dist/index.js";
+import { OpenAIResponsesCodec, STFCodec, createEncoder, createDecoder } from "../dist/index.js";
 import { OpenAI } from "openai";
 
 const HISTORY_PATH = "history.stf";
@@ -22,7 +22,7 @@ async function loadHistory() {
         return createDecoder(STFCodec)(data).messages;
     } catch(err) {
         if((/** @type{{code?: unknown}} */ (err)).code === 'ENOENT') {
-            return [{role: "system", content: "You are a helpful assistant."}];
+            return [{role: "developer", content: "You are a helpful assistant."}];
         }
 
         throw err;
@@ -40,8 +40,8 @@ async function main() {
     const messages = await loadHistory();
     const rl = readline.createInterface({input: stdin, output: stdout});
 
-    const encode = createEncoder(OpenAIChatCodec);
-    const decode = createDecoder(OpenAIChatCodec);
+    const encode = createEncoder(OpenAIResponsesCodec);
+    const decode = createDecoder(OpenAIResponsesCodec);
 
     while(true) {
         const user_input = await rl.question("You> ");
@@ -49,16 +49,14 @@ async function main() {
 
         messages.push({role: 'user', content: user_input});
 
-        const completion = await openai.chat.completions.create({
+        const response = await openai.responses.create({
             model: 'gpt-5-nano',
-            messages: encode(messages),
+            input: encode(messages),
         });
 
-        const response = completion.choices[0].message;
+        messages.push(...decode(response).messages);
 
-        messages.push(...decode([response]).messages);
-
-        console.log(`Assistant> ${response.content}`);
+        console.log(`Assistant> ${response.output_text}`);
         await saveHistory(messages);
     }
 

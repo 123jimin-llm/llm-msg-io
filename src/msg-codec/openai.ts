@@ -5,9 +5,9 @@ import {
     ChatCompletionMessageToolCall,
 } from "openai/resources/chat";
 
-import { Message, MessageContent, ContentPart, WithCreateEncoder, WithCreateDecoder } from "../message/index.js";
+import { Message, MessageContent, ContentPart, WithCreateEncoder, WithCreateDecoder, concatContentsTo } from "../message/index.js";
 import { ToolCall } from "../message/index.js";
-import { ResponseInput, ResponseInputItem, ResponseInputText, ResponseInputContent, ResponseInputMessageContentList, ResponseOutputMessage, Response } from "openai/resources/responses/responses.js";
+import { ResponseInput, ResponseInputItem, ResponseOutputMessage, Response } from "openai/resources/responses/responses.js";
 
 function toChatCompletionContent(content: MessageContent|null|undefined): OpenAIChatInputMessage['content'] {
     if(content == null) return null;
@@ -25,19 +25,26 @@ function toChatCompletionContent(content: MessageContent|null|undefined): OpenAI
     });
 }
 
-function toResponseInputContent(content: MessageContent|null|undefined): ResponseInputMessageContentList {
+function toResponseInputContent(role: string, content: MessageContent|null|undefined): Array<Extract<ResponseInputItem, {content: unknown}>['content'][number]> {
     if(!content) return [];
 
-    if(typeof content === 'string') {
-        return [{
-            type: 'input_text',
+    const makeTextContent = (content: string): {type: 'input_text', text: string}|{type: 'output_text', text: string, annotations: never[]} => {
+        if(role !== 'assistant') return {type: 'input_text', text: content};
+        
+        return {
+            type: 'output_text',
             text: content,
-        } satisfies ResponseInputText];
+            annotations: [],
+        };
+    };
+
+    if(typeof content === 'string') {
+        return [makeTextContent(content)];
     }
 
-    return content.map((part): ResponseInputContent => {
+    return content.map((part) => {
         switch(part.type) {
-            case 'text': return { type: 'input_text', text: part.text };
+            case 'text': return makeTextContent(part.text);
             // TODO
             default: throw new Error(`Unknown type: '${(part as {type: string}).type}'`);
         }
@@ -167,8 +174,8 @@ export const OpenAIResponsesInputCodec = {
             const msg = {
                 type: 'message',
                 role: message.role as ResponseInputItem.Message['role'],
-                content: toResponseInputContent(message.content),
-            } as ResponseInputItem.Message;
+                content: toResponseInputContent(message.role, message.content),
+            } as ResponseInputItem;
 
             return msg;
         });
@@ -177,10 +184,41 @@ export const OpenAIResponsesInputCodec = {
 
 export const OpenAIResponsesOutputCodec = {
     createDecoder: () => (response) => {
-        return response.output.map((_api_message): Message => {
-            // TODO
-            throw new Error("Not yet implemented!");
-        });
+        const messages: Message[] = [];
+
+        let message: Message|null = null;
+
+        const getMessage = (): Message => {
+            if(message == null) {
+                message = {
+                    role: "", content: "",
+                };
+                messages.push(message);
+            }
+
+            return message;
+        };
+
+        for(const output_item of response.output) {
+            switch(output_item.type) {
+                case 'reasoning': {
+                    const msg = getMessage();
+                    const reasoning_content: string = output_item.content?.map((part) => part.text).join("") ?? output_item.summary?.map((part) => part.text).join("\n\n") ?? "";
+                    msg.reasoning = concatContentsTo(msg.reasoning ?? "", reasoning_content);
+                    break;
+                }
+                case 'message': {
+                    const msg = getMessage();
+                    msg.id = output_item.id;
+                    msg.role = output_item.role;
+                    msg.content = concatContentsTo(msg.content, fromResponseOutputContent(output_item.content));
+                    break;
+                }
+                default: throw new Error("Not yet implemented!")
+            }
+        }
+
+        return messages;
     },
 } satisfies WithCreateDecoder<Response>;
 
