@@ -4,7 +4,8 @@ import { exportType, type PublicType } from "../../util/type.js";
 import { MessageContent } from "./content.js";
 
 export const ToolCall = exportType(type({
-    "id?": "string",    
+    "id?": "string",
+    "call_id?": "string",
     name: "string",
     arguments: "string",
 
@@ -15,6 +16,8 @@ export type ToolCall = typeof ToolCall.infer;
 export interface Message {
     /** Unique identifier for a message. */
     id?: string|undefined;
+
+    call_id?: string|undefined;
 
     /** Role of the sender. */
     role: string;
@@ -40,6 +43,7 @@ export interface Message {
 
 export const Message: PublicType<Message> = exportType(type({
     "id?": "string|undefined",
+    "call_id?": "string|undefined",
     "name?": "string|undefined",
     role: 'string',
 

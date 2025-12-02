@@ -19,6 +19,8 @@ export const ContentPartImage = exportType(ContentPartFileBase.and({
     type: '"image"',
 }));
 
+export type ContentPartImage = typeof ContentPartImage.infer;
+
 export const ContentPartAudio = exportType(ContentPartFileBase.and({
     type: '"audio"',
 }));
