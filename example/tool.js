@@ -1,25 +1,25 @@
 /* eslint-env node */
 //@ts-check
-
-import { createDecoder, createEncoder, MessageArray, OpenAIChatCodec } from "../dist/index.js";
+/** @import { MessageArray } from "../dist/index.js" */
+import { createDecoder, createEncoder, OpenAIResponsesCodec } from "../dist/index.js";
 import { OpenAI } from "openai";
 
 const tools = [
     {
         type: /** @type {const} */ ('function'),
-        function: {
-            name: "get_current_weather",
-            description: "Get the current weather in a given location",
-            parameters: {
-                type: 'object',
-                properties: {
-                    city: {
-                        type: 'string',
-                        description: "The city and the country.",
-                    },
+        name: "get_current_weather",
+        description: "Get the current weather in a given location",
+        strict: true,
+        parameters: {
+            type: 'object',
+            properties: {
+                city: {
+                    type: 'string',
+                    description: "The city and the country.",
                 },
-                required: ['city'],
-            }
+            },
+            additionalProperties: false,
+            required: ['city'],
         },
     }
 ];
@@ -27,22 +27,21 @@ const tools = [
 async function main() {
     const openai = new OpenAI();
 
-    const encode = createEncoder(OpenAIChatCodec);
-    const decode = createDecoder(OpenAIChatCodec);
+    const encode = createEncoder(OpenAIResponsesCodec);
+    const decode = createDecoder(OpenAIResponsesCodec);
 
     /** @type {MessageArray} */
     const messages = [
         {role: "user", content: "What is the weather in London?"},
     ];
     
-    const completion = await openai.chat.completions.create({
+    const res = await openai.responses.create({
         model: 'gpt-5-mini',
-        messages: encode(messages),
+        input: encode(messages),
         tools,
     });
 
-    const response = decode([completion.choices[0].message]).messages[0].tool_calls;
-    console.log(response);
+    console.log(res);
 }
 
 main().catch(console.error);
