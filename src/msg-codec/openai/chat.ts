@@ -84,7 +84,6 @@ function fromChatCompletionToolCall(tool_call: ChatCompletionMessageToolCall): T
     }
 }
 
-/** @deprecated */
 export const OpenAIChatInputCodec = {
     createEncoder: () => (messages) => {
         return messages.map((message): OpenAIChatInputMessage => {
@@ -103,7 +102,6 @@ export const OpenAIChatInputCodec = {
     },
 } satisfies WithCreateEncoder<OpenAIChatInputMessage[]>;
 
-/** @deprecated */
 export const OpenAIChatOutputCodec = {
     createDecoder: () => (api_messages) => {
         return api_messages.map((api_message): Message => {
@@ -121,7 +119,6 @@ export const OpenAIChatOutputCodec = {
     },
 } satisfies WithCreateDecoder<OpenAIChatOutputMessage[]>;
 
-/** @deprecated */
 export const OpenAIChatCodec = {
     createEncoder: OpenAIChatInputCodec.createEncoder,
     createDecoder: OpenAIChatOutputCodec.createDecoder,
