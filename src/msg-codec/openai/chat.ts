@@ -16,11 +16,55 @@ function toChatCompletionContent(content: MessageContent|null|undefined): OpenAI
 
     return content.map((part): ChatCompletionContentPart => {
         switch(part.type) {
-            case 'text': return { type: 'text', text: part.text };
-            // TODO
-            default: throw new Error(`Unknown type: '${(part as {type: string}).type}'`);
+            case 'text':
+                return { type: 'text', text: part.text };
+            case 'image': {
+                if(part.url) {
+                    return { type: 'image_url', image_url: { url: part.url } };
+                }
+                if(part.data) {
+                    const b64_data = (typeof part.data === 'string') ? part.data : Buffer.from(part.data).toString('base64');
+                    const format = part.format ?? 'png';
+                    return {
+                        type: 'image_url',
+                        image_url: { url: `data:image/${format};base64,${b64_data}` },
+                    };
+                }
+                throw new Error("Image content part must have url or data.");
+            }
+            case 'audio': {
+                if(!part.data) throw new Error("Audio content part must have data.");
+                const b64_data = (typeof part.data === 'string') ? part.data : Buffer.from(part.data).toString('base64');
+                return {
+                    type: 'input_audio',
+                    input_audio: {
+                        data: b64_data,
+                        format: part.format as 'wav' | 'mp3' ?? 'wav',
+                    },
+                };
+            }
+            case 'file': {
+                const file: ChatCompletionContentPart.File.File = {};
+                if(part.file_id) file.file_id = part.file_id;
+                if(part.name) file.filename = part.name;
+                if(part.data) {
+                    const b64_data = (typeof part.data === 'string') ? part.data : Buffer.from(part.data).toString('base64');
+                    file.file_data = b64_data;
+                }
+                return { type: 'file', file };
+            }
+            default:
+                throw new Error(`Unknown type: '${(part as {type: string}).type}'`);
         }
     });
+}
+
+function toChatCompletionTextContent(content: MessageContent|null|undefined): string|null {
+    if(content == null) return null;
+
+    if(typeof content === 'string') return content;
+
+    return content.map((v) => v.type === 'text' ? v.text : "").join("");
 }
 
 function fromChatCompletionContent(content: OpenAIChatInputMessage['content']|null|undefined): MessageContent {
@@ -50,7 +94,6 @@ function fromChatCompletionContent(content: OpenAIChatInputMessage['content']|nu
             }
             case 'image_url': return { type: 'image', url: part.image_url.url };
             case 'input_audio': return { type: 'audio', data: part.input_audio.data, format: part.input_audio.format };
-            // TODO
             default: throw new Error(`Unknown type: '${(part as {type: string}).type}'`);
         }
     });
@@ -87,14 +130,29 @@ function fromChatCompletionToolCall(tool_call: ChatCompletionMessageToolCall): T
 export const OpenAIChatInputCodec = {
     createEncoder: () => (messages) => {
         return messages.map((message): OpenAIChatInputMessage => {
+            const role = message.role as OpenAIChatInputMessage['role'];
+            if(role === 'tool') {
+                return {
+                    role: 'tool',
+                    tool_call_id: message.call_id ?? message.id ?? "",
+                    content: toChatCompletionTextContent(message.content) ?? "",
+                } satisfies OpenAIChatInputMessage;
+            }
             const msg = {
                 role: message.role as OpenAIChatInputMessage['role'],
-                name: message.name,
                 content: toChatCompletionContent(message.content),
             } as OpenAIChatInputMessage;
 
+            if(message.name != null) {
+                (msg as {name?: string}).name = message.name;
+            }
+
             if(message.tool_calls?.length) {
                 (msg as {tool_calls: ChatCompletionMessageToolCall[]}).tool_calls = message.tool_calls.map((tool_call) => toChatCompletionToolCall(tool_call));
+            }
+
+            if(message.refusal != null) {
+                (msg as {refusal?: string}).refusal = toChatCompletionTextContent(message.refusal) ?? "";
             }
 
             return msg;
@@ -112,6 +170,10 @@ export const OpenAIChatOutputCodec = {
 
             if(api_message.tool_calls?.length) {
                 msg.tool_calls = api_message.tool_calls.map((tool_call) => fromChatCompletionToolCall(tool_call));
+            }
+
+            if('refusal' in api_message && api_message.refusal != null) {
+                msg.refusal = api_message.refusal;
             }
 
             return msg;
