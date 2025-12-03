@@ -7,7 +7,7 @@ import * as readline from "node:readline/promises";
 import { stdin, stdout } from "node:process";
 import * as fs from "node:fs/promises";
 
-import { OpenAIResponsesCodec, STFCodec, createEncoder, createDecoder } from "../dist/index.js";
+import { OpenAIResponseCodec, STFCodec, createEncoder, createDecoder } from "../dist/index.js";
 import { OpenAI } from "openai";
 
 const HISTORY_PATH = "history.stf";
@@ -40,8 +40,8 @@ async function main() {
     const messages = await loadHistory();
     const rl = readline.createInterface({input: stdin, output: stdout});
 
-    const encode = createEncoder(OpenAIResponsesCodec);
-    const decode = createDecoder(OpenAIResponsesCodec);
+    const encode = createEncoder(OpenAIResponseCodec);
+    const decode = createDecoder(OpenAIResponseCodec);
 
     while(true) {
         const user_input = await rl.question("You> ");
@@ -49,9 +49,11 @@ async function main() {
 
         messages.push({role: 'user', content: user_input});
 
+        console.dir(encode(messages), {depth: 999});
+
         const response = await openai.responses.create({
+            ...encode(messages),
             model: 'gpt-5-nano',
-            input: encode(messages),
         });
 
         messages.push(...decode(response).messages);

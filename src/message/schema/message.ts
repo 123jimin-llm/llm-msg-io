@@ -79,3 +79,12 @@ export function isMessageArray(obj: MessageArrayLike): obj is MessageArray {
 export function asMessageArray(obj: MessageArrayLike): MessageArray {
     return isMessageArray(obj) ? obj : [obj];
 }
+
+export function getMessageExtra<T>(message: Message, key: string, init?: false) : T|null;
+export function getMessageExtra<T>(message: Message, key: string, init: true) : T;
+export function getMessageExtra<T>(message: Message, key: string, init = false): T|null {
+    const message_extra = (message.extra || (init ? (message.extra = {}) : null)) as {[key]?: T};
+    if(!message_extra) return null;
+
+    return (message_extra[key] || (init ? (message_extra[key] = {} as T) : null));
+}

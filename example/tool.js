@@ -1,7 +1,7 @@
 /* eslint-env node */
 //@ts-check
 /** @import { MessageArray } from "../dist/index.js" */
-import { createDecoder, createEncoder, OpenAIResponsesCodec } from "../dist/index.js";
+import { createDecoder, createEncoder, OpenAIResponseCodec } from "../dist/index.js";
 import { OpenAI } from "openai";
 
 const tools = [
@@ -27,21 +27,23 @@ const tools = [
 async function main() {
     const openai = new OpenAI();
 
-    const encode = createEncoder(OpenAIResponsesCodec);
-    const decode = createDecoder(OpenAIResponsesCodec);
+    const encode = createEncoder(OpenAIResponseCodec);
+    const decode = createDecoder(OpenAIResponseCodec);
 
     /** @type {MessageArray} */
     const messages = [
         {role: "user", content: "What is the weather in London?"},
     ];
     
-    const res = await openai.responses.create({
+    const api_res = await openai.responses.create({
+        ...encode(messages),
         model: 'gpt-5-mini',
-        input: encode(messages),
         tools,
     });
 
-    console.log(res);
+    const res = decode(api_res).messages;
+    console.dir(res);
+    console.dir(res[0].tool_calls);
 }
 
 main().catch(console.error);

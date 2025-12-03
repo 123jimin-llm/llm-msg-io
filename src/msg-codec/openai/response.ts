@@ -4,9 +4,17 @@ import {
     ResponseFunctionToolCall,
     ResponseInputContent,
     Response,
+    ResponseCreateParamsBase,
 } from "openai/resources/responses/responses.mjs";
 
-import { Message, MessageContent, ContentPart, WithCreateEncoder, WithCreateDecoder, concatContentsTo, ToolCall } from "../../message/index.js";
+import { Message, MessageContent, ContentPart, WithCreateEncoder, WithCreateDecoder, concatContentsTo, ToolCall, getMessageExtra } from "../../message/index.js";
+import { getNextUID } from "../../util/uid.js";
+
+export interface OpenAIExtra {
+    reasoning_id?: string;
+}
+
+const OPENAI_EXTRA_KEY = 'openai';
 
 type InputContentItem = Extract<ResponseInputItem, {content: unknown}>['content'][number];
 type OutputContentItem = ResponseOutputMessage['content'][number];
@@ -69,7 +77,7 @@ function toResponseInputToolCalls(tool_calls: ToolCall[]|null|undefined): Respon
         const func_call: ResponseFunctionToolCall = {
             type: 'function_call',
             name: tool_call.name,
-            call_id: tool_call.call_id ?? "",
+            call_id: tool_call.call_id ?? `call_temp_${getNextUID()}`,
             arguments: tool_call.arguments,
         };
 
@@ -91,11 +99,12 @@ function fromResponseToolCall(api_tool_call: ResponseFunctionToolCall): ToolCall
     return tool_call;
 }
 
-export const OpenAIResponsesInputCodec = {
+export const OpenAIResponseInputCodec = {
     createEncoder: () => (messages) => {
         const input_items: ResponseInputItem[] = [];
 
         for(const message of messages) {
+            const openai_extra = getMessageExtra<OpenAIExtra>(message, OPENAI_EXTRA_KEY);
             const role = message.role;
 
             if(role === 'tool') {
@@ -105,7 +114,7 @@ export const OpenAIResponsesInputCodec = {
 
                 input_items.push({
                     type: 'function_call_output',
-                    call_id: message.call_id ?? message.id ?? "",
+                    call_id: message.call_id ?? message.id ?? `call_temp_${getNextUID()}`,
                     output: content,
                 });
 
@@ -117,9 +126,17 @@ export const OpenAIResponsesInputCodec = {
             if(content.length > 0 || !message.tool_calls?.length) {
                 const input_role = role as Extract<ResponseInputItem, {role: string}>['role'];
                 if(role === 'assistant') {
+                    if(openai_extra?.reasoning_id) {
+                        input_items.push({
+                            type: 'reasoning',
+                            id: openai_extra.reasoning_id,
+                            summary: [], // TODO: fill it in
+                        });
+                    }
+
                     input_items.push({
                         type: 'message',
-                        id: message.id ?? "",
+                        id: message.id ?? `msg_temp_${getNextUID()}`,
                         role: 'assistant',
                         content: content as OutputContentItem[],
                         status: 'completed',
@@ -138,11 +155,13 @@ export const OpenAIResponsesInputCodec = {
             }
         }
 
-        return input_items;
+        return {
+            input: input_items,
+        };
     },
-} satisfies WithCreateEncoder<ResponseInputItem[]>;
+} satisfies WithCreateEncoder<ResponseCreateParamsBase>;
 
-export const OpenAIResponsesOutputCodec = {
+export const OpenAIResponseOutputCodec = {
     createDecoder: () => (response) => {
         const messages: Message[] = [];
 
@@ -190,6 +209,9 @@ export const OpenAIResponsesOutputCodec = {
                     if(item.summary?.length) {
                         msg.reasoning = concatContentsTo(msg.reasoning ?? "", ...item.summary.map(({text}) => text));
                     }
+
+                    getMessageExtra<OpenAIExtra>(msg, OPENAI_EXTRA_KEY, true).reasoning_id = item.id;
+
                     break;
                 }
                 default: {
@@ -200,15 +222,11 @@ export const OpenAIResponsesOutputCodec = {
 
         flushMessage();
 
-        if(messages.length === 1) {
-            messages[0].id = response.id;
-        }
-
         return { messages };
     },
 } satisfies WithCreateDecoder<Response>;
 
-export const OpenAIResponsesCodec = {
-    createEncoder: OpenAIResponsesInputCodec.createEncoder,
-    createDecoder: OpenAIResponsesOutputCodec.createDecoder,
+export const OpenAIResponseCodec = {
+    createEncoder: OpenAIResponseInputCodec.createEncoder,
+    createDecoder: OpenAIResponseOutputCodec.createDecoder,
 };
