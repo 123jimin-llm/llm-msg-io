@@ -1,4 +1,5 @@
 import { Message, MessageArray } from "./schema/index.js";
+import { LLMStream } from "./stream/index.js";
 
 /** Decoded list of messages with metadata. */
 export type DecodedData<MetadataType=unknown> = {metadata?: MetadataType, messages: Message[]};
@@ -17,11 +18,17 @@ export type MessageDecoder<EncodedType=string, MetadataType=unknown> = (encoded:
 /** Decode encoded data without validation. */
 export type RawMessageDecoder<EncodedType=string> = (encoded: EncodedType) => unknown;
 
+/** Converts an API stream type into a stream object. */
+export type StreamDecoder<StreamType> = (stream: StreamType) => LLMStream;
+
 /** A function that returns an encoder. */
 export type CodecEncoder<EncodedType=string, EncodeOptions extends object=object, MetadataType=unknown> = (options?: Partial<EncodeOptions>) => MessageEncoder<EncodedType, MetadataType>;
 
 /** A function that returns a decoder. */
 export type CodecDecoder<EncodedType=string, DecodeOptions extends object=object> = (options?: Partial<DecodeOptions>) => RawMessageDecoder<EncodedType>;
+
+/** A function that returns a stream decoder. */
+export type CodecStreamDecoder<StreamType, DecodeOptions extends object=object> = (options?: Partial<DecodeOptions>) => StreamDecoder<StreamType>;
 
 /** An object that provides an encoder. */
 export interface WithCreateEncoder<EncodedType=string, EncodeOptions extends object=object, MetadataType=unknown> {
@@ -32,6 +39,11 @@ export interface WithCreateEncoder<EncodedType=string, EncodeOptions extends obj
 export interface WithCreateDecoder<EncodedType=string, DecodeOptions extends object=object> {
     createDecoder: CodecDecoder<EncodedType, DecodeOptions>;
 };
+
+/** An object that provides a stream decoder. */
+export interface WithCreateStreamDecoder<StreamType, DecodeOption extends object=object> {
+    createStreamDecoder: CodecStreamDecoder<StreamType, DecodeOption>;
+}
 
 /** An object that provides both an encoder and a decoder. */
 export type Codec<EncodedType=string, EncodeOptions extends object=object, DecodeOptions extends object=object, MetadataType=unknown>

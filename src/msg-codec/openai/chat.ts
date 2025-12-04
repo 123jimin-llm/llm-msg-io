@@ -1,11 +1,11 @@
-import {
+import type {
     ChatCompletionMessageParam as OpenAIChatInputMessage,
     ChatCompletionMessage as OpenAIChatOutputMessage,
     ChatCompletion as OpenAIChatCompletion,
     ChatCompletionContentPart,
     ChatCompletionMessageToolCall,
     ChatCompletionCreateParamsBase,
-} from "openai/resources/chat/completions.mjs";
+} from "openai/resources/chat/completions";
 
 import { Message, MessageContent, ContentPart, WithCreateEncoder, WithCreateDecoder, ToolCall } from "../../message/index.js";
 
