@@ -16,6 +16,12 @@ export interface OpenAIExtra {
 
 const OPENAI_EXTRA_KEY = 'openai';
 
+function ensureIDPrefix(prefix: string, id: string|null|undefined): string {
+    if(!id) return `${prefix}_temp_${getNextUID()}`;
+    if(id.startsWith(prefix)) return id;
+    return `${prefix}_${id}`;
+}
+
 type InputContentItem = Extract<ResponseInputItem, {content: unknown}>['content'][number];
 type OutputContentItem = ResponseOutputMessage['content'][number];
 
@@ -77,7 +83,7 @@ function toResponseInputToolCalls(tool_calls: ToolCall[]|null|undefined): Respon
         const func_call: ResponseFunctionToolCall = {
             type: 'function_call',
             name: tool_call.name,
-            call_id: tool_call.call_id ?? `call_temp_${getNextUID()}`,
+            call_id: ensureIDPrefix('call', tool_call.call_id),
             arguments: tool_call.arguments,
         };
 
@@ -114,7 +120,7 @@ export const OpenAIResponseInputCodec = {
 
                 input_items.push({
                     type: 'function_call_output',
-                    call_id: message.call_id ?? message.id ?? `call_temp_${getNextUID()}`,
+                    call_id: ensureIDPrefix('call', message.call_id ?? message.id),
                     output: content,
                 });
 
@@ -136,7 +142,7 @@ export const OpenAIResponseInputCodec = {
 
                     input_items.push({
                         type: 'message',
-                        id: message.id ?? `msg_temp_${getNextUID()}`,
+                        id: ensureIDPrefix('msg', message.id),
                         role: 'assistant',
                         content: content as OutputContentItem[],
                         status: 'completed',
