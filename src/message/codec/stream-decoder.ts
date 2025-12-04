@@ -10,3 +10,15 @@ export type CodecStreamDecoder<StreamType, DecodeOptions extends object=object> 
 export interface WithCreateStreamDecoder<StreamType, DecodeOption extends object=object> {
     createStreamDecoder: CodecStreamDecoder<StreamType, DecodeOption>;
 }
+
+/** Either a function that returns a stream decoder, or a codec with createStreamDecoder. */
+export type CodecStreamDecoderLike<StreamType, DecodeOptions extends object=object> = CodecStreamDecoder<StreamType, DecodeOptions> | WithCreateStreamDecoder<StreamType, DecodeOptions>;
+
+/** Invokes the function that returns a stream decoder. */
+export function createStreamDecoder<StreamType, DecodeOptions extends object=object>(
+    codec: CodecStreamDecoderLike<StreamType, DecodeOptions>,
+    options?: DecodeOptions,
+) {
+    const createDecoder = (typeof codec === 'function') ? codec : codec.createStreamDecoder;
+    return createDecoder(options);
+}
