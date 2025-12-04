@@ -1,4 +1,4 @@
 // Supports for various API endpoints.
 
-export * from "./null.js";
-export * from "./openai/index.js";
+export * from "./null.ts";
+export * from "./openai/index.ts";

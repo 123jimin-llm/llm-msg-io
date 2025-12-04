@@ -1,10 +1,10 @@
-export * from "./args.js";
-export * from "./type.js";
+export * from "./args.ts";
+export * from "./type.ts";
 
-import type { Command } from "./type.js";
+import type { Command } from "./type.ts";
 
-import { MESSAGE_COMMANDS } from "./message.js";
-import { MISC_COMMANDS } from "./misc.js";
+import { MESSAGE_COMMANDS } from "./message.ts";
+import { MISC_COMMANDS } from "./misc.ts";
 
 export const COMMANDS: Command[] = [
     ...MESSAGE_COMMANDS,

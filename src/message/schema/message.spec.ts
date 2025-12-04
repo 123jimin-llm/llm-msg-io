@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { Message, MessageArray } from "./message.js";
+import { Message, MessageArray } from "./message.ts";
 
 describe("Message", () =>{
     it("should assert valid messages", () => {

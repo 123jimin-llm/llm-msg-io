@@ -1,3 +1,3 @@
-export * from "./chat.js";
-export * from "./chat-stream.js";
-export * from "./response.js";
+export * from "./chat.ts";
+export * from "./chat-stream.ts";
+export * from "./response.ts";

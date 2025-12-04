@@ -1,3 +1,3 @@
-export * from "./message/index.js";
-export * from "./msg-codec/index.js";
-export * from "./file-codec/index.js";
+export * from "./message/index.ts";
+export * from "./msg-codec/index.ts";
+export * from "./file-codec/index.ts";

@@ -1,5 +1,5 @@
-import { concatContentsTo } from "./content.js";
-import type { Message, ToolCall } from "./message.js";
+import { concatContentsTo } from "./content.ts";
+import type { Message, ToolCall } from "./message.ts";
 
 export interface MessageDeltaMessage {
     type: 'message';
@@ -24,7 +24,8 @@ function getMessageAt(messages: Message[], index: number): Message {
         } satisfies Message);
     }
 
-    return messages[index];
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return messages[index]!;
 }
 
 function getToolCallAt(message: Message, index: number): ToolCall {
@@ -38,7 +39,8 @@ function getToolCallAt(message: Message, index: number): ToolCall {
         });
     }
 
-    return tool_calls[index];
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return tool_calls[index]!;
 }
 
 /**

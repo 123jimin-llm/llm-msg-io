@@ -1,4 +1,4 @@
-import type { MessageContent } from "../index.js";
+import type { MessageContent } from "../index.ts";
 
 export interface ContentDeltaEvent {
     type: "content.delta";

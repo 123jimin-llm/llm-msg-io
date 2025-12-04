@@ -1,2 +1,2 @@
-export * from "./codec/index.js";
-export * from "./schema/index.js";
+export * from "./codec/index.ts";
+export * from "./schema/index.ts";

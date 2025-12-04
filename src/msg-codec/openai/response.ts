@@ -1,14 +1,15 @@
-import {
+import type {
     ResponseInputItem,
     ResponseOutputMessage,
     ResponseFunctionToolCall,
     ResponseInputContent,
     Response,
     ResponseCreateParamsBase,
-} from "openai/resources/responses/responses.mjs";
+} from "openai/resources/responses/responses";
 
-import { Message, MessageContent, ContentPart, WithCreateEncoder, WithCreateDecoder, concatContentsTo, ToolCall, getMessageExtra } from "../../message/index.js";
-import { getNextUID } from "../../util/uid.js";
+import type { Message, MessageContent, ContentPart, WithCreateEncoder, WithCreateDecoder, ToolCall } from "../../message/index.ts";
+import { concatContentsTo, getMessageExtra } from "../../message/index.ts";
+import { getNextUID } from "../../util/uid.ts";
 
 export interface OpenAIExtra {
     reasoning_id?: string;
@@ -64,7 +65,8 @@ function fromResponseOutputContent(contents: OutputContentItem[]|null|undefined)
     if(!contents?.length) return "";
 
     if(contents.length === 1) {
-        const [part] = contents;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const part = contents[0]!;
         if(part.type === 'output_text' && !(part.annotations?.length)) return part.text;
     }
 

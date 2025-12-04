@@ -1,7 +1,7 @@
-import type { Codec } from "../../message/codec/index.js";
+import type { Codec } from "../../message/codec/index.ts";
 
-import { createEncoder } from "./encoder.js";
-import { createDecoder } from "./decoder.js";
+import { createEncoder } from "./encoder.ts";
+import { createDecoder } from "./decoder.ts";
 
 export const STFCodec = {
     createEncoder,

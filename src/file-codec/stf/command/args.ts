@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 import JSON5 from "json5";
 
-import type { CommandArgs } from "./type.js";
+import type { CommandArgs } from "./type.ts";
 
 function scanBlank(s: string, i: number): number {
     while( i < s.length && (s[i] === ' ' || s[i] === '\t') ) ++i;
@@ -79,12 +81,12 @@ export function parseCommandArgs(args_text: string, line_no: number = 0): Comman
         if(i >= n) break;
 
         const key_start = i;
-        if(!/[a-z]/i.test(args_text[i])) {
+        if(!/[a-z]/i.test(args_text[i]!)) {
             throw new SyntaxError(`Line ${line_no+1}: Argument key must start with [a-z].`);
         }
 
         ++i;
-        while(i < n && /[a-z0-9]/i.test(args_text[i])) ++i;
+        while(i < n && /[a-z0-9]/i.test(args_text[i]!)) ++i;
         const key = args_text.slice(key_start, i);
 
         i = scanBlank(args_text, i);

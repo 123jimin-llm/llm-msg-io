@@ -1,6 +1,6 @@
 /// ND-JSON format
 
-import type { Codec } from "../message/codec/index.js";
+import type { Codec } from "../message/codec/index.ts";
 
 type JsonObject = Record<string, unknown>;
 
@@ -46,7 +46,7 @@ export const NDJSONCodec = {
             assertJsonObject(value);
 
             if(!metadata_parsed && ('metadata' in value) && Object.keys(value).length === 1) {
-                metadata = value.metadata;
+                metadata = value['metadata'];
                 metadata_parsed = true;
                 continue;
             }

@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
-import { type Message, createDecoder } from "../../message/index.js";
-import { createDecoder as createSTFDecoder } from "./decoder.js";
+import { type Message, createDecoder } from "../../message/index.ts";
+import { createDecoder as createSTFDecoder } from "./decoder.ts";
 
 const decoder = createDecoder(createSTFDecoder);
 

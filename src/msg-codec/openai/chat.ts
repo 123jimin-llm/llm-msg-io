@@ -7,7 +7,8 @@ import type {
     ChatCompletionCreateParamsBase,
 } from "openai/resources/chat/completions";
 
-import { Message, MessageContent, ContentPart, WithCreateEncoder, WithCreateDecoder, ToolCall } from "../../message/index.js";
+import type { Message, MessageContent, ContentPart, WithCreateEncoder, WithCreateDecoder } from "../../message/index.ts";
+import { ToolCall } from "../../message/index.ts";
 
 function toChatCompletionContent(content: MessageContent|null|undefined): OpenAIChatInputMessage['content'] {
     if(content == null) return null;
@@ -77,7 +78,8 @@ function fromChatCompletionContent(content: OpenAIChatInputMessage['content']|nu
     }
 
     if(content.length === 1) {
-        const [part] = content;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const part = content[0]!;
         if(part.type === 'text') return part.text;
     }
 

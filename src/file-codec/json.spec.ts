@@ -1,7 +1,7 @@
 import { assert } from 'chai';
-import { JSONCodec } from "./json.js"
+import { JSONCodec } from "./json.ts"
 
-import { type Message, asDecodedData } from "../index.js";
+import { type Message, asDecodedData } from "../index.ts";
 
 const messages: Message[] = [
     {

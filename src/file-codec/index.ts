@@ -1,8 +1,8 @@
 // Supports for each file format.
 
-export * from "./json.js";
-export * from "./ndjson.js";
+export * from "./json.ts";
+export * from "./ndjson.ts";
 
-export * from "./toml.js";
+export * from "./toml.ts";
 
-export * from "./stf/index.js";
+export * from "./stf/index.ts";

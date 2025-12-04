@@ -1,7 +1,7 @@
-export * from "./event.js";
+export * from "./event.ts";
 
-import { Message } from "../index.js";
-import { LLMStreamEvent, LLMStreamEventType } from "./event.js";
+import { Message } from "../index.ts";
+import type { LLMStreamEvent, LLMStreamEventType } from "./event.ts";
 
 export type LLMStreamEventListener<T extends LLMStreamEventType> = (event: Extract<LLMStreamEvent, {type: T}>) => void;
 

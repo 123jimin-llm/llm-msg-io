@@ -1,6 +1,6 @@
-import type { CodecDecoder } from "../../message/index.js";
-import { COMMAND_LOOKUP, CommandMode, parseCommandArgs } from "./command/index.js";
-import { createDecodeState, flushBufferedLines, flushDecodeState } from "./decode-state.js";
+import type { CodecDecoder } from "../../message/index.ts";
+import { COMMAND_LOOKUP, CommandMode, parseCommandArgs } from "./command/index.ts";
+import { createDecodeState, flushBufferedLines, flushDecodeState } from "./decode-state.ts";
 
 const BLANK_LINE_PATTERN = /^[ \t]*$/;
 const COMMAND_LINE_PATTERN = /^;[ \t]*(\/\/|\/\*|\*\/|#|[a-z][a-z0-9]*)/i;
@@ -70,7 +70,8 @@ export const createDecoder: CodecDecoder<string, Partial<STFDecoderOptions>> = (
         const command_match = raw_line.match(COMMAND_LINE_PATTERN);
         if(command_match == null) throw new SyntaxError(`Line ${line_no + 1}: Unknown command line.`)
 
-        const command_name = command_match[1];
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const command_name = command_match[1]!;
 
         // line comments
         if(command_name === "//" || command_name === "#") {

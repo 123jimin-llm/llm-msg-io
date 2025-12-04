@@ -1,4 +1,4 @@
-import { type DecodeState } from "../decode-state.js";
+import { type DecodeState } from "../decode-state.ts";
 
 export const CommandMode = Object.freeze({
     NILADIC: 0,

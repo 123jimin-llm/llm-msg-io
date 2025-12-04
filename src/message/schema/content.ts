@@ -1,5 +1,5 @@
 import { type } from 'arktype';
-import { exportType } from "../../util/type.js";
+import { exportType } from "../../util/type.ts";
 
 export const ContentPartText = exportType(type({
     type: '"text"',
@@ -56,7 +56,9 @@ export type MessageContent = typeof MessageContent.infer;
  */
 export function concatContents(...contents: MessageContent[]): MessageContent {
     if(contents.length === 0) return "";
-    if(contents.length === 1) return contents[0];
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    if(contents.length === 1) return contents[0]!;
 
     if(contents.every((content) => (typeof content) === 'string')) {
         return contents.join('');

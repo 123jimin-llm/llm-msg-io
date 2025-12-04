@@ -1,7 +1,7 @@
 import { type } from "arktype";
-import { exportType, type PublicType } from "../../util/type.js";
+import { exportType, type PublicType } from "../../util/type.ts";
 
-import { MessageContent } from "./content.js";
+import { MessageContent } from "./content.ts";
 
 export const ToolCall = exportType(type({
     "id?": "string",

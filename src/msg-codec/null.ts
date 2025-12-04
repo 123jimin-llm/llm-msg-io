@@ -1,4 +1,4 @@
-import { Codec, MessageArrayLike } from "../message/index.js";
+import type { Codec, MessageArrayLike } from "../message/index.ts";
 
 export const NullCodec = {
     createEncoder: () => (messages) => messages,

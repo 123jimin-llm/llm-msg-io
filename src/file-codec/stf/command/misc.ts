@@ -1,5 +1,5 @@
-import { flushDecodeState } from "../decode-state.js";
-import { Command, CommandMode } from "./type.js";
+import { flushDecodeState } from "../decode-state.ts";
+import { type Command, CommandMode } from "./type.ts";
 
 const COMMAND_FLUSH: Command = {
     mode: CommandMode.NILADIC,

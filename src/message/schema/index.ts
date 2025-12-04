@@ -1,3 +1,3 @@
-export * from "./content.js";
-export * from "./delta.js";
-export * from "./message.js";
+export * from "./content.ts";
+export * from "./delta.ts";
+export * from "./message.ts";

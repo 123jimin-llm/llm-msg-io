@@ -1,7 +1,7 @@
 import { assert } from 'chai';
-import { ChatCompletionMessage } from 'openai/resources';
+import type { ChatCompletionMessage } from 'openai/resources';
 
-import { OpenAIChatOutputMessagesCodec } from "./chat.js";
+import { OpenAIChatOutputMessagesCodec } from "./chat.ts";
 
 describe("OpenAIChatOutputMessagesCodec", () =>{
     it("should be able to decode simple messages", () => {

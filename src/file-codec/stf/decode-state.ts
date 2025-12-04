@@ -1,6 +1,6 @@
-import { concatContentsTo, type Message } from "../../message/index.js";
+import { concatContentsTo, type Message } from "../../message/index.ts";
 
-import type { Command, CommandArgs } from "./command/index.js";
+import type { Command, CommandArgs } from "./command/index.ts";
 
 export interface DecodeState {
     /** List of messages. */

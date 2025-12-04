@@ -1,4 +1,4 @@
-import { Message } from "../schema/index.js";
+import { Message } from "../schema/index.ts";
 
 /** Encode a list of messages together with arbitrary metadata. */
 export type MessageEncoder<EncodedType=string, MetadataType=unknown> = (messages: Message[], metadata?: MetadataType) => EncodedType;

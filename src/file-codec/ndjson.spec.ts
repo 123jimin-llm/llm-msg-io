@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
-import { NDJSONCodec } from "./ndjson.js";
-import { type Message, asDecodedData } from "../index.js";
+import { NDJSONCodec } from "./ndjson.ts";
+import { type Message, asDecodedData } from "../index.ts";
 
 const messages: Message[] = [
     {

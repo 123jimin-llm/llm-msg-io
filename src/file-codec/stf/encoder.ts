@@ -1,6 +1,6 @@
 import JSON5 from "json5";
 
-import type { Message, CodecEncoder } from "../../message/index.js";
+import type { Message, CodecEncoder } from "../../message/index.ts";
 
 const ROLE_COMMAND_MAP: Readonly<Record<string, string>> = {
     'user': 'user',
