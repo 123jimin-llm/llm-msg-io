@@ -1,8 +1,10 @@
 import {
     ChatCompletionMessageParam as OpenAIChatInputMessage,
     ChatCompletionMessage as OpenAIChatOutputMessage,
+    ChatCompletion as OpenAIChatCompletion,
     ChatCompletionContentPart,
     ChatCompletionMessageToolCall,
+    ChatCompletionCreateParamsBase,
 } from "openai/resources/chat/completions.mjs";
 
 import { Message, MessageContent, ContentPart, WithCreateEncoder, WithCreateDecoder, ToolCall } from "../../message/index.js";
@@ -129,7 +131,7 @@ function fromChatCompletionToolCall(tool_call: ChatCompletionMessageToolCall): T
 
 export const OpenAIChatInputCodec = {
     createEncoder: () => (messages) => {
-        return messages.map((message): OpenAIChatInputMessage => {
+        const api_messages = messages.map((message): OpenAIChatInputMessage => {
             const role = message.role as OpenAIChatInputMessage['role'];
             if(role === 'tool') {
                 return {
@@ -157,12 +159,14 @@ export const OpenAIChatInputCodec = {
 
             return msg;
         });
-    },
-} satisfies WithCreateEncoder<OpenAIChatInputMessage[]>;
 
-export const OpenAIChatOutputCodec = {
+        return {messages: api_messages};
+    },
+} satisfies WithCreateEncoder<Pick<ChatCompletionCreateParamsBase, 'messages'>>;
+
+export const OpenAIChatOutputMessagesCodec = {
     createDecoder: () => (api_messages) => {
-        return api_messages.map((api_message): Message => {
+        const messages = api_messages.map((api_message): Message => {
             const msg: Message = {
                 role: api_message.role,
                 content: fromChatCompletionContent(api_message.content),
@@ -178,8 +182,25 @@ export const OpenAIChatOutputCodec = {
 
             return msg;
         });
+
+        return {
+            messages,
+        };
     },
 } satisfies WithCreateDecoder<OpenAIChatOutputMessage[]>;
+
+export const OpenAIChatOutputCodec = {
+    createDecoder: () => ({id, created, model, choices}) => {
+        return {
+            metadata: {
+                id,
+                created_at: new Date(created*1000),
+                model,
+            },
+            messages: OpenAIChatOutputMessagesCodec.createDecoder()(choices.map(({message}) => message)).messages,
+        };
+    },
+} satisfies WithCreateDecoder<OpenAIChatCompletion>;
 
 export const OpenAIChatCodec = {
     createEncoder: OpenAIChatInputCodec.createEncoder,
