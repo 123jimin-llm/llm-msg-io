@@ -1,6 +1,6 @@
 /// JSON support
 
-import type { Codec } from "../message/codec.js";
+import type { Codec } from "../message/codec/index.js";
 
 export const JSONCodec = {
     createEncoder: () => (messages, metadata?) => {

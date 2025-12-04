@@ -2,7 +2,7 @@
 
 import { parse, stringify } from 'smol-toml';
 
-import type { Codec } from "../message/codec.js";
+import type { Codec } from "../message/codec/index.js";
 
 export const TOMLCodec = {
     createEncoder: () => (messages, metadata?) => {

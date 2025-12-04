@@ -1,4 +1,4 @@
-import type { Codec } from "../../message/index.js";
+import type { Codec } from "../../message/codec/index.js";
 
 import { createEncoder } from "./encoder.js";
 import { createDecoder } from "./decoder.js";
