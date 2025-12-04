@@ -10,6 +10,8 @@ import type {
 import type { Message, MessageContent, ContentPart, WithCreateEncoder, WithCreateDecoder } from "../../message/index.ts";
 import { ToolCall } from "../../message/index.ts";
 
+import { OpenAIChatStreamCodec } from "./chat-stream.ts";
+
 function toChatCompletionContent(content: MessageContent|null|undefined): OpenAIChatInputMessage['content'] {
     if(content == null) return null;
 
@@ -207,4 +209,5 @@ export const OpenAIChatOutputCodec = {
 export const OpenAIChatCodec = {
     createEncoder: OpenAIChatInputCodec.createEncoder,
     createDecoder: OpenAIChatOutputCodec.createDecoder,
+    createStreamDecoder: OpenAIChatStreamCodec.createStreamDecoder,
 };

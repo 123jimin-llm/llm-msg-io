@@ -1,4 +1,5 @@
 export * from "./event.ts";
+export * from "./handler.ts";
 
 import type { Message } from "../schema/index.ts";
 import type { LLMStreamEvent, LLMStreamEventType } from "./event.ts";
