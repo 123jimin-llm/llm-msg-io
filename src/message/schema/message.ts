@@ -58,33 +58,3 @@ export const Message: PublicType<Message> = exportType(type({
 
 export const MessageArray = exportType(Message.array());
 export type MessageArray = typeof MessageArray.infer;
-
-/** Objects that can be converted to an array of messages. */
-export type MessageArrayLike = Message|MessageArray;
-
-/**
- * Returns whether the given object is an array of messages.
- * @param obj The object to check.
- * @returns Whether `obj` is an array of messages.
- */
-export function isMessageArray(obj: MessageArrayLike): obj is MessageArray {
-    return Array.isArray(obj);
-}
-
-/**
- * Converts the given object to an array of messages.
- * @param obj Either a message or an array of messages.
- * @returns Either `obj` or `[obj]`, depending on whether `obj` is an array of messages.
- */
-export function asMessageArray(obj: MessageArrayLike): MessageArray {
-    return isMessageArray(obj) ? obj : [obj];
-}
-
-export function getMessageExtra<T>(message: Message, key: string, init?: false) : T|null;
-export function getMessageExtra<T>(message: Message, key: string, init: true) : T;
-export function getMessageExtra<T>(message: Message, key: string, init = false): T|null {
-    const message_extra = (message.extra || (init ? (message.extra = {}) : null)) as {[key]?: T};
-    if(!message_extra) return null;
-
-    return (message_extra[key] || (init ? (message_extra[key] = {} as T) : null));
-}
