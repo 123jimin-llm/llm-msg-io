@@ -67,7 +67,7 @@ export interface StreamErrorEvent {
     error: Error;
 }
 
-export type LLMStreamEvent = never
+export type StepStreamEvent = never
     | ContentDeltaEvent
     | RefusalDeltaEvent
     | ReasoningDeltaEvent
@@ -80,4 +80,4 @@ export type LLMStreamEvent = never
     | StreamErrorEvent
     ;
 
-export type LLMStreamEventType = LLMStreamEvent['type'];
+export type StepStreamEventType = StepStreamEvent['type'];

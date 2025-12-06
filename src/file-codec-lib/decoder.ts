@@ -1,4 +1,4 @@
-import { Message, MessageArray } from "../schema/index.ts";
+import { Message, MessageArray } from "../message/index.ts";
 
 /** Decoded list of messages with metadata. */
 export type DecodedData<MetadataType=unknown> = {metadata?: MetadataType, messages: Message[]};
@@ -55,7 +55,9 @@ export function asDecodedData(obj: unknown): DecodedData<unknown> {
 }
 
 /** Either a function that returns a decoder, or a codec with createDecoder. */
-export type CodecDecoderLike<EncodedType=string, DecodeOptions extends object=object> = CodecDecoder<EncodedType, DecodeOptions> | WithCreateDecoder<EncodedType, DecodeOptions>;
+export type CodecDecoderLike<EncodedType=string, DecodeOptions extends object=object>
+    = CodecDecoder<EncodedType, DecodeOptions>
+    | WithCreateDecoder<EncodedType, DecodeOptions>;
 
 /** Invokes the function that returns a raw deserializer. */
 export function createRawDecoder<EncodedType=string, DecodeOptions extends object=object>(

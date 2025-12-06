@@ -1,6 +1,6 @@
 /// ND-JSON format
 
-import type { Codec } from "../message/codec/index.ts";
+import type { FileCodec } from "../file-codec-lib/index.ts";
 
 type JsonObject = Record<string, unknown>;
 
@@ -61,4 +61,4 @@ export const NDJSONCodec = {
 
         return {messages};
     },
-} satisfies Codec<string>;
+} satisfies FileCodec<string>;

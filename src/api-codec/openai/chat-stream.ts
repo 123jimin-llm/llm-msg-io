@@ -1,8 +1,8 @@
 import type { Stream } from "openai/streaming";
 import type { ChatCompletionChunk } from "openai/resources";
 
-import type { LLMStream, LLMStreamEventHandlersRecord, LLMStreamEventListener, LLMStreamEventType, LLMStepResponse } from "../../message/stream/index.ts";
-import  { addLLMStreamEventHandler, invokeLLMStreamEventHandlers } from "../../message/stream/index.ts";
+import type { LLMStream, LLMStreamEventHandlersRecord, LLMStreamEventListener, LLMStreamEventType, LLMStepResponse } from "../../api-codec-lib/stream/index.ts";
+import  { addLLMStreamEventHandler, invokeLLMStreamEventHandlers } from "../../api-codec-lib/stream/index.ts";
 import type { WithCreateStreamDecoder } from "../../message/codec/index.ts";
 import { ToolCall, type Message } from "../../message/index.ts";
 

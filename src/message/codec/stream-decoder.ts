@@ -1,4 +1,4 @@
-import type { LLMStream } from "../stream/index.ts";
+import type { LLMStream } from "../../api-codec-lib/stream/index.ts";
 
 /** Converts an API stream type into a stream object. */
 export type StreamDecoder<StreamType> = (stream: StreamType) => LLMStream;
