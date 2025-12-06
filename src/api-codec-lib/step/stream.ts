@@ -14,13 +14,13 @@ export type StepStreamDecoder<
 export type CodecStepStreamDecoder<
     EncodedType,
     DecodedType extends StepResponse = StepResponse,
-    DecodeOptions extends object=object,
+    DecodeOptions extends object = object,
 > = (options?: Partial<DecodeOptions>) => StepStreamDecoder<EncodedType, DecodedType>;
 
 export interface WithCreateStepStreamDecoder<
     EncodedType,
     DecodedType extends StepResponse = StepResponse,
-    DecodeOptions extends object=object,
+    DecodeOptions extends object = object,
 > {
     createStepStreamDecoder: CodecStepStreamDecoder<EncodedType, DecodedType, DecodeOptions>;
 }
@@ -28,7 +28,7 @@ export interface WithCreateStepStreamDecoder<
 export type CodecStepStreamDecoderLike<
     EncodedType,
     DecodedType extends StepResponse = StepResponse,
-    DecodeOptions extends object=object,
+    DecodeOptions extends object = object,
 >
     = CodecStepStreamDecoder<EncodedType, DecodedType, DecodeOptions>
     | WithCreateStepStreamDecoder<EncodedType, DecodedType, DecodeOptions>;
@@ -36,7 +36,7 @@ export type CodecStepStreamDecoderLike<
 export function createStepStreamDecoder<
     EncodedType,
     DecodedType extends StepResponse = StepResponse,
-    DecodeOptions extends object=object,
+    DecodeOptions extends object = object,
 >(
     codec: CodecStepStreamDecoderLike<EncodedType, DecodedType, DecodeOptions>,
     options?: DecodeOptions,
