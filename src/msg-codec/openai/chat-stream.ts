@@ -6,6 +6,8 @@ import  { addLLMStreamEventHandler, invokeLLMStreamEventHandlers } from "../../m
 import type { WithCreateStreamDecoder } from "../../message/codec/index.ts";
 import { ToolCall, type Message } from "../../message/index.ts";
 
+export type OpenAIChatCompletionStream = Stream<ChatCompletionChunk>;
+
 export const OpenAIChatStreamCodec = {
     createStreamDecoder: () => (api_stream) => {
         const handlers: LLMStreamEventHandlersRecord = {};
@@ -140,4 +142,4 @@ export const OpenAIChatStreamCodec = {
 
         return stream;
     },
-} satisfies WithCreateStreamDecoder<Stream<ChatCompletionChunk>>;
+} satisfies WithCreateStreamDecoder<OpenAIChatCompletionStream>;
