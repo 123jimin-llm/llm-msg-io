@@ -2,11 +2,7 @@ import { Message, MessageArray } from "../schema/index.ts";
 
 /** Decoded list of messages with metadata. */
 export type DecodedData<MetadataType=unknown> = {metadata?: MetadataType, messages: Message[]};
-
-export type RawDecodedData<MetadataType=unknown> = Message[] | {
-    metadata?: MetadataType,
-    messages: Message[],
-};
+export type RawDecodedData<MetadataType=unknown> = Message[] | DecodedData<MetadataType>;
 
 /** Decode encoded data into a list of messages together with metadata. */
 export type MessageDecoder<EncodedType=string, MetadataType=unknown> = (encoded: EncodedType) => DecodedData<MetadataType>;
