@@ -50,7 +50,7 @@ console.log(decoded);
 - `/src`: Source code for the library.
   - `/src/util`: Utilities.
   - `/src/message`: Codec type definitions and message utilities.
-  - `/src/msg-codec`: Codecs for API message formats.
+  - `/src/api-codec`: Codecs for API message formats.
   - `/src/file-codec`: Codecs for file formats.
 - `/example`: Example usage of `llm-msg-io`.
 
@@ -86,7 +86,7 @@ It also provides helpers like `createEncoder` and `createDecoder`.
 
 ### Codec
 
-Two domains: `src/file-codec` for serialized file formats and `src/msg-codec` for API input/outputs.
+Two domains: `src/file-codec` for serialized file formats and `src/api-codec` for API input/outputs.
 
 ## Testing
 
