@@ -2,7 +2,7 @@
 
 import { parse, stringify } from 'smol-toml';
 
-import type { Codec } from "../message/codec/index.ts";
+import type { FileCodec } from "../file-codec-lib/index.ts";
 
 export const TOMLCodec = {
     createEncoder: () => (messages, metadata?) => {
@@ -18,5 +18,5 @@ export const TOMLCodec = {
 
         return parse(source) as unknown;
     },
-} satisfies Codec<unknown>;
+} satisfies FileCodec<unknown>;
 

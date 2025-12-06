@@ -1,4 +1,5 @@
 export * from "./encoder.ts";
+export * from "./decoder.ts";
 
 import type { WithCreateEncoder } from "./encoder.ts";
 import type { WithCreateDecoder } from "./decoder.ts";

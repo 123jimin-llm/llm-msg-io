@@ -1,4 +1,4 @@
-import type { CodecDecoder } from "../../message/index.ts";
+import type { CodecDecoder } from "../../file-codec-lib/index.ts";
 import { COMMAND_LOOKUP, CommandMode, parseCommandArgs } from "./command/index.ts";
 import { createDecodeState, flushBufferedLines, flushDecodeState } from "./decode-state.ts";
 
