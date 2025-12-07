@@ -1,25 +1,25 @@
 import type { StepStreamEventHandler, StepStreamEventType } from "../../message/stream/index.ts";
-import type { StepResponse } from "./response.ts";
+import type { StepResult } from "./response.ts";
 
-export interface StepStream<DecodedType extends StepResponse = StepResponse> {
+export interface StepStream<DecodedType extends StepResult = StepResult> {
     on<T extends StepStreamEventType>(type: T, handler: StepStreamEventHandler<T>): this;
     done(): Promise<DecodedType>;
 }
 
 export type StepStreamDecoder<
     EncodedType,
-    DecodedType extends StepResponse = StepResponse,
+    DecodedType extends StepResult = StepResult,
 > = (api_stream: EncodedType) => StepStream<DecodedType>;
 
 export type CodecStepStreamDecoder<
     EncodedType,
-    DecodedType extends StepResponse = StepResponse,
+    DecodedType extends StepResult = StepResult,
     DecodeOptions extends object = object,
 > = (options?: Partial<DecodeOptions>) => StepStreamDecoder<EncodedType, DecodedType>;
 
 export interface WithCreateStepStreamDecoder<
     EncodedType,
-    DecodedType extends StepResponse = StepResponse,
+    DecodedType extends StepResult = StepResult,
     DecodeOptions extends object = object,
 > {
     createStepStreamDecoder: CodecStepStreamDecoder<EncodedType, DecodedType, DecodeOptions>;
@@ -27,7 +27,7 @@ export interface WithCreateStepStreamDecoder<
 
 export type CodecStepStreamDecoderLike<
     EncodedType,
-    DecodedType extends StepResponse = StepResponse,
+    DecodedType extends StepResult = StepResult,
     DecodeOptions extends object = object,
 >
     = CodecStepStreamDecoder<EncodedType, DecodedType, DecodeOptions>
@@ -35,7 +35,7 @@ export type CodecStepStreamDecoderLike<
 
 export function createStepStreamDecoder<
     EncodedType,
-    DecodedType extends StepResponse = StepResponse,
+    DecodedType extends StepResult = StepResult,
     DecodeOptions extends object = object,
 >(
     codec: CodecStepStreamDecoderLike<EncodedType, DecodedType, DecodeOptions>,

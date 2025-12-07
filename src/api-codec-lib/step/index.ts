@@ -3,16 +3,16 @@ export * from "./response.ts";
 export * from "./stream.ts";
 
 import type { Nullable } from "../../util/type.ts";
-import { createStepEncoder, type StepRequest, type WithCreateStepEncoder } from "./request.ts";
-import { createStepDecoder, type StepResponse, type WithCreateStepDecoder } from "./response.ts";
+import { createStepEncoder, type StepParams, type WithCreateStepEncoder } from "./request.ts";
+import { createStepDecoder, type StepResult, type WithCreateStepDecoder } from "./response.ts";
 import { createStepStreamDecoder, type StepStream, type WithCreateStepStreamDecoder } from "./stream.ts";
 
 export type APIStepCodec<
     APIRequestType, APIResponseType,
     EncodeOptions extends object = object,
     DecodeOptions extends object = object,
-    RequestType extends StepRequest = StepRequest,
-    ResponseType extends StepResponse = StepResponse,
+    RequestType extends StepParams = StepParams,
+    ResponseType extends StepResult = StepResult,
 >
     = WithCreateStepEncoder<APIRequestType, RequestType, EncodeOptions>
     & WithCreateStepDecoder<APIResponseType, ResponseType, DecodeOptions>;
@@ -22,8 +22,8 @@ export type APIStepCodecWithStream<
     EncodeOptions extends object = object,
     DecodeOptions extends object = object,
     StreamDecodeOptions extends object = DecodeOptions,
-    RequestType extends StepRequest = StepRequest,
-    ResponseType extends StepResponse = StepResponse,
+    RequestType extends StepParams = StepParams,
+    ResponseType extends StepResult = StepResult,
 >
     = APIStepCodec<APIRequestType, APIResponseType, EncodeOptions, DecodeOptions, RequestType, ResponseType>
     & WithCreateStepStreamDecoder<APIStreamType, ResponseType, StreamDecodeOptions>;
@@ -37,8 +37,8 @@ export function wrapAPIStep<
     EncodeOptions extends object = object,
     DecodeOptions extends object = object,
     StreamDecodeOptions extends DecodeOptions = DecodeOptions,
-    RequestType extends StepRequest = StepRequest,
-    ResponseType extends StepResponse = StepResponse,
+    RequestType extends StepParams = StepParams,
+    ResponseType extends StepResult = StepResult,
 >(
     codec: APIStepCodecWithStream<APIRequestBaseType & { stream?: Nullable<boolean> }, APIResponseType, APIStreamType, EncodeOptions, DecodeOptions, StreamDecodeOptions, RequestType, ResponseType>,
     api: APIStep<APIRequestBaseType, APIResponseType, APIStreamType>,

@@ -1,6 +1,6 @@
 import type { ChatCompletionChunk } from "openai/resources/chat/completions";
 
-import type { StepResponse, StepStream, WithCreateStepStreamDecoder } from "../../../api-codec-lib/step/index.ts";
+import type { StepResult, StepStream, WithCreateStepStreamDecoder } from "../../../api-codec-lib/step/index.ts";
 import { addStepStreamEventHandler, invokeStepStreamEventHandler, Message, type StepStreamEventHandler, type StepStreamEventHandlersRecord, type StepStreamEventType, type ToolCall } from "../../../message/index.ts";
 import type { Stream } from "openai/streaming";
 
@@ -10,7 +10,7 @@ export const OpenAIChatStreamCodec = {
     createStepStreamDecoder: () => (api_stream) => {
         const handlers: StepStreamEventHandlersRecord = {};
 
-        const process_promise = (async(): Promise<StepResponse> => {
+        const process_promise = (async(): Promise<StepResult> => {
             let role = "";
             let content = "";
             let refusal = "";

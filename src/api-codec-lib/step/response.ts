@@ -1,22 +1,22 @@
 import type { Message } from "../../message/index.ts";
 
-export interface StepResponse {
+export interface StepResult {
     messages: Message[];
 }
 
-export type StepDecoder<EncodedType, DecodedType extends StepResponse = StepResponse> = (api_res: EncodedType) => DecodedType;
+export type StepDecoder<EncodedType, DecodedType extends StepResult = StepResult> = (api_res: EncodedType) => DecodedType;
 
-export type CodecStepDecoder<EncodedType, DecodedType extends StepResponse = StepResponse, DecodeOptions extends object=object> = (options?: Partial<DecodeOptions>) => StepDecoder<EncodedType, DecodedType>;
+export type CodecStepDecoder<EncodedType, DecodedType extends StepResult = StepResult, DecodeOptions extends object=object> = (options?: Partial<DecodeOptions>) => StepDecoder<EncodedType, DecodedType>;
 
-export interface WithCreateStepDecoder<EncodedType, DecodedType extends StepResponse = StepResponse, DecodeOptions extends object=object> {
+export interface WithCreateStepDecoder<EncodedType, DecodedType extends StepResult = StepResult, DecodeOptions extends object=object> {
     createStepDecoder: CodecStepDecoder<EncodedType, DecodedType, DecodeOptions>;
 };
 
-export type CodecStepDecoderLike<EncodedType, DecodedType extends StepResponse = StepResponse, DecodeOptions extends object=object>
+export type CodecStepDecoderLike<EncodedType, DecodedType extends StepResult = StepResult, DecodeOptions extends object=object>
     = CodecStepDecoder<EncodedType, DecodedType, DecodeOptions>
     | WithCreateStepDecoder<EncodedType, DecodedType, DecodeOptions>;
 
-export function createStepDecoder<EncodedType, DecodedType extends StepResponse = StepResponse, DecodeOptions extends object=object>(
+export function createStepDecoder<EncodedType, DecodedType extends StepResult = StepResult, DecodeOptions extends object=object>(
     codec: CodecStepDecoderLike<EncodedType, DecodedType, DecodeOptions>,
     options?: DecodeOptions,
 ): StepDecoder<EncodedType, DecodedType> {
