@@ -1,9 +1,13 @@
 import type {
+    ChatCompletionMessageParam as OpenAIChatInputMessage,
+    ChatCompletionContentPart,
+    ChatCompletionMessageToolCall,
     ChatCompletionCreateParams,
 } from "openai/resources/chat/completions";
 
 import type { Nullable } from "../../../util/type.ts";
 import type { WithCreateStepEncoder } from "../../../api-codec-lib/step/request.ts";
+import { messageContentToText, type MessageContent, type ToolCall } from "../../../message/index.ts";
 
 function toChatCompletionContent(content: Nullable<MessageContent>): OpenAIChatInputMessage['content'] {
     if(content == null) return null;
@@ -57,6 +61,52 @@ function toChatCompletionContent(content: Nullable<MessageContent>): OpenAIChatI
     });
 }
 
-export const OpenAIChatRequestCodec = {
+function toChatCompletionToolCall(tool_call: ToolCall): ChatCompletionMessageToolCall {
+    return {
+        id: tool_call.id ?? "",
+        type: 'function',
+        function: {
+            name: tool_call.name,
+            arguments: tool_call.arguments,
+        },
+    }
+}
 
+export const OpenAIChatRequestCodec = {
+    createStepEncoder: () => (req): ChatCompletionCreateParams => {
+        const api_messages = req.messages.map((message): OpenAIChatInputMessage => {
+            const role = message.role as OpenAIChatInputMessage['role'];
+            if(role === 'tool') {
+                return {
+                    role: 'tool',
+                    tool_call_id: message.call_id ?? message.id ?? "",
+                    content: messageContentToText(message.content) ?? "",
+                } satisfies OpenAIChatInputMessage;
+            }
+            const msg = {
+                role: message.role as OpenAIChatInputMessage['role'],
+                content: toChatCompletionContent(message.content),
+            } as OpenAIChatInputMessage;
+
+            if(message.name != null) {
+                (msg as {name?: string}).name = message.name;
+            }
+
+            if(message.tool_calls?.length) {
+                (msg as {tool_calls: ChatCompletionMessageToolCall[]}).tool_calls = message.tool_calls.map((tool_call) => toChatCompletionToolCall(tool_call));
+            }
+
+            if(message.refusal != null) {
+                (msg as {refusal?: string}).refusal = messageContentToText(message.refusal) ?? "";
+            }
+
+            return msg;
+        });
+
+        return {
+            model: "gpt-5-nano",
+            messages: api_messages,
+            stream: false,
+        };
+    },
 } satisfies WithCreateStepEncoder<ChatCompletionCreateParams>;

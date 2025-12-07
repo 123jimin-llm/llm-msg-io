@@ -1,3 +1,5 @@
+import type { Nullable } from "../util/type.ts";
+import type { MessageContent } from "./schema/content.ts";
 import type { Message, MessageArray } from "./schema/message.ts";
 
 /** Objects that can be converted to an array of messages. */
@@ -19,6 +21,15 @@ export function isMessageArray(obj: MessageArrayLike): obj is MessageArray {
  */
 export function asMessageArray(obj: MessageArrayLike): MessageArray {
     return isMessageArray(obj) ? obj : [obj];
+}
+
+export function messageContentToText(content: MessageContent): string;
+export function messageContentToText(content: Nullable<never>): null;
+export function messageContentToText(content: Nullable<MessageContent>): string|null {
+    if(content == null) return null;
+    if(typeof content === 'string') return content;
+
+    return content.map((part) => part.type === 'text' ? part.text : "").join("");
 }
 
 export function getMessageExtra<T>(message: Message, key: string, init?: false) : T|null;
