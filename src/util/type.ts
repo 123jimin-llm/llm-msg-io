@@ -13,3 +13,5 @@ export function exportType<T extends Type>(t: T) {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function assertEqualType<T, U extends T>(..._: [T] extends [U] ? [] : [never]): void {}
+
+export type Nullable<T> = T | null | undefined;

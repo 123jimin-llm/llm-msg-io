@@ -50,16 +50,15 @@ export function wrapAPIStep<
     const stepStreamDecoder = createStepStreamDecoder<APIStreamType, ResponseType, StreamDecodeOptions>(codec, stream_decode_options);
     
     return async <IsStream extends boolean = false>(req: RequestType & { stream?: IsStream }): Promise<IsStream extends true ? StepStream<ResponseType> : ResponseType> => {
-        type APIResponseType = IsStream extends true ? APIStreamType : APIResponseType;
         type ReturnType = IsStream extends true ? StepStream<ResponseType> : ResponseType;
         const api_req = stepEncoder(req);
         // Skip type-checking due to TS2589
-        const api_res = (await (api as (api_req: unknown) => Promise<unknown>)(api_req)) as APIResponseType;
+        const api_res = await (api as (api_req: unknown) => Promise<unknown>)(api_req);
 
         if (req.stream) {
-            return stepStreamDecoder(api_res) as ReturnType;
+            return stepStreamDecoder(api_res as APIStreamType) as ReturnType;
         } else {
-            return stepDecoder(api_res) as ReturnType;
+            return stepDecoder(api_res as APIResponseType) as ReturnType;
         }
     };
 }
