@@ -2,6 +2,7 @@ export * from "./request.ts";
 export * from "./response.ts";
 export * from "./stream.ts";
 
+import type { Nullable } from "../../util/type.ts";
 import { createStepEncoder, type StepRequest, type WithCreateStepEncoder } from "./request.ts";
 import { createStepDecoder, type StepResponse, type WithCreateStepDecoder } from "./response.ts";
 import { createStepStreamDecoder, type StepStream, type WithCreateStepStreamDecoder } from "./stream.ts";
@@ -29,7 +30,7 @@ export type APIStepCodecWithStream<
 
 export type APIStep<
     APIRequestBaseType, APIResponseType, APIStreamType,
-> = <IsStream extends boolean = false>(req: APIRequestBaseType & { stream?: IsStream }) => Promise<IsStream extends true ? APIStreamType : APIResponseType>;
+> = <IsStream extends boolean = false>(req: APIRequestBaseType & { stream?: Nullable<IsStream> }) => Promise<IsStream extends true ? APIStreamType : APIResponseType>;
 
 export function wrapAPIStep<
     APIRequestBaseType, APIResponseType, APIStreamType,
@@ -39,17 +40,17 @@ export function wrapAPIStep<
     RequestType extends StepRequest = StepRequest,
     ResponseType extends StepResponse = StepResponse,
 >(
-    codec: APIStepCodecWithStream<APIRequestBaseType & { stream?: boolean }, APIResponseType, APIStreamType, EncodeOptions, DecodeOptions, StreamDecodeOptions, RequestType, ResponseType>,
+    codec: APIStepCodecWithStream<APIRequestBaseType & { stream?: Nullable<boolean> }, APIResponseType, APIStreamType, EncodeOptions, DecodeOptions, StreamDecodeOptions, RequestType, ResponseType>,
     api: APIStep<APIRequestBaseType, APIResponseType, APIStreamType>,
     encode_options?: EncodeOptions,
     decode_options?: DecodeOptions,
     stream_decode_options?: StreamDecodeOptions,
 ): APIStep<RequestType, ResponseType, StepStream<ResponseType>> {
-    const stepEncoder = createStepEncoder<APIRequestBaseType & { stream?: boolean }, RequestType, EncodeOptions>(codec, encode_options);
+    const stepEncoder = createStepEncoder<APIRequestBaseType & { stream?: Nullable<boolean> }, RequestType, EncodeOptions>(codec, encode_options);
     const stepDecoder = createStepDecoder<APIResponseType, ResponseType, DecodeOptions>(codec, decode_options);
     const stepStreamDecoder = createStepStreamDecoder<APIStreamType, ResponseType, StreamDecodeOptions>(codec, stream_decode_options);
     
-    return async <IsStream extends boolean = false>(req: RequestType & { stream?: IsStream }): Promise<IsStream extends true ? StepStream<ResponseType> : ResponseType> => {
+    return async <IsStream extends boolean = false>(req: RequestType & { stream?: Nullable<IsStream> }): Promise<IsStream extends true ? StepStream<ResponseType> : ResponseType> => {
         type ReturnType = IsStream extends true ? StepStream<ResponseType> : ResponseType;
         const api_req = stepEncoder(req);
         // Skip type-checking due to TS2589

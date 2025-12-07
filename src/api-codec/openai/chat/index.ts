@@ -11,10 +11,16 @@ import { OpenAIChatRequestCodec } from "./request.ts";
 import { OpenAIChatResponseCodec } from "./response.ts";
 import { OpenAIChatStreamCodec, type OpenAIChatCompletionStream } from "./stream.ts";
 
-import type { APIStepCodecWithStream } from "../../../api-codec-lib/step/index.ts";
+import { wrapAPIStep, type APIStep, type APIStepCodecWithStream, type StepRequest, type StepResponse, type StepStream } from "../../../api-codec-lib/step/index.ts";
 
 export const OpenAIChatCodec = {
     ...OpenAIChatRequestCodec,
     ...OpenAIChatResponseCodec,
     ...OpenAIChatStreamCodec,
 } satisfies APIStepCodecWithStream<ChatCompletionCreateParamsBase, ChatCompletion, OpenAIChatCompletionStream>;
+
+export function wrapOpenAIChat(
+    api: APIStep<ChatCompletionCreateParamsBase, ChatCompletion, OpenAIChatCompletionStream>,
+): APIStep<StepRequest, StepResponse, StepStream<StepResponse>> {
+    return wrapAPIStep(OpenAIChatCodec, api);
+}
