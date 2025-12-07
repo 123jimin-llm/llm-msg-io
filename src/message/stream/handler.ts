@@ -1,22 +1,22 @@
 import type { StepStreamEvent, StepStreamEventType } from "./event.ts";
 
-export type LLMStreamEventHandler<K extends StepStreamEventType> = (event: Extract<StepStreamEvent, {type: K}>) => void;
+export type StepStreamEventHandler<K extends StepStreamEventType> = (event: Extract<StepStreamEvent, {type: K}>) => void;
 
-export type LLMStreamEventHandlersRecord = {
-    [K in StepStreamEventType]?: Array<LLMStreamEventHandler<K>>;
+export type StepStreamEventHandlersRecord = {
+    [K in StepStreamEventType]?: Array<StepStreamEventHandler<K>>;
 };
 
-export function addLLMStreamEventHandler<K extends StepStreamEventType>(
-    record: LLMStreamEventHandlersRecord,
+export function addStepStreamEventHandler<K extends StepStreamEventType>(
+    record: StepStreamEventHandlersRecord,
     type: K,
-    handler: LLMStreamEventHandler<K>
+    handler: StepStreamEventHandler<K>
 ) {
-    const handlers: Array<LLMStreamEventHandler<K>> = (record[type] ??= []);
+    const handlers: Array<StepStreamEventHandler<K>> = (record[type] ??= []);
     handlers.push(handler);
 }
 
-export function invokeLLMStreamEventHandlers<K extends StepStreamEventType>(
-    record: LLMStreamEventHandlersRecord,
+export function invokeStepStreamEventHandler<K extends StepStreamEventType>(
+    record: StepStreamEventHandlersRecord,
     event: Extract<StepStreamEvent, {type: K}>,
 ) {
     const handlers = record[event.type];
@@ -24,5 +24,3 @@ export function invokeLLMStreamEventHandlers<K extends StepStreamEventType>(
         for(const handler of handlers) handler(event);
     }
 }
-
-export type StepStreamEventListener<T extends StepStreamEventType> = (event: Extract<StepStreamEvent, {type: T}>) => void;

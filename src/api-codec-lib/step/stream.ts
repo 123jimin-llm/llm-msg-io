@@ -1,8 +1,8 @@
-import type { StepStreamEventListener, StepStreamEventType } from "../../message/stream/index.ts";
+import type { StepStreamEventHandler, StepStreamEventType } from "../../message/stream/index.ts";
 import type { StepResponse } from "./response.ts";
 
 export interface StepStream<DecodedType extends StepResponse = StepResponse> {
-    on<T extends StepStreamEventType>(type: T, listener: StepStreamEventListener<T>): this;
+    on<T extends StepStreamEventType>(type: T, handler: StepStreamEventHandler<T>): this;
     done(): Promise<DecodedType>;
 }
 
