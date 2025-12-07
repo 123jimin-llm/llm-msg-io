@@ -7,7 +7,7 @@ import * as readline from "node:readline/promises";
 import { stdin, stdout } from "node:process";
 import * as fs from "node:fs/promises";
 
-import { OpenAIChatCodec, STFCodec, createEncoder, createDecoder, createStreamDecoder } from "../dist/index.js";
+import { STFCodec, createEncoder, createDecoder, wrapOpenAIChat } from "../dist/index.js";
 import { OpenAI } from "openai";
 
 const HISTORY_PATH = "history.stf";
@@ -40,8 +40,11 @@ async function main() {
     const messages = await loadHistory();
     const rl = readline.createInterface({input: stdin, output: stdout});
 
-    const encode = createEncoder(OpenAIChatCodec);
-    const decode = createStreamDecoder(OpenAIChatCodec);
+    const step = wrapOpenAIChat((req) => {
+        console.log(req);
+        if(!req.stream) throw new Error("Why?");
+        return openai.chat.completions.create(req);
+    });
 
     while(true) {
         const user_input = await rl.question("You> ");
@@ -49,16 +52,12 @@ async function main() {
 
         messages.push({role: 'user', content: user_input});
 
-        const stream = await openai.chat.completions.create({
-            ...encode(messages),
-            model: 'gpt-5-nano',
+        const stream = await step({
+            messages,
             stream: true,
         });
 
-        console.log(stream);
-        const res = decode(stream);
-
-        const ans = await res.done();
+        const ans = await stream.done();
         console.log(ans);
 
         await saveHistory(messages);

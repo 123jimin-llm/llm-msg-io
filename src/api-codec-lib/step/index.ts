@@ -52,7 +52,7 @@ export function wrapAPIStep<
     
     return async <IsStream extends boolean = false>(req: RequestType & { stream?: Nullable<IsStream> }): Promise<IsStream extends true ? StepStream<ResponseType> : ResponseType> => {
         type ReturnType = IsStream extends true ? StepStream<ResponseType> : ResponseType;
-        const api_req = stepEncoder(req);
+        const api_req = {...stepEncoder(req), stream: req.stream ?? false};
         // Skip type-checking due to TS2589
         const api_res = await (api as (api_req: unknown) => Promise<unknown>)(api_req);
 

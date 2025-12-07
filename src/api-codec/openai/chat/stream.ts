@@ -8,7 +8,6 @@ export type OpenAIChatCompletionStream = Stream<ChatCompletionChunk>;
 
 export const OpenAIChatStreamCodec = {
     createStepStreamDecoder: () => (api_stream) => {
-        
         const handlers: StepStreamEventHandlersRecord = {};
 
         const process_promise = (async(): Promise<StepResponse> => {

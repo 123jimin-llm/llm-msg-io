@@ -3,8 +3,10 @@ export * from "./response.ts";
 export * from "./stream.ts";
 
 import type {
+    Completions,
     ChatCompletion,
     ChatCompletionCreateParamsBase,
+    ChatCompletionCreateParams,
 } from "openai/resources/chat/completions";
 
 import { OpenAIChatRequestCodec } from "./request.ts";
@@ -20,7 +22,7 @@ export const OpenAIChatCodec = {
 } satisfies APIStepCodecWithStream<ChatCompletionCreateParamsBase, ChatCompletion, OpenAIChatCompletionStream>;
 
 export function wrapOpenAIChat(
-    api: APIStep<ChatCompletionCreateParamsBase, ChatCompletion, OpenAIChatCompletionStream>,
+    api: (req: ChatCompletionCreateParams) => ReturnType<typeof Completions.prototype.create>,
 ): APIStep<StepRequest, StepResponse, StepStream<StepResponse>> {
-    return wrapAPIStep(OpenAIChatCodec, api);
+    return wrapAPIStep(OpenAIChatCodec, api as APIStep<ChatCompletionCreateParamsBase, ChatCompletion, OpenAIChatCompletionStream>);
 }
