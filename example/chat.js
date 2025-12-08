@@ -7,7 +7,7 @@ import * as readline from "node:readline/promises";
 import { stdin, stdout } from "node:process";
 import * as fs from "node:fs/promises";
 
-import { STFCodec, createEncoder, createDecoder, wrapOpenAIChat } from "../dist/index.js";
+import { STFCodec, createEncoder, createDecoder, wrapOpenAIChat, messageContentToText } from "../dist/index.js";
 import { OpenAI } from "openai";
 
 const HISTORY_PATH = "history.stf";
@@ -40,11 +40,7 @@ async function main() {
     const messages = await loadHistory();
     const rl = readline.createInterface({input: stdin, output: stdout});
 
-    const step = wrapOpenAIChat((req) => {
-        console.log(req);
-        if(!req.stream) throw new Error("Why?");
-        return openai.chat.completions.create(req);
-    });
+    const step = wrapOpenAIChat((req) => openai.chat.completions.create(req));
 
     while(true) {
         const user_input = await rl.question("You> ");
@@ -57,8 +53,16 @@ async function main() {
             stream: true,
         });
 
+        stdout.write("AI> ");
+
+        stream.on("content.delta", (event) => {
+            stdout.write(messageContentToText(event.delta));
+        });
+
         const ans = await stream.done();
-        console.log(ans);
+        messages.push(...ans.messages);
+
+        stdout.write("\n");
 
         await saveHistory(messages);
     }
