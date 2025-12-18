@@ -24,6 +24,21 @@ describe("file-codec/stf", () => {
                 ] satisfies Message[]);
             });
 
+            it("should decode a simple STF file involving nunjucks", () => {
+                const serialized = [
+                    ";developer",
+                    "{{ prompt.game }}",
+                    ";user",
+                    "{{ prompt.scenario }}",
+                ].join('\n');
+
+                const { messages } = decoder(serialized);
+                assert.deepStrictEqual(messages, [
+                    {role: 'developer', content: "{{ prompt.game }}"},
+                    {role: 'user', content: "{{ prompt.scenario }}"},
+                ] satisfies Message[]);
+            });
+
             it("should handle multiline content", () => {
                 const serialized = [
                     ";user",
