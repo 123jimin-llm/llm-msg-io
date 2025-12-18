@@ -57,6 +57,12 @@ export function stripMessageIds(messages: Message|Message[]): Message|Message[] 
     }
 }
 
+/**
+ * Swaps message ID of a given message.
+ * @param msg_id_map 
+ * @param message 
+ * @returns 
+ */
 export function mapMessageId(msg_id_map: Map<string, string>|Record<string, string>, message: Message): Message {
     const msg = {...message};
     if(msg.id == null) return msg;
@@ -76,5 +82,42 @@ export function mapMessageIds(msg_id_map: Map<string, string>|Record<string, str
         return messages.map((message) => mapMessageId(msg_id_map, message));
     } else {
         return mapMessageId(msg_id_map, messages);
+    }
+}
+
+/**
+ * Transforms all text contents of a given message.
+ * @param fn 
+ * @param message 
+ * @returns 
+ */
+export function mapMessageText(fn: (text: string) => string, message: Message): Message {
+    const { content } = message;
+
+    let new_content;
+
+    if(typeof content === 'string') {
+        new_content = fn(content);
+    } else {
+        new_content = content.map(part => {
+            if(part.type === 'text') return { ...part, text: fn(part.text) };
+            else return part;
+        });
+    }
+
+    return {
+        ...message,
+        content: new_content,
+    };
+}
+
+
+export function mapMessageTexts(fn: (text: string) => string, message: Message): Message;
+export function mapMessageTexts(fn: (text: string) => string, messages: Message[]): Message[];
+export function mapMessageTexts(fn: (text: string) => string, messages: Message|Message[]): Message|Message[] {
+    if(Array.isArray(messages)) {
+        return messages.map((message) => mapMessageText(fn, message));
+    } else {
+        return mapMessageText(fn, messages);
     }
 }
