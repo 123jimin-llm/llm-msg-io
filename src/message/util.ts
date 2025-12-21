@@ -111,7 +111,6 @@ export function mapMessageText(fn: (text: string) => string, message: Message): 
     };
 }
 
-
 export function mapMessageTexts(fn: (text: string) => string, message: Message): Message;
 export function mapMessageTexts(fn: (text: string) => string, messages: Message[]): Message[];
 export function mapMessageTexts(fn: (text: string) => string, messages: Message|Message[]): Message|Message[] {
@@ -119,5 +118,35 @@ export function mapMessageTexts(fn: (text: string) => string, messages: Message|
         return messages.map((message) => mapMessageText(fn, message));
     } else {
         return mapMessageText(fn, messages);
+    }
+}
+
+export async function asyncMapMessageText(fn: (text: string) => Promise<string>, message: Message): Promise<Message> {
+    const { content } = message;
+
+    let new_content;
+
+    if(typeof content === 'string') {
+        new_content = await fn(content);
+    } else {
+        new_content = await Promise.all(content.map(async(part) => {
+            if(part.type === 'text') return { ...part, text: await fn(part.text) };
+            else return part;
+        }));
+    }
+
+    return {
+        ...message,
+        content: new_content,
+    };
+}
+
+export async function asyncMapMessageTexts(fn: (text: string) => Promise<string>, message: Message): Promise<Message>;
+export async function asyncMapMessageTexts(fn: (text: string) => Promise<string>, messages: Message[]): Promise<Message[]>;
+export async function asyncMapMessageTexts(fn: (text: string) => Promise<string>, messages: Message|Message[]): Promise<Message|Message[]> {
+    if(Array.isArray(messages)) {
+        return await Promise.all(messages.map((message) => asyncMapMessageText(fn, message)));
+    } else {
+        return asyncMapMessageText(fn, messages);
     }
 }
