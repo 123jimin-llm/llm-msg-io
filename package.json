@@ -35,13 +35,13 @@
     "@types/chai": "^5.2.3",
     "@types/mocha": "^10.0.10",
     "@types/node": "^25.0.3",
-    "chai": "^6.2.1",
+    "chai": "^6.2.2",
     "eslint": "^9.39.2",
     "mocha": "^11.7.5",
-    "openai": "^6.14.0",
+    "openai": "^6.15.0",
     "rimraf": "^6.1.2",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.50.0"
+    "typescript-eslint": "^8.51.0"
   },
   "peerDependencies": {
     "@google/genai": "^1",
@@ -50,6 +50,6 @@
   "dependencies": {
     "arktype": "^2.1.29",
     "json5": "^2.2.3",
-    "smol-toml": "^1.5.2"
+    "smol-toml": "^1.6.0"
   }
 }
