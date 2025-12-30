@@ -60,7 +60,7 @@ Here is the encoded value:
 
 ### History to/from STF
 
-[Simple Text Format](./doc/stf/README.md) is a simple plaintext format for storing LLM messages.
+[Simple Text Format](./docs/stf/README.md) is a simple plaintext format for storing LLM messages.
 Check the documentation for more details.
 
 Here is the encoded value, using `STFCodec`:
@@ -79,7 +79,7 @@ Hi!
 
 - Converting to/from various API message formats.
 - Converting to/from various serialization formats.
-- [STF](./doc/stf/README.md) format for simple text representation of LLM messages.
+- [STF](./docs/stf/README.md) format for simple text representation of LLM messages.
 - Minimal dependencies.
 
 ### Supported API Message Types
@@ -87,10 +87,10 @@ Hi!
 - `OpenAIChatCodec`: for OpenAI chat completion parameters and responses
 ### Supported Serialization Types
 
-- `JSONCodec`: to/from [JSON](./doc/json.md)
-- `NDJSONCodec`: to/from [NDJSON](./doc/json.md)
+- `JSONCodec`: to/from [JSON](./docs/json.md)
+- `NDJSONCodec`: to/from [NDJSON](./docs/json.md)
 - `TOMLCodec`: to/from TOML, using the same format as `JSONCodec` does.
-- `STFCodec`: to/from [STF](./doc/stf/README.md)
+- `STFCodec`: to/from [STF](./docs/stf/README.md)
 
 ### Minimal Dependencies
 
