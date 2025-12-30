@@ -6,7 +6,7 @@ import type {
 } from "openai/resources/chat/completions";
 
 import type { Nullable } from "../../../util/type.ts";
-import type { WithCreateStepEncoder } from "../../../api-codec-lib/step/request.ts";
+import type { WithCreateStepEncoder } from "../../../api-codec-lib/index.ts";
 import { messageContentToText, type MessageContent, type ToolCall } from "../../../message/index.ts";
 
 function toChatCompletionContent(content: Nullable<MessageContent>): OpenAIChatInputMessage['content'] {
