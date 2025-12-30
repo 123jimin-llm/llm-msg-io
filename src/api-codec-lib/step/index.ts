@@ -30,6 +30,10 @@ export type APIStepCodecWithStream<
 
 export type APIStep<
     APIRequestBaseType, APIResponseType, APIStreamType,
+> = <IsStream extends boolean = false>(req: APIRequestBaseType & { stream?: Nullable<IsStream> }) => Promise<APIStreamType | APIResponseType>;
+
+export type StrictAPIStep<
+    APIRequestBaseType, APIResponseType, APIStreamType,
 > = <IsStream extends boolean = false>(req: APIRequestBaseType & { stream?: Nullable<IsStream> }) => Promise<IsStream extends true ? APIStreamType : APIResponseType>;
 
 export function wrapAPIStep<
@@ -45,7 +49,7 @@ export function wrapAPIStep<
     encode_options?: EncodeOptions,
     decode_options?: DecodeOptions,
     stream_decode_options?: StreamDecodeOptions,
-): APIStep<RequestType, ResponseType, StepStream<ResponseType>> {
+): StrictAPIStep<RequestType, ResponseType, StepStream<ResponseType>> {
     const stepEncoder = createStepEncoder<APIRequestBaseType & { stream?: Nullable<boolean> }, RequestType, EncodeOptions>(codec, encode_options);
     const stepDecoder = createStepDecoder<APIResponseType, ResponseType, DecodeOptions>(codec, decode_options);
     const stepStreamDecoder = createStepStreamDecoder<APIStreamType, ResponseType, StreamDecodeOptions>(codec, stream_decode_options);
