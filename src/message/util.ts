@@ -32,7 +32,16 @@ export function messageContentToText(content: Nullable<MessageContent>): string|
     return content.map((part) => part.type === 'text' ? part.text : "").join("");
 }
 
-export function getMessageExtra<T>(message: Message, key: string, init?: false) : T|null;
+export function messageContentToTextArray(content: MessageContent): string[];
+export function messageContentToTextArray(content: Nullable<never>): null;
+export function messageContentToTextArray(content: Nullable<MessageContent>): string[]|null {
+    if(content == null) return null;
+    if(typeof content === 'string') return [content];
+
+    return content.filter((part) => part.type === 'text').map((part) => part.text);
+}
+
+export function getMessageExtra<T>(message: Message, key: string, init?: boolean) : T|null;
 export function getMessageExtra<T>(message: Message, key: string, init: true) : T;
 export function getMessageExtra<T>(message: Message, key: string, init = false): T|null {
     const message_extra = (message.extra || (init ? (message.extra = {}) : null)) as {[key]?: T};
