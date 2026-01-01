@@ -70,4 +70,4 @@ async function main() {
     rl.close();
 }
 
-main().catch(console.error);
+main().catch(globalThis.console.error);
