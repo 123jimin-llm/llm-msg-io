@@ -4,13 +4,14 @@
 /** @import {Message} from "../dist/index.js" */
 
 import * as readline from "node:readline/promises";
-import { stdin, stdout } from "node:process";
-import * as fs from "node:fs/promises";
+import { stdin, stdout, env } from "node:process";
 
 import { createStepEncoder, createStepDecoder, GeminiGenerateContentRequestCodec, GeminiGenerateContentResponseCodec } from "../dist/index.js";
 import { GoogleGenAI } from "@google/genai";
 
-const api = new GoogleGenAI({});
+const api = new GoogleGenAI({
+    apiKey: env['GEMINI_API_KEY'],
+});
 
 async function main() {
     /** @type {Message[]} */

@@ -89,7 +89,7 @@ export const GeminiGenerateContentRequestCodec = {
         type GenerateContentParametersConfig = {'config': Exclude<GenerateContentParameters['config'], undefined>};
         const api_req: GenerateContentParameters & GenerateContentParametersConfig = {
             model: "gemini-3-flash-preview",
-            contents: [],
+            contents: api_messages,
             config: {},
         };
 
