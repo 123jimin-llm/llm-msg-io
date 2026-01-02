@@ -6,7 +6,7 @@
 import * as readline from "node:readline/promises";
 import { stdin, stdout, env } from "node:process";
 
-import { createStepEncoder, createStepDecoder, GeminiGenerateContentRequestCodec, GeminiGenerateContentResponseCodec, messageContentToText } from "../dist/index.js";
+import { createStepEncoder, createStepDecoder, GeminiGenerateContentCodec, messageContentToText } from "../dist/index.js";
 import { GoogleGenAI } from "@google/genai";
 
 const api = new GoogleGenAI({
@@ -20,8 +20,8 @@ async function main() {
     ];
     const rl = readline.createInterface({input: stdin, output: stdout});
 
-    const encode = createStepEncoder(GeminiGenerateContentRequestCodec);
-    const decode = createStepDecoder(GeminiGenerateContentResponseCodec);
+    const encode = createStepEncoder(GeminiGenerateContentCodec);
+    const decode = createStepDecoder(GeminiGenerateContentCodec);
 
     while(true) {
         const user_input = await rl.question("You> ");
