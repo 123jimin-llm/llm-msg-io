@@ -6,6 +6,18 @@ import type { Stream } from "openai/streaming";
 
 export type OpenAIChatCompletionStream = Stream<ChatCompletionChunk>;
 
+export function fromOpenAIDelta(api_delta: ChatCompletionChunk.Choice.Delta): Partial<Message> {
+    const delta: Partial<Message> = {};
+    
+    if(api_delta.role) delta.role = api_delta.role;
+    if(api_delta.content) delta.content = api_delta.content;
+    if(api_delta.refusal) delta.refusal = api_delta.refusal;
+
+    
+
+    return delta;
+}
+
 export const OpenAIChatStreamCodec = {
     createStepStreamDecoder: () => (api_stream) => {
         const handlers: StepStreamEventHandlersRecord = {};
@@ -38,18 +50,13 @@ export const OpenAIChatStreamCodec = {
 
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 const choice = chunk.choices[0]!;
-                const api_delta = choice.delta;
-
-                const delta: Partial<Message> = {};
-                if(api_delta.role) delta.role = api_delta.role;
-                if(api_delta.content) delta.content = api_delta.content;
-                if(api_delta.refusal) delta.refusal = api_delta.refusal;
+                const delta = fromOpenAIDelta(choice.delta);
 
                 invokeStepStreamEventHandlerFromDelta(handlers, message, delta);
 
                 // TODO: Move to invokeStepStreamEventHandlerFromDelta.
-                if(api_delta.tool_calls) {
-                    for(const tc of api_delta.tool_calls) {
+                if(choice.delta.tool_calls) {
+                    for(const tc of choice.delta.tool_calls) {
                         const ind = tc.index;
                         let existing = tool_calls.get(ind);
                         if(!existing) {
