@@ -11,3 +11,12 @@ export function getMessageExtraGemini(message: Message, init: true) : GeminiExtr
 export function getMessageExtraGemini(message: Message, init = false): GeminiExtra|null {
     return getMessageExtra<GeminiExtra>(message, MESSAGE_EXTRA_GEMINI, init);
 }
+
+export function mergeMessageExtraGemini(extra: GeminiExtra, delta: GeminiExtra) {
+    if(delta.thought_signatures) {
+        extra.thought_signatures = [
+            ...(extra.thought_signatures || []),
+            ...delta.thought_signatures,
+        ];
+    }
+}

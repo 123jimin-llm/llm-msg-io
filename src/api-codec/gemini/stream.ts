@@ -4,6 +4,7 @@ import type { Message, StepStreamEventHandler, StepStreamEventHandlersRecord, St
 import { addStepStreamEventHandler, invokeStepStreamEventHandler, invokeStepStreamEventHandlerFromDelta } from "../../message/index.ts";
 
 import { fromGeminiContent, fromGeminiFinishReason } from "./response.ts";
+import { getMessageExtraGemini, mergeMessageExtraGemini } from "./extra.ts";
 
 export const GeminiGenerateContentStreamCodec = {
     createStepStreamDecoder: () => (api_stream) => {
@@ -40,6 +41,11 @@ export const GeminiGenerateContentStreamCodec = {
 
                 const delta = fromGeminiContent(content);
                 invokeStepStreamEventHandlerFromDelta(handlers, message, delta);
+
+                const delta_extra = getMessageExtraGemini(delta);
+                if(delta_extra) {
+                    mergeMessageExtraGemini(getMessageExtraGemini(message, true), delta_extra);
+                }
 
                 if(candidate.finishReason) {
                     finish_reason = fromGeminiFinishReason(candidate.finishReason);
