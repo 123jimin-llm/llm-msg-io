@@ -1,5 +1,5 @@
 import { type } from 'arktype';
-import { exportType } from "../../util/type.ts";
+import { exportType, type Nullable } from "../../util/type.ts";
 
 export const ContentPartText = exportType(type({
     type: '"text"',
@@ -47,6 +47,24 @@ export function textToContentPartArray(text: string): ContentPart[] {
 
 export const MessageContent = exportType(type('string').or(ContentPart.array()));
 export type MessageContent = typeof MessageContent.infer;
+
+export function messageContentToText(content: MessageContent): string;
+export function messageContentToText(content: Nullable<never>): null;
+export function messageContentToText(content: Nullable<MessageContent>): string|null {
+    if(content == null) return null;
+    if(typeof content === 'string') return content;
+
+    return content.map((part) => part.type === 'text' ? part.text : "").join("");
+}
+
+export function messageContentToTextArray(content: MessageContent): string[];
+export function messageContentToTextArray(content: Nullable<never>): null;
+export function messageContentToTextArray(content: Nullable<MessageContent>): string[]|null {
+    if(content == null) return null;
+    if(typeof content === 'string') return [content];
+
+    return content.filter((part) => part.type === 'text').map((part) => part.text);
+}
 
 /**
  * Concatenates multiple message contents into a single message content.

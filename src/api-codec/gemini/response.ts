@@ -34,7 +34,7 @@ export function fromGeminiContent(api_content: Content): Message {
     const thought_signatures: string[] = [];
 
     let content: MessageContent = "";
-    const reasonings: string[] = [];
+    const reasoning_arr: string[] = [];
 
     for(const part of api_content.parts ?? []) {
         if(part.thoughtSignature) {
@@ -51,7 +51,7 @@ export function fromGeminiContent(api_content: Content): Message {
         if(!part.text) continue;
         
         if(part.thought) {
-            reasonings.push(part.text);
+            reasoning_arr.push(part.text);
         } else {
             content = concatContentsTo(content, part.text);
         }
@@ -62,8 +62,8 @@ export function fromGeminiContent(api_content: Content): Message {
         content,
     };
 
-    if(reasonings.length) {
-        message.reasoning = reasonings.join('\n');
+    if(reasoning_arr.length) {
+        message.reasoning = reasoning_arr.join('\n');
     }
 
     if(thought_signatures.length) {

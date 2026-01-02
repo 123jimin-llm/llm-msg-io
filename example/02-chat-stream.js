@@ -42,7 +42,7 @@ async function main() {
         const api_res = await api.models.generateContentStream(api_req);
         const stream = decode(api_res);
 
-        stdout.write("AI > ");
+        stdout.write("AI> ");
 
         stream.on("content.delta", (event) => {
             stdout.write(messageContentToText(event.delta));
@@ -50,6 +50,8 @@ async function main() {
 
         const res = await stream.done();
         history.push(user_msg, ...res.messages);
+
+        stdout.write("\n");
     }
 
     rl.close();

@@ -1,7 +1,7 @@
 import type { ChatCompletionChunk } from "openai/resources/chat/completions";
 
 import type { StepResult, StepStream, WithCreateStepStreamDecoder } from "../../../api-codec-lib/step/index.ts";
-import { addStepStreamEventHandler, invokeStepStreamEventHandler, Message, type StepStreamEventHandler, type StepStreamEventHandlersRecord, type StepStreamEventType, type ToolCall } from "../../../message/index.ts";
+import { addStepStreamEventHandler, invokeStepStreamEventHandler, invokeStepStreamEventHandlerFromDelta, Message, type StepStreamEventHandler, type StepStreamEventHandlersRecord, type StepStreamEventType, type ToolCall } from "../../../message/index.ts";
 import type { Stream } from "openai/streaming";
 
 export type OpenAIChatCompletionStream = Stream<ChatCompletionChunk>;
@@ -11,11 +11,13 @@ export const OpenAIChatStreamCodec = {
         const handlers: StepStreamEventHandlersRecord = {};
 
         const process_promise = (async(): Promise<StepResult> => {
-            let role = "";
-            let content = "";
-            let refusal = "";
-            let finish_reason = "";
+            const message: Message = {
+                role: "",
+                content: "",
+            };
+            
             let started = false;
+            let finish_reason = "";
 
             const tool_calls = new Map<number, ToolCall>();
             const tool_call_started = new Set<number>();
@@ -36,34 +38,18 @@ export const OpenAIChatStreamCodec = {
 
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 const choice = chunk.choices[0]!;
-                const delta = choice.delta;
+                const api_delta = choice.delta;
 
-                if(delta.role) {
-                    role = delta.role;
-                    invokeStepStreamEventHandler(handlers, {
-                        type: "role",
-                        role,
-                    });
-                }
+                const delta: Partial<Message> = {};
+                if(api_delta.role) delta.role = api_delta.role;
+                if(api_delta.content) delta.content = api_delta.content;
+                if(api_delta.refusal) delta.refusal = api_delta.refusal;
 
-                if(delta.content) {
-                    content += delta.content;
-                    invokeStepStreamEventHandler(handlers, {
-                        type: 'content.delta',
-                        delta: delta.content,
-                    });
-                }
+                invokeStepStreamEventHandlerFromDelta(handlers, message, delta);
 
-                if(delta.refusal) {
-                    refusal += delta.refusal;
-                    invokeStepStreamEventHandler(handlers, {
-                        type: 'refusal.delta',
-                        delta: delta.refusal,
-                    });
-                }
-
-                if(delta.tool_calls) {
-                    for(const tc of delta.tool_calls) {
+                // TODO: Move to invokeStepStreamEventHandlerFromDelta.
+                if(api_delta.tool_calls) {
+                    for(const tc of api_delta.tool_calls) {
                         const ind = tc.index;
                         let existing = tool_calls.get(ind);
                         if(!existing) {
@@ -113,12 +99,8 @@ export const OpenAIChatStreamCodec = {
                 finish_reason: finish_reason,
             });
 
-            const message: Message = {
-                role: role || "assistant",
-                content,
-            };
+            message.role = message.role || "assistant";
 
-            if(refusal) message.refusal = refusal;
             if(tool_calls.size > 0) {
                 message.tool_calls = Array.from(tool_calls.entries())
                     .sort(([a], [b]) => a-b)
