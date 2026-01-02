@@ -1,6 +1,8 @@
 import type { Message } from "../../message/index.ts";
+import type { FunctionDefinition } from "./function.ts";
 
 export interface StepParams {
+    functions?: FunctionDefinition[];
     messages: Message[];
 }
 

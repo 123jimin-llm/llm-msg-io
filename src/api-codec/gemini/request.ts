@@ -1,6 +1,6 @@
-import type { Content, GenerateContentParameters, Part } from "@google/genai";
+import type { Content, FunctionDeclaration, GenerateContentParameters, Part } from "@google/genai";
 
-import type { WithCreateStepEncoder } from "../../api-codec-lib/index.ts";
+import type { FunctionDefinition, WithCreateStepEncoder } from "../../api-codec-lib/index.ts";
 import { Message, messageContentToTextArray } from "../../message/index.ts";
 import { getMessageExtraGemini, type GeminiExtra } from "./extra.ts";
 import type { Nullable } from "../../util/type.ts";
@@ -12,6 +12,12 @@ export function isGeminiSystemRole(role: string): boolean {
     }
 
     return false;
+}
+
+export function toGeminiFunctionDeclaration(func_def: FunctionDefinition): FunctionDeclaration {
+    return {
+        ...func_def,
+    } as FunctionDeclaration;
 }
 
 function createWithThoughtSignature(gemini_extra: Nullable<GeminiExtra>) {
@@ -95,6 +101,12 @@ export const GeminiGenerateContentRequestCodec = {
 
         if(system_instructions.length > 0) {
             api_req.config.systemInstruction = system_instructions;
+        }
+
+        if(req.functions?.length) {
+            api_req.config.tools = [{
+                functionDeclarations: req.functions.map((fn) => toGeminiFunctionDeclaration(fn)),
+            }];
         }
 
         return api_req;

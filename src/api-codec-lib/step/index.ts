@@ -1,6 +1,7 @@
 export * from "./request.ts";
 export * from "./response.ts";
 export * from "./stream.ts";
+export * from "./function.ts";
 
 import type { Nullable } from "../../util/type.ts";
 import { createStepEncoder, type StepParams, type WithCreateStepEncoder } from "./request.ts";
