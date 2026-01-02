@@ -6,7 +6,7 @@
 import * as readline from "node:readline/promises";
 import { stdin, stdout, env } from "node:process";
 
-import { createStepEncoder, createStepDecoder, GeminiGenerateContentRequestCodec, GeminiGenerateContentResponseCodec } from "../dist/index.js";
+import { createStepEncoder, createStepDecoder, GeminiGenerateContentRequestCodec, GeminiGenerateContentResponseCodec, messageContentToText } from "../dist/index.js";
 import { GoogleGenAI } from "@google/genai";
 
 const api = new GoogleGenAI({
@@ -27,22 +27,26 @@ async function main() {
         const user_input = await rl.question("You> ");
         if(user_input.match(/^\s\*$/)) break;
 
+        const user_msg = {
+            role: "user",
+            content: user_input,
+        };
+
         const api_req = encode({
             messages: [
                 ...history,
-                {
-                    role: "user",
-                    content: user_input,
-                },
+                user_msg,
             ],
         });
-
-        globalThis.console.log(api_req);
 
         const api_res = await api.models.generateContent(api_req);
         const res = decode(api_res);
 
-        globalThis.console.log(res);
+        for(const message of res.messages) {
+            stdout.write(`AI > ${messageContentToText(message.content)}\n`);
+        }
+
+        history.push(user_msg, ...res.messages);
     }
 
     rl.close();
