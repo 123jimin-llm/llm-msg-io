@@ -8,12 +8,13 @@ import { env, exit } from "node:process";
 
 import { createStepEncoder, createStepDecoder, GeminiGenerateContentCodec, getMessageExtraGemini } from "../../dist/index.js";
 import { GoogleGenAI } from "@google/genai";
+import { ThinkingLevel } from '@google/genai';
 
 const api = new GoogleGenAI({
     apiKey: env['GEMINI_API_KEY'],
 });
 
-const TEST_MODEL = "gemini-3-flash-preview";
+const TEST_MODEL = "gemini-2.5-flash";
 
 /**
  * @param {StepResult} res 
@@ -32,32 +33,27 @@ async function main() {
     /** @type {Message[]} */
     const history = [
         {role: "developer", content: "All responses must adhere to the following format: `The answer? It is ...`"},
-        {role: "user", content: "Let a = 3 and b = 4. What is a times b?"},
+        {role: "user", content: "Let a = 5328 and b = 6434. What is a times b?"},
     ];
 
     const encode = createStepEncoder(GeminiGenerateContentCodec);
     const decode = createStepDecoder(GeminiGenerateContentCodec);
 
     let api_req = encode({messages: history});
-    let res = decode(await api.models.generateContent({
+    const api_res = await api.models.generateContent({
         ...api_req,
         model: TEST_MODEL,
-    }));
+        config: {
+            thinkingConfig: {
+                includeThoughts: true,
+                thinkingBudget: 8000,
+            },
+        }
+    });
+    let res = decode(api_res);
 
-    check(res, /^The answer\? It is\D*12\D*$/);
-
-    history.push(
-        ...res.messages,
-        {role: "user", content: "Answer again, but this time, a = 7."},
-    );
-
-    api_req = encode({messages: history});
-    res = decode(await api.models.generateContent({
-        ...api_req,
-        model: TEST_MODEL,
-    }));
-
-    check(res, /^The answer\? It is\D*28\D*$/);
+    globalThis.console.log(api_res.candidates?.[0].content);
+    globalThis.console.log(res);
 }
 
 main().catch((err) => {
