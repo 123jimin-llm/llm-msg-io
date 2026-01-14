@@ -57,6 +57,14 @@ export function invokeStepStreamEventHandlerFromDelta(
         });
     }
 
+    if(delta.reasoning) {
+        message.reasoning = concatContentsTo(message.reasoning ?? "", delta.reasoning);
+        invokeStepStreamEventHandler(record, {
+            type: "reasoning.delta",
+            delta: delta.reasoning,
+        });
+    }
+
     if(delta.refusal) {
         message.refusal = concatContentsTo(message.refusal ?? "", delta.refusal);
         invokeStepStreamEventHandler(record, {
