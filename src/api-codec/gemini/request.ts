@@ -90,6 +90,7 @@ export const GeminiGenerateContentRequestCodec = {
                     parts: toGeminiParts(message),
                 };
             }));
+            break;
         }
 
         type GenerateContentParametersConfig = {'config': Exclude<GenerateContentParameters['config'], undefined>};
