@@ -5,15 +5,15 @@ import { addStepStreamEventHandler, invokeStepStreamEventHandler, invokeStepStre
 import type { Stream } from "openai/streaming";
 
 export type OpenAIChatCompletionStream = Stream<ChatCompletionChunk>;
+type OpenAIDelta = ChatCompletionChunk.Choice.Delta & {reasoning?: string};
 
-export function fromOpenAIDelta(api_delta: ChatCompletionChunk.Choice.Delta): Partial<Message> {
+export function fromOpenAIDelta(api_delta: OpenAIDelta): Partial<Message> {
     const delta: Partial<Message> = {};
     
     if(api_delta.role) delta.role = api_delta.role;
     if(api_delta.content) delta.content = api_delta.content;
-    if(api_delta.refusal) delta.refusal = api_delta.refusal;
-
-    
+    if(api_delta.reasoning) delta.reasoning = api_delta.reasoning;
+    if(api_delta.refusal) delta.refusal = api_delta.refusal;    
 
     return delta;
 }
