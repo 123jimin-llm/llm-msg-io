@@ -1,44 +1,63 @@
 # llm-msg-io
 
-> [!CAUTION]
-> This project is currently in active development, and no backward compatibility is guaranteed.
+> [!WARNING]
+> This project is currently in active development.
+> 
+> I personally use this library in many projects of mine, but I do occasionally find bugs and make breaking changes.
 
-`llm-msg-io` is a small library for converting LLM messages to various formats.
+`llm-msg-io` is a small library for converting LLM messages and various LLM-related API requests/responses to various formats.
 
-## Example Usage
+Also check out [briko](https://github.com/123jimin-llm/briko), which provides a modular tool to build LLM applications.
+
+## Installation
+
+`npm install @jiminp/llm-msg-io`
+
+## Examples
 
 ### Managing Chat Context
 
 ```ts
+import OpenAI from 'openai';
+
 import {
+  type Message,
   OpenAIChatCodec,
-  createEncoder,
-  createDecoder,
+  createStepEncoder,
+  createStepDecoder,
 } from "@jiminp/llm-msg-io";
 
-const messages = [
+const messages: Message[] = [
   {role: 'system', content: 'You are a helpful assistant.'},
   {role: 'user', content: 'Hello!'},
 ];
 
-// Encode messages to be sent to OpenAI.
-const encode = createEncoder(OpenAIChatCodec);
-const encoded = encode(messages);
+// Convert message list to OpenAI chat completion API request.
+const encode = createStepEncoder(OpenAIChatCodec);
+const api_req = encode({messages});
 
-// Assume `response` is a message object from OpenAI API.
-const response = {role: 'assistant', content: "Hi!"};
+const client = new OpenAI();
+const api_res = client.chat.completions.create({
+  ...api_req,
+  model: 'gpt-5.2',
+});
 
 // Decode the response and add it to your message history.
-const decode = createDecoder(OpenAIChatCodec);
-messages.push(...decode([response]).messages);
+const decode = createStepDecoder(OpenAIChatCodec);
+messages.push(...decode(api_res).messages);
 ```
 
 ### History to/from JSON
 
 ```ts
-import { JSONCodec, createEncoder, createDecoder } from "@jiminp/llm-msg-io";
+import {
+  type Message,
+  JSONCodec,
+  createEncoder,
+  createDecoder,
+} from "@jiminp/llm-msg-io";
 
-const messages = [
+const messages: Message[] = [
   {role: 'user', content: 'Hello!'},
   {role: 'assistant', content: "Hi!"},
 ];
@@ -58,20 +77,6 @@ Here is the encoded value:
 [{"role":"user","content":"Hello!"},{"role":"assistant","content":"Hi!"}]
 ```
 
-### History to/from STF
-
-[Simple Text Format](./docs/stf/README.md) is a simple plaintext format for storing LLM messages.
-Check the documentation for more details.
-
-Here is the encoded value, using `STFCodec`:
-
-```stf
-;user
-Hello!
-;ai
-Hi!
-```
-
 ## Features
 
 > [!WARNING]
@@ -84,7 +89,9 @@ Hi!
 
 ### Supported API Message Types
 
-- `OpenAIChatCodec`: for OpenAI chat completion parameters and responses
+- `OpenAIChatCodec`: for OpenAI chat completion requests and responses
+- `GeminiGenerateContentCodec` for Gemini `generateContent` / `generateContentStream`
+
 ### Supported Serialization Types
 
 - `JSONCodec`: to/from [JSON](./docs/json.md)
@@ -93,6 +100,8 @@ Hi!
 - `STFCodec`: to/from [STF](./docs/stf/README.md)
 
 ### Minimal Dependencies
+
+`llm-msg-io` tries to minimize dependencies.
 
 Here's the result of running `pnpm ls -P --depth 99` on the root directory:
 
@@ -107,10 +116,6 @@ arktype 2.1.25
 json5 2.2.3
 smol-toml 1.4.2
 ```
-
-## Installation
-
-`npm install @jiminp/llm-msg-io`
 
 ## Development
 
