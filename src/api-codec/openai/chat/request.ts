@@ -6,7 +6,7 @@ import type {
 } from "openai/resources/chat/completions";
 
 import type { Nullable } from "../../../util/type.ts";
-import type { WithCreateStepEncoder } from "../../../api-codec-lib/index.ts";
+import type { StepParams, WithCreateStepEncoder } from "../../../api-codec-lib/index.ts";
 import { messageContentToText, type MessageContent, type ToolCall } from "../../../message/index.ts";
 
 function toChatCompletionContent(content: Nullable<MessageContent>): OpenAIChatInputMessage['content'] {
@@ -72,8 +72,12 @@ function toChatCompletionToolCall(tool_call: ToolCall): ChatCompletionMessageToo
     }
 }
 
+export interface OpenAIChatRequestEncodeOptions {
+    model: string;
+}
+
 export const OpenAIChatRequestCodec = {
-    createStepEncoder: () => (req): ChatCompletionCreateParams => {
+    createStepEncoder: ({model = "gpt-5-nano"} = {}) => (req): ChatCompletionCreateParams => {
         const api_messages = req.messages.map((message): OpenAIChatInputMessage => {
             const role = message.role as OpenAIChatInputMessage['role'];
             if(role === 'tool') {
@@ -104,9 +108,9 @@ export const OpenAIChatRequestCodec = {
         });
 
         return {
-            model: "gpt-5-nano",
+            model,
             messages: api_messages,
             stream: false,
         };
     },
-} satisfies WithCreateStepEncoder<ChatCompletionCreateParams>;
+} satisfies WithCreateStepEncoder<ChatCompletionCreateParams, StepParams, OpenAIChatRequestEncodeOptions>;

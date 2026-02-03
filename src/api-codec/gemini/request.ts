@@ -1,6 +1,6 @@
 import type { Content, FunctionDeclaration, GenerateContentParameters, Part } from "@google/genai";
 
-import type { FunctionDefinition, WithCreateStepEncoder } from "../../api-codec-lib/index.ts";
+import type { FunctionDefinition, StepParams, WithCreateStepEncoder } from "../../api-codec-lib/index.ts";
 import { Message, messageContentToTextArray } from "../../message/index.ts";
 import { getMessageExtraGemini, type GeminiExtra } from "./extra.ts";
 import type { Nullable } from "../../util/type.ts";
@@ -70,8 +70,12 @@ export function toGeminiParts(message: Message): Part[] {
     });
 }
 
+export interface GeminiGenerateContentRequestEncodeOptions {
+    model: string;
+}
+
 export const GeminiGenerateContentRequestCodec = {
-    createStepEncoder: () => (req): GenerateContentParameters => {
+    createStepEncoder: ({model = "gemini-3-flash-preview"} = {}) => (req): GenerateContentParameters => {
         const system_instructions: string[] = [];
         const api_messages: GenerateContentParameters['contents'] = [];
 
@@ -93,9 +97,9 @@ export const GeminiGenerateContentRequestCodec = {
             break;
         }
 
-        type GenerateContentParametersConfig = {'config': Exclude<GenerateContentParameters['config'], undefined>};
+        type GenerateContentParametersConfig = {config: Exclude<GenerateContentParameters['config'], undefined>};
         const api_req: GenerateContentParameters & GenerateContentParametersConfig = {
-            model: "gemini-3-flash-preview",
+            model,
             contents: api_messages,
             config: {},
         };
@@ -112,4 +116,4 @@ export const GeminiGenerateContentRequestCodec = {
 
         return api_req;
     },
-} satisfies WithCreateStepEncoder<GenerateContentParameters>;
+} satisfies WithCreateStepEncoder<GenerateContentParameters, StepParams, GeminiGenerateContentRequestEncodeOptions>;
