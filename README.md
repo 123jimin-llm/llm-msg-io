@@ -92,6 +92,19 @@ Here is the encoded value:
 - `OpenAIChatCodec`: for OpenAI chat completion requests and responses
 - `GeminiGenerateContentCodec` for Gemini `generateContent` / `generateContentStream`
 
+#### Stream Events
+
+- `content.delta`
+- `refusal.delta`
+- `reasoning.delta`
+- `tool_call.start`
+- `tool_call.delta`
+- `tool_call.end`
+- `role`
+- `stream.start`
+- `stream.end`
+- `stream.error`
+
 ### Supported Serialization Types
 
 - `JSONCodec`: to/from [JSON](./docs/json.md)
