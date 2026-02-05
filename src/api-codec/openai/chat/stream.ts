@@ -2,7 +2,7 @@ import type { ChatCompletionChunk } from "openai/resources/chat/completions";
 
 import type { StepResult, WithCreateStepStreamDecoder } from "../../../api-codec-lib/step/index.ts";
 import { toStepStream } from "../../../api-codec-lib/step/index.ts";
-import type { MessageDelta, ToolCallDelta, StepStreamEvent } from "../../../message/index.ts";
+import type { MessageDelta, ToolCallDelta, StepStreamEvent, StreamEndEvent } from "../../../message/index.ts";
 import { applyDeltaToStepStreamState, createStepStreamState, finalizeStepStreamState, stepStreamStateToResult } from "../../../message/index.ts";
 import type { Stream } from "openai/streaming";
 
@@ -66,10 +66,9 @@ export const OpenAIChatStreamCodec = {
 
             yield* finalizeStepStreamState(state);
             
-            yield {
-                type: "stream.end",
-                finish_reason: finish_reason,
-            };
+            const stream_end_event: StreamEndEvent = {type: 'stream.end'};
+            if(finish_reason) stream_end_event.finish_reason = finish_reason;
+            yield stream_end_event;
 
             return stepStreamStateToResult(state);
         })());
