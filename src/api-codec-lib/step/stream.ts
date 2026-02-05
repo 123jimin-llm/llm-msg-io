@@ -8,7 +8,7 @@ export type StepStreamEventGenerator<DecodedType extends StepResult = StepResult
 export type StepStreamDecoder<
     EncodedType,
     DecodedType extends StepResult = StepResult,
-> = (api_stream: EncodedType) => StepStreamEventGenerator<DecodedType>;
+> = (api_stream: PromiseLike<EncodedType>) => StepStreamEventGenerator<DecodedType>;
 
 export type CodecStepStreamDecoder<
     EncodedType,

@@ -13,7 +13,7 @@ export const GeminiGenerateContentStreamCodec = {
         let started = false;
         let finish_reason = "";
         
-        for await(const chunk of api_stream) {
+        for await(const chunk of await api_stream) {
             const candidate = chunk.candidates?.[0];
             if(!candidate) continue;
 

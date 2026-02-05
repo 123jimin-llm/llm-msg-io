@@ -39,7 +39,7 @@ export const OpenAIChatStreamCodec = {
         let started = false;
         let finish_reason = "";
 
-        for await(const chunk of api_stream) {
+        for await(const chunk of await api_stream) {
             if(!started) {
                 started = true;
                 yield {
