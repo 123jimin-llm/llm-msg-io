@@ -3,12 +3,12 @@ import { applyDeltaToStepStreamState, finalizeStepStreamState, createStepStreamS
 import type { StepStreamEvent } from "../../message/stream/index.ts";
 import type { StepResult } from "./response.ts";
 
-export type StepStreamGenerator<DecodedType extends StepResult = StepResult> = AsyncGenerator<StepStreamEvent, DecodedType>;
+export type StepStreamEventGenerator<DecodedType extends StepResult = StepResult> = AsyncGenerator<StepStreamEvent, DecodedType>;
 
 export type StepStreamDecoder<
     EncodedType,
     DecodedType extends StepResult = StepResult,
-> = (api_stream: EncodedType) => StepStreamGenerator<DecodedType>;
+> = (api_stream: EncodedType) => StepStreamEventGenerator<DecodedType>;
 
 export type CodecStepStreamDecoder<
     EncodedType,
