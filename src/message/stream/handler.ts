@@ -1,6 +1,7 @@
+import type { StepResult } from "../../api-codec-lib/index.ts";
 import type { Nullable } from "../../util/type.ts";
-import { concatContentsTo } from "../schema/content.ts";
-import type { Message } from "../schema/message.ts";
+import { concatContentsTo, ToolCall } from "../schema/index.ts";
+import type { Message, MessageDelta } from "../schema/index.ts";
 import type { StepStreamEvent, StepStreamEventType } from "./event.ts";
 
 export type StepStreamEventHandler<K extends StepStreamEventType> = (event: Extract<StepStreamEvent, {type: K}>) => void;
@@ -18,7 +19,7 @@ export function addStepStreamEventHandler<K extends StepStreamEventType>(
     handlers.push(handler);
 }
 
-export function invokeStepStreamEventHandler<K extends StepStreamEventType>(
+export function invokeStepStreamEventHandlers<K extends StepStreamEventType>(
     record: StepStreamEventHandlersRecord,
     event: Extract<StepStreamEvent, {type: K}>,
 ) {
@@ -28,48 +29,120 @@ export function invokeStepStreamEventHandler<K extends StepStreamEventType>(
     }
 }
 
+export type StepStreamState = {
+    message: Message;
+    tool_calls: Map<number, ToolCall>;
+    tool_call_started: Set<number>;
+};
+
+export function createStepStreamState(): StepStreamState {
+    return {
+        message: {role: "", content: ""},
+        tool_calls: new Map(),
+        tool_call_started: new Set(),
+    };
+}
+
+export function stepStreamStateToResult(state: StepStreamState): StepResult {
+    return {
+        messages: [state.message],
+    };
+}
+
 /**
  * Handles `role`, `content`, and `refusal` updates.
  * (TODO: Handle tool calls.)
  */
-export function invokeStepStreamEventHandlerFromDelta(
-    record: StepStreamEventHandlersRecord,
-    message: Message,
-    delta: Nullable<Partial<Message>>,
-) {
+export function* applyDeltaToStepStreamState(
+    state: StepStreamState,
+    delta: Nullable<MessageDelta>,
+): Generator<StepStreamEvent> {
     if(delta == null) {
         return;
     }
 
+    const {message, tool_calls, tool_call_started} = state;
+
     if(delta.role && delta.role !== message.role) {
         message.role = delta.role;
-        invokeStepStreamEventHandler(record, {
+        yield {
             type: "role",
             role: delta.role,
-        });
+        };
     }
 
     if(delta.content) {
         message.content = concatContentsTo(message.content, delta.content);
-        invokeStepStreamEventHandler(record, {
+        yield {
             type: "content.delta",
             delta: delta.content,
-        });
+        };
     }
 
     if(delta.reasoning) {
         message.reasoning = concatContentsTo(message.reasoning ?? "", delta.reasoning);
-        invokeStepStreamEventHandler(record, {
+        yield {
             type: "reasoning.delta",
             delta: delta.reasoning,
-        });
+        };
     }
 
     if(delta.refusal) {
         message.refusal = concatContentsTo(message.refusal ?? "", delta.refusal);
-        invokeStepStreamEventHandler(record, {
+        yield {
             type: "refusal.delta",
             delta: "",
-        });
+        };
+    }
+
+    if(delta.tool_calls) {
+        for(const tc of delta.tool_calls) {
+            const ind = tc.index;
+            let existing = tool_calls.get(ind);
+
+            if(!existing) {
+                existing = { id: "", name: "", arguments: "" };
+                tool_calls.set(ind, existing);
+            }
+
+            if(tc.id) existing.id = tc.id;
+            if(tc.name) existing.name += tc.name;
+            if(tc.arguments) existing.arguments += tc.arguments;
+
+            if (!tool_call_started.has(ind) && existing.id && existing.name) {
+                tool_call_started.add(ind);
+                yield {
+                    type: "tool_call.start",
+                    index: ind,
+                    id: existing.id,
+                    name: existing.name,
+                };
+            }
+            
+            if (tc.arguments) {
+                yield {
+                    type: "tool_call.delta",
+                    index: ind,
+                    delta: tc.arguments,
+                };
+            }
+        }
+    }
+}
+
+export function* finalizeStepStreamState({tool_calls, message}: StepStreamState): Generator<StepStreamEvent> {
+    for (const [ind, tc] of tool_calls.entries()) {
+        yield {
+            type: "tool_call.end",
+            index: ind,
+            tool_call: tc,
+        };
+    }
+
+    if(!message.role) message.role = 'assistant';
+    if(tool_calls.size > 0) {
+        message.tool_calls = [...tool_calls.entries()]
+            .sort(([a], [b]) => a - b)
+            .map(([, tc]): ToolCall => tc);
     }
 }

@@ -1,7 +1,8 @@
 import type { Content, FinishReason, GenerateContentResponse, Blob as GeminiBlob } from "@google/genai";
 
 import type { StepResult, WithCreateStepDecoder } from "../../api-codec-lib/index.ts";
-import { concatContentsTo, type ContentPart, type Message, type MessageContent } from "../../message/index.ts";
+import type { ContentPart, Message, MessageContent } from "../../message/index.ts";
+import { concatContentsTo } from "../../message/index.ts";
 import { getMessageExtraGemini } from "./extra.ts";
 
 // Converts to OpenAI-compatible finish reason.
@@ -30,7 +31,7 @@ export function fromGeminiBlob(blob: GeminiBlob): ContentPart|null {
     return null;
 }
 
-export function fromGeminiContent(api_content: Content): Message {
+export function fromGeminiContent(api_content: Content): Omit<Message, 'tool_calls'> {
     const thought_signatures: string[] = [];
 
     let content: MessageContent = "";
@@ -46,6 +47,10 @@ export function fromGeminiContent(api_content: Content): Message {
             if(blob_part) {
                 content = concatContentsTo(content, [blob_part]);
             }
+        }
+
+        if(part.functionCall) {
+            // TODO: handle function calls.
         }
 
         if(!part.text) continue;
