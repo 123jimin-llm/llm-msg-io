@@ -1,7 +1,7 @@
 /* eslint-env node */
 //@ts-check
 
-/** @import {Message} from "../dist/index.js" */
+/** @import {StepResult, Message} from "../dist/index.js" */
 
 import * as readline from "node:readline/promises";
 import { stdin, stdout, env } from "node:process";
@@ -44,12 +44,18 @@ async function main() {
 
         stdout.write("AI> ");
 
-        stream.on("content.delta", (event) => {
-            stdout.write(messageContentToText(event.delta));
-        });
+        while(true) {
+            const res = await stream.next();
+            if(res.done) {
+                history.push(user_msg, ...res.value.messages);
+                break;
+            }
 
-        const res = await stream.done();
-        history.push(user_msg, ...res.messages);
+            const {value: event} = res;
+            if(event.type === 'content.delta') {
+                stdout.write(messageContentToText(event.delta));
+            }
+        }
 
         stdout.write("\n");
     }
