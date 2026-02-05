@@ -2,32 +2,7 @@ import type { StepResult } from "../../api-codec-lib/index.ts";
 import type { Nullable } from "../../util/type.ts";
 import { concatContentsTo, ToolCall } from "../schema/index.ts";
 import type { Message, MessageDelta } from "../schema/index.ts";
-import type { StepStreamEvent, StepStreamEventType } from "./event.ts";
-
-export type StepStreamEventHandler<K extends StepStreamEventType> = (event: Extract<StepStreamEvent, {type: K}>) => void;
-
-export type StepStreamEventHandlersRecord = {
-    [K in StepStreamEventType]?: Array<StepStreamEventHandler<K>>;
-};
-
-export function addStepStreamEventHandler<K extends StepStreamEventType>(
-    record: StepStreamEventHandlersRecord,
-    type: K,
-    handler: StepStreamEventHandler<K>
-) {
-    const handlers: Array<StepStreamEventHandler<K>> = (record[type] ??= []);
-    handlers.push(handler);
-}
-
-export function invokeStepStreamEventHandlers<K extends StepStreamEventType>(
-    record: StepStreamEventHandlersRecord,
-    event: Extract<StepStreamEvent, {type: K}>,
-) {
-    const handlers = record[event.type];
-    if(handlers?.length) {
-        for(const handler of handlers) handler(event);
-    }
-}
+import type { StepStreamEvent } from "./event.ts";
 
 export type StepStreamState = {
     message: Message;

@@ -1,20 +1,14 @@
 import type { ToolCallDelta } from "../../message/index.ts";
-import { addStepStreamEventHandler, invokeStepStreamEventHandlers, applyDeltaToStepStreamState, finalizeStepStreamState, createStepStreamState } from "../../message/stream/index.ts";
-import type { StepStreamEvent, StepStreamEventHandler, StepStreamEventHandlersRecord, StepStreamEventType } from "../../message/stream/index.ts";
-import { createGeneratorController } from "../../util/generator.ts";
+import { applyDeltaToStepStreamState, finalizeStepStreamState, createStepStreamState } from "../../message/stream/index.ts";
+import type { StepStreamEvent } from "../../message/stream/index.ts";
 import type { StepResult } from "./response.ts";
 
-export interface StepStream<DecodedType extends StepResult = StepResult> {
-    on<T extends StepStreamEventType>(type: T, handler: StepStreamEventHandler<T>): this;
-    events(): AsyncIterable<StepStreamEvent>;
-    
-    done(): Promise<DecodedType>;
-}
+export type StepStreamGenerator<DecodedType extends StepResult = StepResult> = AsyncGenerator<StepStreamEvent, DecodedType>;
 
 export type StepStreamDecoder<
     EncodedType,
     DecodedType extends StepResult = StepResult,
-> = (api_stream: EncodedType) => StepStream<DecodedType>;
+> = (api_stream: EncodedType) => StepStreamGenerator<DecodedType>;
 
 export type CodecStepStreamDecoder<
     EncodedType,
@@ -47,55 +41,6 @@ export function createStepStreamDecoder<
     options?: DecodeOptions,
 ): StepStreamDecoder<EncodedType, DecodedType> {
     return (typeof codec === 'function' ? codec : codec.createStepStreamDecoder)(options);
-}
-
-export function toStepStream<DecodedType extends StepResult = StepResult>(
-    event_generator: AsyncGenerator<StepStreamEvent, DecodedType>,
-): StepStream<StepResult> {
-    const handlers: StepStreamEventHandlersRecord = {};
-    const events = createGeneratorController<StepStreamEvent, DecodedType>();
-
-    void (async() => {
-        for await(const event of events.entries()) {
-            invokeStepStreamEventHandlers(handlers, event);
-        }
-    })();
-
-    void (async() => {
-        let result: DecodedType;
-
-        try {
-            while(true) {
-                const {done, value} = await event_generator.next();
-                if(done) {
-                    result = value;
-                    break;
-                }
-
-                events.yeet(value);
-            }
-        } catch(err) {
-            events.fail(err);
-            return;
-        }
-
-        events.done(result);
-    })();
-    
-    const stream: StepStream<DecodedType> = {
-        on<T extends StepStreamEventType>(type: T, handler: StepStreamEventHandler<T>) {
-            addStepStreamEventHandler(handlers, type, handler);
-            return stream;
-        },
-        events() {
-            return events.entries();
-        },
-        done() {
-            return events.result();
-        }
-    };
-
-    return stream;
 }
 
 export async function* stepResultPromiseToEvents<DecodedType extends StepResult>(
