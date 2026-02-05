@@ -79,8 +79,8 @@ export function toStepStream<DecodedType extends StepResult = StepResult>(
             return;
         }
 
-        return result;
-    });
+        events.done(result);
+    })();
     
     const stream: StepStream<DecodedType> = {
         on<T extends StepStreamEventType>(type: T, handler: StepStreamEventHandler<T>) {
