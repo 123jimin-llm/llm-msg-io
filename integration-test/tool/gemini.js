@@ -3,11 +3,10 @@
 
 /** @import {Message, StepResult} from "../../dist/index.js" */
 
-import { assert } from 'chai';
 import { env, exit } from "node:process";
 import { readFileSync } from "node:fs";
 
-import { createStepEncoder, createStepDecoder, GeminiGenerateContentCodec, getMessageExtraGemini } from "../../dist/index.js";
+import { createStepEncoder, createStepDecoder, GeminiGenerateContentCodec } from "../../dist/index.js";
 import { GoogleGenAI } from "@google/genai";
 
 const functions = JSON.parse(readFileSync(new globalThis.URL('functions.json', import.meta.url)).toString());
@@ -37,10 +36,10 @@ async function main() {
         model: TEST_MODEL,
     });
     
-    console.log(api_res.candidates?.[0]?.content?.parts[0]?.functionCall);
+    globalThis.console.log(api_res.candidates?.[0]?.content?.parts[0]?.functionCall);
 
     let res = decode(api_res);
-    console.log(res.messages[0]);
+    globalThis.console.log(res.messages[0]);
 }
 
 main().catch((err) => {
