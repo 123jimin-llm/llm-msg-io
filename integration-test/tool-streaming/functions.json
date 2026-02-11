@@ -1,0 +1,74 @@
+[
+    {
+        "name": "create_character_profile",
+        "description": "Create a detailed character profile for a fictional character based on a description",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "full_name": {
+                    "type": "string",
+                    "description": "The character's full name"
+                },
+                "age": {
+                    "type": "integer",
+                    "description": "The character's age in years"
+                },
+                "occupation": {
+                    "type": "string",
+                    "description": "The character's occupation or profession"
+                },
+                "personality_traits": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "A list of at least 5 personality traits"
+                },
+                "background_story": {
+                    "type": "string",
+                    "description": "A detailed background story of at least 200 words"
+                },
+                "physical_description": {
+                    "type": "string",
+                    "description": "A detailed physical description including height, build, hair, eyes, and distinguishing features"
+                },
+                "skills": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "A list of at least 5 skills the character possesses"
+                },
+                "motivations": {
+                    "type": "string",
+                    "description": "A detailed description of the character's motivations and goals"
+                },
+                "relationships": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": { "type": "string" },
+                            "relation": { "type": "string" },
+                            "description": { "type": "string" }
+                        },
+                        "required": ["name", "relation", "description"]
+                    },
+                    "description": "A list of at least 3 important relationships"
+                },
+                "catchphrase": {
+                    "type": "string",
+                    "description": "The character's signature catchphrase"
+                }
+            },
+            "required": [
+                "full_name",
+                "age",
+                "occupation",
+                "personality_traits",
+                "background_story",
+                "physical_description",
+                "skills",
+                "motivations",
+                "relationships",
+                "catchphrase"
+            ]
+        }
+    }
+]
