@@ -37,7 +37,7 @@ async function main() {
         model: TEST_MODEL,
     });
     
-    console.log(api_res.candidates?.[0]?.content?.parts);
+    console.log(api_res.candidates?.[0]?.content?.parts[0]?.functionCall);
 
     let res = decode(api_res);
     console.log(res.messages[0]);
