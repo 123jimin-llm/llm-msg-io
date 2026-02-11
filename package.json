@@ -35,9 +35,11 @@
   },
   "homepage": "https://github.com/123jimin-llm/llm-msg-io",
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.74.0",
     "@eslint/js": "^9.39.2",
     "@google/genai": "^1.40.0",
     "@jiminp/eslint-config": "^1.1.0",
+    "@stylistic/eslint-plugin": "^5.8.0",
     "@types/chai": "^5.2.3",
     "@types/mocha": "^10.0.10",
     "@types/node": "^25.2.0",
@@ -50,11 +52,11 @@
     "typescript-eslint": "^8.54.0"
   },
   "peerDependencies": {
+    "@anthropic-ai/sdk": "^0.74.0",
     "@google/genai": "^1",
     "openai": "^6"
   },
   "dependencies": {
-    "@stylistic/eslint-plugin": "^5.8.0",
     "arktype": "^2.1.29",
     "json5": "^2.2.3",
     "smol-toml": "^1.6.0"

@@ -90,7 +90,8 @@ Here is the encoded value:
 ### Supported API Message Types
 
 - `OpenAIChatCodec`: for OpenAI chat completion requests and responses
-- `GeminiGenerateContentCodec` for Gemini `generateContent` / `generateContentStream`
+- `GeminiGenerateContentCodec`: for Gemini `generateContent` / `generateContentStream`
+- (TODO) `ClaudeMessagesCodec`: for Claude `messages.create`.
 
 #### Stream Events
 
