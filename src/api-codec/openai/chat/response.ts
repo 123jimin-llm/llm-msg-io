@@ -5,7 +5,7 @@ import type {
     ChatCompletionMessageToolCall,
 } from "openai/resources/chat/completions";
 
-import type {Nullable} from "../../../util/type.ts";
+import {unreachable, type Nullable} from "../../../util/type.ts";
 import {Message, ToolCall, type ContentPart, type MessageContent} from "../../../message/index.js";
 import type {WithCreateDecoder} from "../../../file-codec-lib/decoder.ts";
 import type {WithCreateStepDecoder} from "../../../api-codec-lib/step/response.ts";
@@ -56,6 +56,8 @@ function fromChatCompletionToolCall(tool_call: ChatCompletionMessageToolCall): T
                 name: tool_call.custom.name,
                 arguments: tool_call.custom.input,
             });
+        default:
+            return unreachable(tool_call);
     }
 }
 

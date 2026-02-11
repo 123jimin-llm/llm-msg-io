@@ -3,7 +3,7 @@ import type {Content, FunctionDeclaration, GenerateContentParameters, Part} from
 import type {FunctionDefinition, StepParams, WithCreateStepEncoder} from "../../api-codec-lib/index.ts";
 import {Message, messageContentToTextArray} from "../../message/index.ts";
 import {getMessageExtraGemini, type GeminiExtra} from "./extra.ts";
-import type {Nullable} from "../../util/type.ts";
+import {unreachable, type Nullable} from "../../util/type.ts";
 
 export function isGeminiSystemRole(role: string): boolean {
     switch(role) {
@@ -66,6 +66,7 @@ export function toGeminiParts(message: Message): Part[] {
             }
             case 'audio': throw new Error("toGeminiParts: audio not yet implemented!");
             case 'file': throw new Error("toGeminiParts: file not yet implemented!");
+            default: return unreachable(part);
         }
     });
 }
