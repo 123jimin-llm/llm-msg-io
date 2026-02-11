@@ -3,6 +3,7 @@
   "version": "0.2.0",
   "description": "A small library for serializing and deserializing LLM messages.",
   "type": "module",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
