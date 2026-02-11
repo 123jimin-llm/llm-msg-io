@@ -1,7 +1,7 @@
 import type { Content, FinishReason, GenerateContentResponse, Blob as GeminiBlob } from "@google/genai";
 
 import type { StepResult, WithCreateStepDecoder } from "../../api-codec-lib/index.ts";
-import type { ContentPart, Message, MessageContent } from "../../message/index.ts";
+import type { ContentPart, Message, MessageContent, ToolCall } from "../../message/index.ts";
 import { concatContentsTo } from "../../message/index.ts";
 import { getMessageExtraGemini } from "./extra.ts";
 
@@ -31,11 +31,12 @@ export function fromGeminiBlob(blob: GeminiBlob): ContentPart|null {
     return null;
 }
 
-export function fromGeminiContent(api_content: Content): Omit<Message, 'tool_calls'> {
+export function fromGeminiContent(api_content: Content): Message {
     const thought_signatures: string[] = [];
 
     let content: MessageContent = "";
     const reasoning_arr: string[] = [];
+    const tool_calls: ToolCall[] = [];
 
     for(const part of api_content.parts ?? []) {
         if(part.thoughtSignature) {
@@ -50,7 +51,13 @@ export function fromGeminiContent(api_content: Content): Omit<Message, 'tool_cal
         }
 
         if(part.functionCall) {
-            // TODO: handle function calls.
+            const fc = part.functionCall;
+            const tc: ToolCall = {
+                name: fc.name ?? '',
+                arguments: JSON.stringify(fc.args ?? {}),
+            };
+            if(fc.id) tc.id = fc.id;
+            tool_calls.push(tc);
         }
 
         if(!part.text) continue;
@@ -69,6 +76,10 @@ export function fromGeminiContent(api_content: Content): Omit<Message, 'tool_cal
 
     if(reasoning_arr.length) {
         message.reasoning = reasoning_arr.join('\n');
+    }
+
+    if(tool_calls.length) {
+        message.tool_calls = tool_calls;
     }
 
     if(thought_signatures.length) {

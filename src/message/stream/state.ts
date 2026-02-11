@@ -2,7 +2,7 @@ import type { StepResult } from "../../api-codec-lib/index.ts";
 import type { Nullable } from "../../util/type.ts";
 import { concatContentsTo, ToolCall } from "../schema/index.ts";
 import type { Message, MessageDelta } from "../schema/index.ts";
-import type { StepStreamEvent } from "./event.ts";
+import type { StepStreamEvent, ToolCallStartEvent } from "./event.ts";
 
 export type StepStreamState = {
     message: Message;
@@ -83,14 +83,18 @@ export function* applyDeltaToStepStreamState(
             if(tc.name) existing.name += tc.name;
             if(tc.arguments) existing.arguments += tc.arguments;
 
-            if (!tool_call_started.has(ind) && existing.id && existing.name) {
+            if (!tool_call_started.has(ind) && existing.name) {
                 tool_call_started.add(ind);
-                yield {
+                
+                const event: ToolCallStartEvent = {
                     type: "tool_call.start",
                     index: ind,
-                    id: existing.id,
                     name: existing.name,
                 };
+
+                if(existing.id != null) event.id = existing.id;
+
+                yield event;
             }
             
             if (tc.arguments) {

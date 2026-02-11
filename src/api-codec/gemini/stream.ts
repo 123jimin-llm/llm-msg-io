@@ -1,6 +1,6 @@
 import type { GenerateContentResponse } from "@google/genai";
 import type { StepResult, WithCreateStepStreamDecoder } from "../../api-codec-lib/index.ts";
-import type { StepStreamEvent, StreamEndEvent, StreamStartEvent } from "../../message/index.ts";
+import type { StepStreamEvent, StreamEndEvent, StreamStartEvent, ToolCallDelta } from "../../message/index.ts";
 import { applyDeltaToStepStreamState, createStepStreamState, finalizeStepStreamState, stepStreamStateToResult } from "../../message/index.ts";
 
 import { fromGeminiContent, fromGeminiFinishReason } from "./response.ts";
@@ -33,8 +33,14 @@ export const GeminiGenerateContentStreamCodec = {
             const {content} = candidate;
             if(content == null) continue;
 
-            const delta = fromGeminiContent(content);
-            yield* applyDeltaToStepStreamState(state, delta);
+            const {tool_calls, ...delta} = fromGeminiContent(content);
+            yield* applyDeltaToStepStreamState(state, {
+                ...delta,
+                tool_calls: tool_calls?.map((tc, ind): ToolCallDelta => ({
+                    ...tc,
+                    index: state.tool_calls.size + ind,
+                })),
+            });
 
             const delta_extra = getMessageExtraGemini(delta);
             if(delta_extra) {

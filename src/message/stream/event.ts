@@ -22,7 +22,7 @@ export interface ReasoningDeltaEvent {
 export interface ToolCallStartEvent {
     type: "tool_call.start";
     index: number;
-    id: string;
+    id?: string;
     name: string;
 }
 
