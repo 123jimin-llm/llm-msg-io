@@ -25,8 +25,7 @@ export function stepStreamStateToResult(state: StepStreamState): StepResult {
 }
 
 /**
- * Handles `role`, `content`, and `refusal` updates.
- * (TODO: Handle tool calls.)
+ * Applies delta to state, and yields events.
  */
 export function* applyDeltaToStepStreamState(
     state: StepStreamState,

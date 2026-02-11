@@ -72,6 +72,8 @@ export const OpenAIChatMessagesCodec = {
                 msg.tool_calls = api_message.tool_calls.map((tool_call) => fromChatCompletionToolCall(tool_call));
             }
 
+            // Note: Reasoning is not available for chat completion API.
+
             if('refusal' in api_message && api_message.refusal != null) {
                 msg.refusal = api_message.refusal;
             }

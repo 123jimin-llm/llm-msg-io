@@ -1,93 +1,39 @@
 # llm-msg-io
 
+Always read this file thoroughly before starting work.
+
 ## Summary
 
-`llm-msg-io` is an npm package providing two functionalities:
+An npm package (`@jiminp/llm-msg-io`) for converting LLM messages to various formats, including a text-based format called [STF](./docs/stf/README.md).
 
-- A library for converting LLM messages to various formats.
-- Specification for [STF](./docs/stf/README.md), a text-based format for LLM messages.
-
-```ts
-import {
-  // A generic type for storing messages in-memory.
-  type Message,
-
-  // Helper functions for creating encoder and decoder functions from a codec.
-  createEncoder, createDecoder,
-
-  // JSON format support.
-  JSONCodec
-} from "@jiminp/llm-msg-io";
-
-const messages: Message[] = [
-  {role: 'user', content: "Hello!"},
-  {role: 'assistant', content: "Hi! What's up?"},
-];
-
-// Messages to JSON
-const encodeMessages = createEncoder(JSONCodec);
-
-// JSON to messages
-const decodeMessages = createDecoder(JSONCodec);
-
-const encoded = encodeMessages(messages);
-console.log(encoded);
-
-const {messages: decoded} = decodeMessages(messages);
-console.log(decoded);
-```
-
-### Tech Stack
-
-- TypeScript, `pnpm`, `eslint`
-- `chai` and `mocha`
-- `arktype`
+**Tech stack:** TypeScript, `pnpm`, `eslint`, `chai`/`mocha`, `arktype`.
 
 ## File Structure
 
-- `/docs`: Documentation for the project.
-  - `/docs/stf`: Specification for the STF format.
-- `/src`: Source code for the library.
-  - `/src/util`: Utilities.
-  - `/src/message`: Codec type definitions and message utilities.
-  - `/src/api-codec`: Codecs for API message formats.
-  - `/src/file-codec`: Codecs for file formats.
-- `/example`: Example usage of `llm-msg-io`.
+- `/docs/stf` — STF format specification.
+- `/src/util` — Utilities (e.g. `exportType` for sanitizing ArkType types).
+- `/src/message` — Canonical message schema (`arktype`), generic codec types, and helpers.
+- `/src/file-codec` — Codecs for serialized file formats (JSON, NDJSON, TOML, STF).
+- `/src/api-codec` — Codecs for API formats (OpenAI, Gemini).
+- `/example` — Example usage.
+- `AGENTS.md` — LLM onboarding guide. Must stay brief while covering all essential context.
 
 ## Architecture
 
-### Message (`src/message`)
-
-The `schema.ts` module contains the canonical message schema (defined with `arktype`) and helpers.
-
-```ts
-// `exportType` from `src/util/type.ts` sanitizes internal ArkType types.  
-export const Message = exportType(type({
-  "id?": 'string',
-  role: 'string',
-  content: type('string').or(ContentPart.array()),
-}));
-
-export type Message = typeof Message.infer;
-```
-
-The `codec.ts` module defines generic codec types.
-
-- `MessageEncoder<EncodedType=string, MetadataType=unknown>` is a function that encodes message + metadata.
-- `MessageDecoder<EncodedType=string, MetadataType=unknown>` does the opposite, and returns `{metadata?: MetadataType, messages: Message[]}`.
-- `RawMessageDecoder<EncodedType=string>` skips validation; may return the object `MessageDecoder` returns, or simply an array of messages.
-- `CodecEncoder` is a function that takes encoder options and returns `MessageEncoder`.
-- `CodecDecoder` is a function that takes decoder options and returns `RawMessageDecoder`.
-- `WithCreateEncoder` is an object with function `createEncoder`.
-- `WithCreateDecoder` is an object with function `createDecoder`.
-- `Codec` is the intersection type of `WithCreateEncoder` and `WithCreateDecoder`.
-
-It also provides helpers like `createEncoder` and `createDecoder`.
-
-### Codec
-
-Two domains: `src/file-codec` for serialized file formats and `src/api-codec` for API input/outputs.
+- **Message schema** (`src/message/schema/`): Defines `Message`, `ContentPart`, etc. with `arktype`.
+- **Codec types** (`src/message/`): Generic `Codec` type (= `WithCreateEncoder` & `WithCreateDecoder`), plus `MessageEncoder`, `MessageDecoder`, and related types. `createEncoder`/`createDecoder` helpers build encoder/decoder functions from a codec.
+- **Codec implementations**: `src/file-codec` for file formats, `src/api-codec` for API I/O.
 
 ## Testing
 
-Unit tests are written with `chai` and `mocha`, and executed via `pnpm test`, which builds the project (`pnpm build`) and then runs Mocha on the compiled spec files under `dist/**/*.spec.js`.
+Tests use `chai`/`mocha`. Run `pnpm test` (builds first, then runs `dist/**/*.spec.js`).
+
+## Integration Tests
+
+`/integration-test` — Non-interactive integration tests that hit real APIs (OpenAI, Gemini). Structure is informal and incomplete; not as rigid as `/src`.
+
+- Run individual tests directly: `node integration-test/<subdir>/<provider>.js`.
+- API keys are set via env variables (`OPENAI_API_KEY`, `GEMINI_API_KEY`). See `integration-test/README.md`.
+- Subdirectories test different codec scenarios: `step/` (basic step), `step-reasoning/` (reasoning models), `tool/` (function calling).
+- Each subdirectory has per-provider files (e.g. `gemini.js`, `openai.js`).
+- Gemini 3 models return `thought_signatures` in message extras; these must be preserved through encode/decode.
