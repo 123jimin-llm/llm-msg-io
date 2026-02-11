@@ -1,8 +1,8 @@
-import { assert } from 'chai';
+import {assert} from 'chai';
 
-import { type Message } from "../../message/index.ts";
-import { createDecoder } from '../../file-codec-lib/index.ts';
-import { createDecoder as createSTFDecoder } from "./decoder.ts";
+import {type Message} from "../../message/index.ts";
+import {createDecoder} from '../../file-codec-lib/index.ts';
+import {createDecoder as createSTFDecoder} from "./decoder.ts";
 
 const decoder = createDecoder(createSTFDecoder);
 
@@ -17,7 +17,7 @@ describe("file-codec/stf", () => {
                     "Hi there!",
                 ].join('\n');
 
-                const { messages } = decoder(serialized);
+                const {messages} = decoder(serialized);
                 assert.deepStrictEqual(messages, [
                     {role: 'user', content: "Hello!"},
                     {role: 'assistant', content: "Hi there!"},
@@ -32,7 +32,7 @@ describe("file-codec/stf", () => {
                     "{{ prompt.scenario }}",
                 ].join('\n');
 
-                const { messages } = decoder(serialized);
+                const {messages} = decoder(serialized);
                 assert.deepStrictEqual(messages, [
                     {role: 'developer', content: "{{ prompt.game }}"},
                     {role: 'user', content: "{{ prompt.scenario }}"},
@@ -47,7 +47,7 @@ describe("file-codec/stf", () => {
                     "Line 3",
                 ].join('\n');
 
-                const { messages } = decoder(serialized);
+                const {messages} = decoder(serialized);
                 assert.deepStrictEqual(messages, [
                     {role: 'user', content: "Line 1\nLine 2\nLine 3"},
                 ] satisfies Message[]);
@@ -60,7 +60,7 @@ describe("file-codec/stf", () => {
                     "",
                 ].join('\n');
 
-                const { messages } = decoder(serialized);
+                const {messages} = decoder(serialized);
                 assert.deepStrictEqual(messages, [
                     {role: 'user', content: "Hello\n"},
                 ] satisfies Message[]);
@@ -73,7 +73,7 @@ describe("file-codec/stf", () => {
                     "",
                     "Line 3",
                 ].join('\n');
-                const { messages } = decoder(serialized);
+                const {messages} = decoder(serialized);
                 assert.deepStrictEqual(messages, [
                     {role: 'user', content: "Line 1\n\nLine 3"},
                 ]);
@@ -91,16 +91,16 @@ describe("file-codec/stf", () => {
                     "  ",
                     "",
                 ].join('\n');
-                const { messages } = decoder(serialized);
+                const {messages} = decoder(serialized);
                 assert.deepStrictEqual(messages, [
                     {role: 'user', content: "Hello!"},
                     {role: 'assistant', content: "Hi there!\n  \n"},
                 ]);
-             });
+            });
 
             it("should decode an empty STF file as an empty array", () => {
                 for(const serialized of ["", " ", "\t", "\n", " \n "]) {
-                    assert.deepStrictEqual(decoder(serialized), { messages: []});
+                    assert.deepStrictEqual(decoder(serialized), {messages: []});
                 }
             });
 
@@ -110,7 +110,7 @@ describe("file-codec/stf", () => {
                     " ; this is not a command",
                 ].join('\n');
 
-                const { messages } = decoder(serialized);
+                const {messages} = decoder(serialized);
                 assert.deepStrictEqual(messages, [
                     {role: 'user', content: " ; this is not a command"},
                 ] satisfies Message[]);
@@ -122,17 +122,17 @@ describe("file-codec/stf", () => {
                     ";;this is not a command",
                 ].join('\n');
 
-                const { messages } = decoder(serialized);
+                const {messages} = decoder(serialized);
                 assert.deepStrictEqual(messages, [
                     {role: 'user', content: ";this is not a command"},
                 ] satisfies Message[]);
             });
-            
+
             it("should use default_role for initial data lines", () => {
                 const serialized = "Hello, world!";
-                const { messages } = createDecoder(createSTFDecoder, {default_role: 'user'})(serialized);
+                const {messages} = createDecoder(createSTFDecoder, {default_role: 'user'})(serialized);
                 assert.deepStrictEqual(messages, [
-                    { role: 'user', content: "Hello, world!" },
+                    {role: 'user', content: "Hello, world!"},
                 ] satisfies Message[]);
             });
         });
@@ -153,7 +153,7 @@ describe("file-codec/stf", () => {
                     "Howdy",
                 ].join('\n');
 
-                const { messages } = decoder(serialized);
+                const {messages} = decoder(serialized);
                 assert.deepStrictEqual(messages, [
                     {role: 'user', content: "Hello"},
                     {role: 'assistant', content: "Hi"},
@@ -174,9 +174,9 @@ describe("file-codec/stf", () => {
                     "Hello!",
                 ].join('\n');
 
-                const { messages } = decoder(serialized);
+                const {messages} = decoder(serialized);
                 assert.deepStrictEqual(messages, [
-                    { role: 'user', content: "Hello!" },
+                    {role: 'user', content: "Hello!"},
                 ] satisfies Message[]);
             });
         });
@@ -184,7 +184,7 @@ describe("file-codec/stf", () => {
         context("message arguments", () => {
             it("should handle key-value arguments for commands", () => {
                 const serialized = ";msg role=user name=\"John Doe\" id=123";
-                const { messages } = decoder(serialized);
+                const {messages} = decoder(serialized);
                 assert.deepStrictEqual(messages, [
                     {
                         role: 'user',
@@ -197,7 +197,7 @@ describe("file-codec/stf", () => {
 
             it("should handle JSON5 arguments for commands", () => {
                 const serialized = ";msg {role: 'user', name: 'John Doe', id: '456'}";
-                const { messages } = decoder(serialized);
+                const {messages} = decoder(serialized);
                 assert.deepStrictEqual(messages, [
                     {
                         role: 'user',
@@ -208,7 +208,7 @@ describe("file-codec/stf", () => {
                 ] satisfies Message[]);
             });
         });
-        
+
         context("message commands", () => {
             it("should decode role-specific commands and role inheritance", () => {
                 const serialized = [
@@ -224,7 +224,7 @@ describe("file-codec/stf", () => {
                     "Tool message.",
                 ].join('\n');
 
-                const { messages } = decoder(serialized);
+                const {messages} = decoder(serialized);
                 assert.deepStrictEqual(messages, [
                     {role: 'system', content: "You are a helpful assistant."},
                     {role: 'user', content: "Hello!"},
@@ -243,7 +243,7 @@ describe("file-codec/stf", () => {
                     "}",
                     ";end",
                 ].join('\n');
-                const { messages } = decoder(serialized);
+                const {messages} = decoder(serialized);
                 assert.deepStrictEqual(messages, [
                     {
                         role: 'user',
@@ -263,20 +263,20 @@ describe("file-codec/stf", () => {
                     ";assistant",
                     "Hi!",
                 ].join('\n');
-                const { messages } = decoder(serialized);
+                const {messages} = decoder(serialized);
                 assert.deepStrictEqual(messages, [
                     {role: 'user', content: 'Hello!'},
                     {role: 'assistant', content: 'Hi!'},
                 ]);
             });
-        })
+        });
 
         context("error handling", () => {
             it("should throw an error for data lines without a message", () => {
                 const serialized = "some content";
                 assert.throws(() => decoder(serialized));
             });
-    
+
             it("should throw an error for unmatched block comments", () => {
                 assert.throws(() => decoder(";/* this is an unterminated block comment"));
                 assert.throws(() => decoder(";*/ this is a closing block comment without an opening one"));

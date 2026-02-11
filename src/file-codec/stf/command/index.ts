@@ -1,10 +1,10 @@
 export * from "./args.ts";
 export * from "./type.ts";
 
-import type { Command } from "./type.ts";
+import type {Command} from "./type.ts";
 
-import { MESSAGE_COMMANDS } from "./message.ts";
-import { MISC_COMMANDS } from "./misc.ts";
+import {MESSAGE_COMMANDS} from "./message.ts";
+import {MISC_COMMANDS} from "./misc.ts";
 
 export const COMMANDS: Command[] = [
     ...MESSAGE_COMMANDS,
@@ -19,7 +19,7 @@ export const COMMAND_LOOKUP = (() => {
         }
 
         lookup.set(command.name, command);
-        
+
         if(command.alias_list) {
             for(const alias of command.alias_list) {
                 if(lookup.has(alias)) {

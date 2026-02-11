@@ -1,16 +1,16 @@
-import type { ChatCompletionChunk } from "openai/resources/chat/completions";
+import type {ChatCompletionChunk} from "openai/resources/chat/completions";
 
-import type { StepResult, WithCreateStepStreamDecoder } from "../../../api-codec-lib/step/index.ts";
-import type { MessageDelta, ToolCallDelta, StepStreamEvent, StreamEndEvent } from "../../../message/index.ts";
-import { applyDeltaToStepStreamState, createStepStreamState, finalizeStepStreamState, stepStreamStateToResult } from "../../../message/index.ts";
-import type { Stream } from "openai/streaming";
+import type {StepResult, WithCreateStepStreamDecoder} from "../../../api-codec-lib/step/index.ts";
+import type {MessageDelta, ToolCallDelta, StepStreamEvent, StreamEndEvent} from "../../../message/index.ts";
+import {applyDeltaToStepStreamState, createStepStreamState, finalizeStepStreamState, stepStreamStateToResult} from "../../../message/index.ts";
+import type {Stream} from "openai/streaming";
 
 export type OpenAIChatCompletionStream = Stream<ChatCompletionChunk>;
 type OpenAIDelta = ChatCompletionChunk.Choice.Delta & {reasoning?: string};
 
 export function fromOpenAIDelta(api_delta: OpenAIDelta): MessageDelta {
     const delta: MessageDelta = {};
-    
+
     if(api_delta.role) delta.role = api_delta.role;
     if(api_delta.content) delta.content = api_delta.content;
     if(api_delta.reasoning) delta.reasoning = api_delta.reasoning;
@@ -33,13 +33,13 @@ export function fromOpenAIDelta(api_delta: OpenAIDelta): MessageDelta {
 }
 
 export const OpenAIChatStreamCodec = {
-    createStepStreamDecoder: () => async function*(api_stream): AsyncGenerator<StepStreamEvent, StepResult> {
+    createStepStreamDecoder: () => async function* (api_stream): AsyncGenerator<StepStreamEvent, StepResult> {
         const state = createStepStreamState();
-        
+
         let started = false;
         let finish_reason = "";
 
-        for await(const chunk of await api_stream) {
+        for await (const chunk of await api_stream) {
             if(!started) {
                 started = true;
                 yield {
@@ -57,13 +57,13 @@ export const OpenAIChatStreamCodec = {
             const delta = fromOpenAIDelta(choice.delta);
             yield* applyDeltaToStepStreamState(state, delta);
 
-            if (choice.finish_reason) {
+            if(choice.finish_reason) {
                 finish_reason = choice.finish_reason;
             }
         }
 
         yield* finalizeStepStreamState(state);
-        
+
         const stream_end_event: StreamEndEvent = {type: 'stream.end'};
         if(finish_reason) stream_end_event.finish_reason = finish_reason;
         yield stream_end_event;

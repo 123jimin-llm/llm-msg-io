@@ -5,9 +5,9 @@ import type {
     ChatCompletionCreateParams,
 } from "openai/resources/chat/completions";
 
-import type { Nullable } from "../../../util/type.ts";
-import type { StepParams, WithCreateStepEncoder } from "../../../api-codec-lib/index.ts";
-import { messageContentToText, type MessageContent, type ToolCall } from "../../../message/index.ts";
+import type {Nullable} from "../../../util/type.ts";
+import type {StepParams, WithCreateStepEncoder} from "../../../api-codec-lib/index.ts";
+import {messageContentToText, type MessageContent, type ToolCall} from "../../../message/index.ts";
 
 function toChatCompletionContent(content: Nullable<MessageContent>): OpenAIChatInputMessage['content'] {
     if(content == null) return null;
@@ -19,17 +19,17 @@ function toChatCompletionContent(content: Nullable<MessageContent>): OpenAIChatI
     return content.map((part): ChatCompletionContentPart => {
         switch(part.type) {
             case 'text':
-                return { type: 'text', text: part.text };
+                return {type: 'text', text: part.text};
             case 'image': {
                 if(part.url) {
-                    return { type: 'image_url', image_url: { url: part.url } };
+                    return {type: 'image_url', image_url: {url: part.url}};
                 }
                 if(part.data) {
                     const b64_data = (typeof part.data === 'string') ? part.data : Buffer.from(part.data).toString('base64');
                     const format = part.format ?? 'png';
                     return {
                         type: 'image_url',
-                        image_url: { url: `data:image/${format};base64,${b64_data}` },
+                        image_url: {url: `data:image/${format};base64,${b64_data}`},
                     };
                 }
                 throw new Error("Image content part must have url or data.");
@@ -53,7 +53,7 @@ function toChatCompletionContent(content: Nullable<MessageContent>): OpenAIChatI
                     const b64_data = (typeof part.data === 'string') ? part.data : Buffer.from(part.data).toString('base64');
                     file.file_data = b64_data;
                 }
-                return { type: 'file', file };
+                return {type: 'file', file};
             }
             default:
                 throw new Error(`Unknown type: '${(part as {type: string}).type}'`);
@@ -63,13 +63,13 @@ function toChatCompletionContent(content: Nullable<MessageContent>): OpenAIChatI
 
 function toChatCompletionToolCall(tool_call: ToolCall): ChatCompletionMessageToolCall {
     return {
-        id: tool_call.id ?? "",
-        type: 'function',
-        function: {
+        "id": tool_call.id ?? "",
+        "type": 'function',
+        "function": {
             name: tool_call.name,
             arguments: tool_call.arguments,
         },
-    }
+    };
 }
 
 export interface OpenAIChatRequestEncodeOptions {

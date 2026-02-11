@@ -1,20 +1,20 @@
-import { Message, MessageArray } from "../message/index.ts";
+import {Message, MessageArray} from "../message/index.ts";
 
 /** Decoded list of messages with metadata. */
-export type DecodedData<MetadataType=unknown> = {metadata?: MetadataType, messages: Message[]};
-export type RawDecodedData<MetadataType=unknown> = Message[] | DecodedData<MetadataType>;
+export type DecodedData<MetadataType = unknown> = {metadata?: MetadataType; messages: Message[]};
+export type RawDecodedData<MetadataType = unknown> = Message[] | DecodedData<MetadataType>;
 
 /** Decode encoded data into a list of messages together with metadata. */
-export type MessageDecoder<EncodedType=string, MetadataType=unknown> = (encoded: EncodedType) => DecodedData<MetadataType>;
+export type MessageDecoder<EncodedType = string, MetadataType = unknown> = (encoded: EncodedType) => DecodedData<MetadataType>;
 
 /** Decode encoded data without validation. */
-export type RawMessageDecoder<EncodedType=string> = (encoded: EncodedType) => unknown;
+export type RawMessageDecoder<EncodedType = string> = (encoded: EncodedType) => unknown;
 
 /** A function that returns a decoder. */
-export type CodecDecoder<EncodedType=string, DecodeOptions extends object=object> = (options?: Partial<DecodeOptions>) => RawMessageDecoder<EncodedType>;
+export type CodecDecoder<EncodedType = string, DecodeOptions extends object = object> = (options?: Partial<DecodeOptions>) => RawMessageDecoder<EncodedType>;
 
 /** An object that provides a decoder. */
-export interface WithCreateDecoder<EncodedType=string, DecodeOptions extends object=object> {
+export interface WithCreateDecoder<EncodedType = string, DecodeOptions extends object = object> {
     createDecoder: CodecDecoder<EncodedType, DecodeOptions>;
 };
 
@@ -55,12 +55,12 @@ export function asDecodedData(obj: unknown): DecodedData<unknown> {
 }
 
 /** Either a function that returns a decoder, or a codec with createDecoder. */
-export type CodecDecoderLike<EncodedType=string, DecodeOptions extends object=object>
-    = CodecDecoder<EncodedType, DecodeOptions>
+export type CodecDecoderLike<EncodedType = string, DecodeOptions extends object = object> =
+    CodecDecoder<EncodedType, DecodeOptions>
     | WithCreateDecoder<EncodedType, DecodeOptions>;
 
 /** Invokes the function that returns a raw deserializer. */
-export function createRawDecoder<EncodedType=string, DecodeOptions extends object=object>(
+export function createRawDecoder<EncodedType = string, DecodeOptions extends object = object>(
     codec: CodecDecoderLike<EncodedType, DecodeOptions>,
     options?: DecodeOptions,
 ): RawMessageDecoder<EncodedType> {
@@ -68,7 +68,7 @@ export function createRawDecoder<EncodedType=string, DecodeOptions extends objec
 }
 
 /** Invokes the function that returns a decoder. */
-export function createDecoder<EncodedType=string, DecodeOptions extends object=object, MetadataType=unknown>(
+export function createDecoder<EncodedType = string, DecodeOptions extends object = object, MetadataType = unknown>(
     codec: CodecDecoderLike<EncodedType, DecodeOptions>,
     options?: DecodeOptions,
     validateMetadata?: (metadata: unknown) => MetadataType,

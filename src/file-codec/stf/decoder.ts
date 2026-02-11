@@ -1,6 +1,6 @@
-import type { CodecDecoder } from "../../file-codec-lib/index.ts";
-import { COMMAND_LOOKUP, CommandMode, parseCommandArgs } from "./command/index.ts";
-import { createDecodeState, flushBufferedLines, flushDecodeState } from "./decode-state.ts";
+import type {CodecDecoder} from "../../file-codec-lib/index.ts";
+import {COMMAND_LOOKUP, CommandMode, parseCommandArgs} from "./command/index.ts";
+import {createDecodeState, flushBufferedLines, flushDecodeState} from "./decode-state.ts";
 
 const BLANK_LINE_PATTERN = /^[ \t]*$/;
 const COMMAND_LINE_PATTERN = /^;[ \t]*(\/\/|\/\*|\*\/|#|[a-z][a-z0-9]*)/i;
@@ -28,14 +28,14 @@ export const createDecoder: CodecDecoder<string, Partial<STFDecoderOptions>> = (
 
     const state = createDecodeState();
     state.default_role = options?.default_role ?? null;
-    
+
     let comment_depth = 0;
 
     const lines = source.split('\n');
     line_loop: for(let line_no = 0; line_no < lines.length; ++line_no) {
         const raw_line = lines[line_no] ?? "";
         const data_line = parseDataLine(raw_line);
-        
+
         if(data_line != null) {
             state.curr_data_line_no = line_no;
 
@@ -68,9 +68,8 @@ export const createDecoder: CodecDecoder<string, Partial<STFDecoderOptions>> = (
         // STF command line
         state.curr_command_line_no = line_no;
         const command_match = raw_line.match(COMMAND_LINE_PATTERN);
-        if(command_match == null) throw new SyntaxError(`Line ${line_no + 1}: Unknown command line.`)
+        if(command_match == null) throw new SyntaxError(`Line ${line_no + 1}: Unknown command line.`);
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const command_name = command_match[1]!;
 
         // line comments
@@ -100,7 +99,7 @@ export const createDecoder: CodecDecoder<string, Partial<STFDecoderOptions>> = (
         if(command_name === "end") {
             if(!state.invoked) throw new SyntaxError(`Line ${line_no + 1}: Unexpected 'end' command.`);
 
-            const { command, args: command_args } = state.invoked;
+            const {command, args: command_args} = state.invoked;
             if(command.mode !== CommandMode.POLYADIC) {
                 throw new SyntaxError(`Line ${line_no + 1}: Unexpected 'end' command for a command '${command.name}'.`);
             }
@@ -141,7 +140,7 @@ export const createDecoder: CodecDecoder<string, Partial<STFDecoderOptions>> = (
     }
 
     if(state.invoked) {
-        throw new SyntaxError(`Unterminated '${state.invoked.command.name}' command.`)
+        throw new SyntaxError(`Unterminated '${state.invoked.command.name}' command.`);
     }
 
     flushDecodeState(state);

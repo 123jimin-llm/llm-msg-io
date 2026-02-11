@@ -1,16 +1,14 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
 import JSON5 from "json5";
 
-import type { CommandArgs } from "./type.ts";
+import type {CommandArgs} from "./type.ts";
 
 function scanBlank(s: string, i: number): number {
-    while( i < s.length && (s[i] === ' ' || s[i] === '\t') ) ++i;
+    while(i < s.length && (s[i] === ' ' || s[i] === '\t')) ++i;
     return i;
 }
 
 function scanNonBlank(s: string, i: number): number {
-    while( i < s.length && s[i] !== ' ' && s[i] !== '\t' ) ++i;
+    while(i < s.length && s[i] !== ' ' && s[i] !== '\t') ++i;
     return i;
 }
 
@@ -18,12 +16,12 @@ function scanNonBlank(s: string, i: number): number {
  * Scan a single-line quoted literal that starts at s[i], where s[i] is ' or ".
  * - Returns the index immediately after the closing quote and the raw literal, inclusive of quotes.
  */
-function scanQuoted(s: string, i: number): {end: number, literal: string} {
+function scanQuoted(s: string, i: number): {end: number; literal: string} {
     const n = s.length;
-    if (i >= n) throw new SyntaxError("Internal error: scanQuoted out of range.");
+    if(i >= n) throw new SyntaxError("Internal error: scanQuoted out of range.");
 
     const quote = s[i];
-    if (quote !== '"' && quote !== "'") {
+    if(quote !== '"' && quote !== "'") {
         throw new SyntaxError("Internal error: `scanQuoted` must start on a quote.");
     }
 
@@ -32,11 +30,11 @@ function scanQuoted(s: string, i: number): {end: number, literal: string} {
 
     for(; j < n; ++j) {
         const ch = s[j];
-        
+
         if(ch === '\n') {
             throw new SyntaxError("Quoted value must be a single line; line feed not allowed.");
         }
-        
+
         if(escaped) {
             escaped = false;
             continue;
@@ -97,14 +95,14 @@ export function parseCommandArgs(args_text: string, line_no: number = 0): Comman
         ++i;
         i = scanBlank(args_text, i);
 
-        if (i >= n) {
+        if(i >= n) {
             throw new SyntaxError(`Line ${line_no + 1}: Expected value after '='.`);
         }
 
         let value: string;
         const ch = args_text[i];
         if(ch === '"' || ch === "'") {
-            const { end, literal } = scanQuoted(args_text, i);
+            const {end, literal} = scanQuoted(args_text, i);
 
             try {
                 const parsed = JSON5.parse(literal);
@@ -112,7 +110,7 @@ export function parseCommandArgs(args_text: string, line_no: number = 0): Comman
                     throw new SyntaxError(`Line ${line_no + 1}: Quoted value must be a string.`);
                 }
                 value = parsed;
-            } catch(e) {
+            } catch (e) {
                 const msg = e instanceof Error ? e.message : String(e);
                 throw new SyntaxError(`Line ${line_no + 1}: Invalid quoted string: ${msg}`);
             }

@@ -1,4 +1,4 @@
-import { type DecodeState } from "../decode-state.ts";
+import {type DecodeState} from "../decode-state.ts";
 
 export const CommandMode = Object.freeze({
     NILADIC: 0,
@@ -12,7 +12,7 @@ export type CommandArgs = Record<string, unknown>;
 
 export interface Command {
     mode: CommandMode;
-    
+
     name: string;
     alias_list?: string[];
 

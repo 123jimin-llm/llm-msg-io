@@ -5,10 +5,10 @@ import type {
     ChatCompletionMessageToolCall,
 } from "openai/resources/chat/completions";
 
-import type { Nullable } from "../../../util/type.ts";
-import { Message, ToolCall, type ContentPart, type MessageContent } from "../../../message/index.js";
-import type { WithCreateDecoder } from "../../../file-codec-lib/decoder.ts";
-import type { WithCreateStepDecoder } from "../../../api-codec-lib/step/response.ts";
+import type {Nullable} from "../../../util/type.ts";
+import {Message, ToolCall, type ContentPart, type MessageContent} from "../../../message/index.js";
+import type {WithCreateDecoder} from "../../../file-codec-lib/decoder.ts";
+import type {WithCreateStepDecoder} from "../../../api-codec-lib/step/response.ts";
 
 function fromChatCompletionContent(content: Nullable<OpenAIChatInputMessage['content']>): MessageContent {
     if(!content) return "";
@@ -18,26 +18,25 @@ function fromChatCompletionContent(content: Nullable<OpenAIChatInputMessage['con
     }
 
     if(content.length === 1) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const part = content[0]!;
         if(part.type === 'text') return part.text;
     }
 
     return content.map((part): ContentPart => {
         switch(part.type) {
-            case 'text': return { type: 'text', text: part.text };
-            case 'refusal': return { type: 'text', text: part.refusal };
+            case 'text': return {type: 'text', text: part.text};
+            case 'refusal': return {type: 'text', text: part.refusal};
             case 'file': {
-                const ret: ContentPart = { type: 'file' };
-                
+                const ret: ContentPart = {type: 'file'};
+
                 if(part.file.file_id) ret.file_id = part.file.file_id;
                 if(part.file.filename) ret.name = part.file.filename;
                 if(part.file.file_data) ret.data = part.file.file_data;
-                
+
                 return ret;
             }
-            case 'image_url': return { type: 'image', url: part.image_url.url };
-            case 'input_audio': return { type: 'audio', data: part.input_audio.data, format: part.input_audio.format };
+            case 'image_url': return {type: 'image', url: part.image_url.url};
+            case 'input_audio': return {type: 'audio', data: part.input_audio.data, format: part.input_audio.format};
             default: throw new Error(`Unknown type: '${(part as {type: string}).type}'`);
         }
     });

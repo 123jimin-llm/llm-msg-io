@@ -1,5 +1,5 @@
-import { type } from "arktype";
-import { exportType } from "../../util/type.ts";
+import {type} from "arktype";
+import {exportType} from "../../util/type.ts";
 
 export const FunctionDefinition = exportType(type({
     name: "string",

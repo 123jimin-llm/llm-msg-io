@@ -1,8 +1,8 @@
-import { assert } from 'chai';
+import {assert} from 'chai';
 
-import { Message, MessageArray } from "./message.ts";
+import {Message, MessageArray} from "./message.ts";
 
-describe("Message", () =>{
+describe("Message", () => {
     it("should assert valid messages", () => {
         const valid_messages: unknown[] = [
             {role: 'user', content: "Hello, world!"},

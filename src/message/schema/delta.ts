@@ -1,4 +1,4 @@
-import type { Message } from "./message.ts";
+import type {Message} from "./message.ts";
 
 /** Incremental tool_call delta (differs from final ToolCall shape). */
 export interface ToolCallDelta {

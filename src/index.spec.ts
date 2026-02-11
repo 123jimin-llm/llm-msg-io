@@ -1,6 +1,6 @@
-import { assert } from 'chai';
+import {assert} from 'chai';
 
-describe("serialize", function() {
+describe("serialize", () => {
 });
 
-describe("deserialize", function() {});
+describe("deserialize", () => {});

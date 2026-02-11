@@ -1,9 +1,9 @@
-import type { Content, FinishReason, GenerateContentResponse, Blob as GeminiBlob } from "@google/genai";
+import type {Content, FinishReason, GenerateContentResponse, Blob as GeminiBlob} from "@google/genai";
 
-import type { StepResult, WithCreateStepDecoder } from "../../api-codec-lib/index.ts";
-import type { ContentPart, Message, MessageContent, ToolCall } from "../../message/index.ts";
-import { concatContentsTo } from "../../message/index.ts";
-import { getMessageExtraGemini } from "./extra.ts";
+import type {StepResult, WithCreateStepDecoder} from "../../api-codec-lib/index.ts";
+import type {ContentPart, Message, MessageContent, ToolCall} from "../../message/index.ts";
+import {concatContentsTo} from "../../message/index.ts";
+import {getMessageExtraGemini} from "./extra.ts";
 
 // Converts to OpenAI-compatible finish reason.
 export function fromGeminiFinishReason(finish_reason: FinishReason): string {
@@ -61,7 +61,7 @@ export function fromGeminiContent(api_content: Content): Message {
         }
 
         if(!part.text) continue;
-        
+
         if(part.thought) {
             reasoning_arr.push(part.text);
         } else {

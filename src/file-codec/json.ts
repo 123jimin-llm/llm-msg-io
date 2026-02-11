@@ -1,6 +1,6 @@
 /// JSON support
 
-import type { FileCodec } from "../file-codec-lib/index.ts";
+import type {FileCodec} from "../file-codec-lib/index.ts";
 
 export const JSONCodec = {
     createEncoder: () => (messages, metadata?) => {

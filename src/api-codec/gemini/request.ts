@@ -1,9 +1,9 @@
-import type { Content, FunctionDeclaration, GenerateContentParameters, Part } from "@google/genai";
+import type {Content, FunctionDeclaration, GenerateContentParameters, Part} from "@google/genai";
 
-import type { FunctionDefinition, StepParams, WithCreateStepEncoder } from "../../api-codec-lib/index.ts";
-import { Message, messageContentToTextArray } from "../../message/index.ts";
-import { getMessageExtraGemini, type GeminiExtra } from "./extra.ts";
-import type { Nullable } from "../../util/type.ts";
+import type {FunctionDefinition, StepParams, WithCreateStepEncoder} from "../../api-codec-lib/index.ts";
+import {Message, messageContentToTextArray} from "../../message/index.ts";
+import {getMessageExtraGemini, type GeminiExtra} from "./extra.ts";
+import type {Nullable} from "../../util/type.ts";
 
 export function isGeminiSystemRole(role: string): boolean {
     switch(role) {
@@ -58,7 +58,7 @@ export function toGeminiParts(message: Message): Part[] {
 
                 return {
                     inlineData: {
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
                         mimeType: header!.slice("data:".length),
                         data: data.slice("base64,".length),
                     },
@@ -80,7 +80,6 @@ export const GeminiGenerateContentRequestCodec = {
         const api_messages: GenerateContentParameters['contents'] = [];
 
         for(let i=0; i<req.messages.length; ++i) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const message = req.messages[i]!;
 
             if(isGeminiSystemRole(message.role)) {

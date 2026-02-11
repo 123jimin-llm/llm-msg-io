@@ -1,6 +1,6 @@
 /// ND-JSON format
 
-import type { FileCodec } from "../file-codec-lib/index.ts";
+import type {FileCodec} from "../file-codec-lib/index.ts";
 
 type JsonObject = Record<string, unknown>;
 

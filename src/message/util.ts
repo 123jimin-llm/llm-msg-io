@@ -1,4 +1,4 @@
-import type { Message, MessageArray } from "./schema/message.ts";
+import type {Message, MessageArray} from "./schema/message.ts";
 
 /** Objects that can be converted to an array of messages. */
 export type MessageArrayLike = Message|MessageArray;
@@ -21,8 +21,8 @@ export function asMessageArray(obj: MessageArrayLike): MessageArray {
     return isMessageArray(obj) ? obj : [obj];
 }
 
-export function getMessageExtra<T>(message: Pick<Message, 'extra'>, key: string, init?: boolean) : T|null;
-export function getMessageExtra<T>(message: Pick<Message, 'extra'>, key: string, init: true) : T;
+export function getMessageExtra<T>(message: Pick<Message, 'extra'>, key: string, init?: boolean): T|null;
+export function getMessageExtra<T>(message: Pick<Message, 'extra'>, key: string, init: true): T;
 export function getMessageExtra<T>(message: Pick<Message, 'extra'>, key: string, init = false): T|null {
     const message_extra = (message.extra || (init ? (message.extra = {}) : null)) as {[key]?: T};
     if(!message_extra) return null;
@@ -48,9 +48,9 @@ export function stripMessageIds(messages: Message|Message[]): Message|Message[] 
 
 /**
  * Swaps message ID of a given message.
- * @param msg_id_map 
- * @param message 
- * @returns 
+ * @param msg_id_map
+ * @param message
+ * @returns
  */
 export function mapMessageId(msg_id_map: Map<string, string>|Record<string, string>, message: Message): Message {
     const msg = {...message};
@@ -76,20 +76,20 @@ export function mapMessageIds(msg_id_map: Map<string, string>|Record<string, str
 
 /**
  * Transforms all text contents of a given message.
- * @param fn 
- * @param message 
- * @returns 
+ * @param fn
+ * @param message
+ * @returns
  */
 export function mapMessageText(fn: (text: string) => string, message: Message): Message {
-    const { content } = message;
+    const {content} = message;
 
     let new_content;
 
     if(typeof content === 'string') {
         new_content = fn(content);
     } else {
-        new_content = content.map(part => {
-            if(part.type === 'text') return { ...part, text: fn(part.text) };
+        new_content = content.map((part) => {
+            if(part.type === 'text') return {...part, text: fn(part.text)};
             else return part;
         });
     }
@@ -111,15 +111,15 @@ export function mapMessageTexts(fn: (text: string) => string, messages: Message|
 }
 
 export async function asyncMapMessageText(fn: (text: string) => Promise<string>, message: Message): Promise<Message> {
-    const { content } = message;
+    const {content} = message;
 
     let new_content;
 
     if(typeof content === 'string') {
         new_content = await fn(content);
     } else {
-        new_content = await Promise.all(content.map(async(part) => {
-            if(part.type === 'text') return { ...part, text: await fn(part.text) };
+        new_content = await Promise.all(content.map(async (part) => {
+            if(part.type === 'text') return {...part, text: await fn(part.text)};
             else return part;
         }));
     }

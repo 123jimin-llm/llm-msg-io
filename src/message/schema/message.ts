@@ -1,13 +1,13 @@
-import { type } from "arktype";
-import { exportType, type PublicType } from "../../util/type.ts";
+import {type} from "arktype";
+import {exportType, type PublicType} from "../../util/type.ts";
 
-import { MessageContent } from "./content.ts";
+import {MessageContent} from "./content.ts";
 
 export const ToolCall = exportType(type({
     "id?": "string",
     "call_id?": "string",
-    name: "string",
-    arguments: "string",
+    "name": "string",
+    "arguments": "string",
 
     "extra?": "unknown",
 }));
@@ -45,9 +45,9 @@ export const Message: PublicType<Message> = exportType(type({
     "id?": "string|undefined",
     "call_id?": "string|undefined",
     "name?": "string|undefined",
-    role: 'string',
+    "role": 'string',
 
-    content: MessageContent,
+    "content": MessageContent,
     "reasoning?": MessageContent.or("undefined"),
     "refusal?": MessageContent.or("undefined"),
 

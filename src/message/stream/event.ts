@@ -1,4 +1,4 @@
-import type { MessageContent, ToolCall } from "../schema/index.ts";
+import type {MessageContent, ToolCall} from "../schema/index.ts";
 
 /** Emitted when content is received. */
 export interface ContentDeltaEvent {

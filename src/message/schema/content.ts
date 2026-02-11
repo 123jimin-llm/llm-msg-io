@@ -1,5 +1,5 @@
-import { type } from 'arktype';
-import { exportType, type Nullable } from "../../util/type.ts";
+import {type} from 'arktype';
+import {exportType, type Nullable} from "../../util/type.ts";
 
 export const ContentPartText = exportType(type({
     type: '"text"',
@@ -7,7 +7,7 @@ export const ContentPartText = exportType(type({
 }));
 
 const ContentPartFileBase = type({
-    type: 'string',
+    "type": 'string',
     "format?": 'string',
     "file_id?": 'string',
     "name?": 'string',
@@ -32,7 +32,7 @@ export const ContentPartFile = exportType(ContentPartFileBase.and({
 export const ContentPart = exportType(ContentPartText
     .or(ContentPartImage)
     .or(ContentPartAudio)
-    .or(ContentPartFile)
+    .or(ContentPartFile),
 );
 
 export type ContentPart = typeof ContentPart.infer;
@@ -68,14 +68,13 @@ export function messageContentToTextArray(content: Nullable<MessageContent>): st
 
 /**
  * Concatenates multiple message contents into a single message content.
- * 
+ *
  * @param contents - An array of message contents to concatenate.
  * @returns A single value representing the concatenated content.
  */
 export function concatContents(...contents: MessageContent[]): MessageContent {
     if(contents.length === 0) return "";
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if(contents.length === 1) return contents[0]!;
 
     if(contents.every((content) => (typeof content) === 'string')) {
@@ -93,13 +92,13 @@ export function concatContents(...contents: MessageContent[]): MessageContent {
 
 /**
  * Concatenates one or more message contents to a target message content.
- * 
+ *
  * - If `target` is an array of `ContentPart` objects, it is modified in-place
  *   by appending the new content parts, and the same array instance is returned.
- * 
- * @param target 
- * @param contents 
- * @returns 
+ *
+ * @param target
+ * @param contents
+ * @returns
  */
 export function concatContentsTo(target: MessageContent, ...contents: MessageContent[]): MessageContent {
     if(contents.length === 0) {

@@ -1,8 +1,8 @@
-import type { StepResult } from "../../api-codec-lib/index.ts";
-import type { Nullable } from "../../util/type.ts";
-import { concatContentsTo, ToolCall } from "../schema/index.ts";
-import type { Message, MessageDelta } from "../schema/index.ts";
-import type { StepStreamEvent, ToolCallStartEvent } from "./event.ts";
+import type {StepResult} from "../../api-codec-lib/index.ts";
+import type {Nullable} from "../../util/type.ts";
+import {concatContentsTo, ToolCall} from "../schema/index.ts";
+import type {Message, MessageDelta} from "../schema/index.ts";
+import type {StepStreamEvent, ToolCallStartEvent} from "./event.ts";
 
 export type StepStreamState = {
     message: Message;
@@ -75,7 +75,7 @@ export function* applyDeltaToStepStreamState(
             let existing = tool_calls.get(ind);
 
             if(!existing) {
-                existing = { id: "", name: "", arguments: "" };
+                existing = {id: "", name: "", arguments: ""};
                 tool_calls.set(ind, existing);
             }
 
@@ -83,9 +83,9 @@ export function* applyDeltaToStepStreamState(
             if(tc.name) existing.name += tc.name;
             if(tc.arguments) existing.arguments += tc.arguments;
 
-            if (!tool_call_started.has(ind) && existing.name) {
+            if(!tool_call_started.has(ind) && existing.name) {
                 tool_call_started.add(ind);
-                
+
                 const event: ToolCallStartEvent = {
                     type: "tool_call.start",
                     index: ind,
@@ -96,8 +96,8 @@ export function* applyDeltaToStepStreamState(
 
                 yield event;
             }
-            
-            if (tc.arguments) {
+
+            if(tc.arguments) {
                 yield {
                     type: "tool_call.delta",
                     index: ind,
@@ -109,7 +109,7 @@ export function* applyDeltaToStepStreamState(
 }
 
 export function* finalizeStepStreamState({tool_calls, message}: StepStreamState): Generator<StepStreamEvent> {
-    for (const [ind, tc] of tool_calls.entries()) {
+    for(const [ind, tc] of tool_calls.entries()) {
         yield {
             type: "tool_call.end",
             index: ind,

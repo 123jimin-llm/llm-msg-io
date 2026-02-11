@@ -1,7 +1,7 @@
-import type { ToolCallDelta } from "../../message/index.ts";
-import { applyDeltaToStepStreamState, finalizeStepStreamState, createStepStreamState } from "../../message/stream/index.ts";
-import type { StepStreamEvent } from "../../message/stream/index.ts";
-import type { StepResult } from "./response.ts";
+import type {ToolCallDelta} from "../../message/index.ts";
+import {applyDeltaToStepStreamState, finalizeStepStreamState, createStepStreamState} from "../../message/stream/index.ts";
+import type {StepStreamEvent} from "../../message/stream/index.ts";
+import type {StepResult} from "./response.ts";
 
 export type StepStreamEventGenerator<DecodedType extends StepResult = StepResult> = AsyncGenerator<StepStreamEvent, DecodedType>;
 
@@ -28,8 +28,8 @@ export type CodecStepStreamDecoderLike<
     EncodedType,
     DecodedType extends StepResult = StepResult,
     DecodeOptions extends object = object,
->
-    = CodecStepStreamDecoder<EncodedType, DecodedType, DecodeOptions>
+> =
+    CodecStepStreamDecoder<EncodedType, DecodedType, DecodeOptions>
     | WithCreateStepStreamDecoder<EncodedType, DecodedType, DecodeOptions>;
 
 export function createStepStreamDecoder<
@@ -46,12 +46,12 @@ export function createStepStreamDecoder<
 export async function* stepResultPromiseToEvents<DecodedType extends StepResult>(
     result_promise: Promise<DecodedType>,
 ): AsyncGenerator<StepStreamEvent, DecodedType> {
-    yield { type: 'stream.start' };
+    yield {type: 'stream.start'};
 
     const res = await result_promise;
     for(const message of res.messages) {
         const state = createStepStreamState();
-        
+
         yield* applyDeltaToStepStreamState(state, {
             ...message,
             tool_calls: message.tool_calls?.map((tool_call, ind): ToolCallDelta => {
@@ -65,7 +65,7 @@ export async function* stepResultPromiseToEvents<DecodedType extends StepResult>
         yield* finalizeStepStreamState(state);
     }
 
-    yield { type: 'stream.end' };
+    yield {type: 'stream.end'};
 
     return res;
 }

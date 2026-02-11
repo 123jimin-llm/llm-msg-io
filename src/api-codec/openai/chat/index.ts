@@ -7,11 +7,11 @@ import type {
     ChatCompletionCreateParamsBase,
 } from "openai/resources/chat/completions";
 
-import { OpenAIChatRequestCodec } from "./request.ts";
-import { OpenAIChatResponseCodec } from "./response.ts";
-import { OpenAIChatStreamCodec, type OpenAIChatCompletionStream } from "./stream.ts";
+import {OpenAIChatRequestCodec} from "./request.ts";
+import {OpenAIChatResponseCodec} from "./response.ts";
+import {OpenAIChatStreamCodec, type OpenAIChatCompletionStream} from "./stream.ts";
 
-import type { APIStepCodecWithStream, } from "../../../api-codec-lib/step/index.ts";
+import type {APIStepCodecWithStream} from "../../../api-codec-lib/step/index.ts";
 
 export const OpenAIChatCodec = {
     ...OpenAIChatRequestCodec,

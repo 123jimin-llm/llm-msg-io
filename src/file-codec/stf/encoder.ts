@@ -1,14 +1,14 @@
 import JSON5 from "json5";
 
-import type { Message } from "../../message/index.ts";
-import type { CodecEncoder } from "../../file-codec-lib/index.ts";
+import type {Message} from "../../message/index.ts";
+import type {CodecEncoder} from "../../file-codec-lib/index.ts";
 
 const ROLE_COMMAND_MAP: Readonly<Record<string, string>> = {
-    'user': 'user',
-    'assistant': 'ai',
-    'system': 'sys',
-    'developer': 'dev',
-    'tool': 'tool',
+    user: 'user',
+    assistant: 'ai',
+    system: 'sys',
+    developer: 'dev',
+    tool: 'tool',
 };
 
 function quoteValue(value: string): string {
@@ -45,7 +45,7 @@ export function stringify(message: Message): string {
     } else {
         command_parts.push(
             ";msg",
-            `role=${quoteValue(message.role)}`
+            `role=${quoteValue(message.role)}`,
         );
     }
 
