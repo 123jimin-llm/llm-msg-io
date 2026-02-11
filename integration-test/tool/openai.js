@@ -1,12 +1,11 @@
-/* eslint-env node */
-//@ts-check
+// @ts-check
 
 /** @import {Message} from "../../dist/index.js" */
 
-import { env, exit } from "node:process";
-import { readFileSync } from "node:fs";
+import {env, exit} from "node:process";
+import {readFileSync} from "node:fs";
 
-import { createStepEncoder, createStepDecoder, OpenAIChatCodec } from "../../dist/index.js";
+import {createStepEncoder, createStepDecoder, OpenAIChatCodec} from "../../dist/index.js";
 import OpenAI from "openai";
 
 const functions = JSON.parse(readFileSync(new globalThis.URL('functions.json', import.meta.url)).toString());
@@ -20,8 +19,8 @@ const TEST_MODEL = "gpt-4.1-nano";
 /** @param {typeof functions} fns */
 function toOpenAITools(fns) {
     return fns.map((/** @type {typeof functions[number]} */ fn) => ({
-        type: /** @type {const} */ ('function'),
-        function: fn,
+        "type": /** @type {const} */ ('function'),
+        "function": fn,
     }));
 }
 

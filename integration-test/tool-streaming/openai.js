@@ -1,13 +1,12 @@
-/* eslint-env node */
-//@ts-check
+// @ts-check
 
 /** @import {Message, StepResult, StepStreamEvent} from "../../dist/index.js" */
 
-import { assert } from 'chai';
-import { env, exit } from "node:process";
-import { readFileSync } from "node:fs";
+import {assert} from 'chai';
+import {env, exit} from "node:process";
+import {readFileSync} from "node:fs";
 
-import { createStepEncoder, createStepStreamDecoder, OpenAIChatCodec } from "../../dist/index.js";
+import {createStepEncoder, createStepStreamDecoder, OpenAIChatCodec} from "../../dist/index.js";
 import OpenAI from "openai";
 
 const functions = JSON.parse(readFileSync(new globalThis.URL('functions.json', import.meta.url)).toString());
@@ -21,8 +20,8 @@ const TEST_MODEL = "gpt-4.1-nano";
 /** @param {typeof functions} fns */
 function toOpenAITools(fns) {
     return fns.map((/** @type {typeof functions[number]} */ fn) => ({
-        type: /** @type {const} */ ('function'),
-        function: fn,
+        "type": /** @type {const} */ ('function'),
+        "function": fn,
     }));
 }
 
@@ -55,9 +54,9 @@ async function main() {
     /** @type {StepResult} */
     let result;
 
-    while (true) {
+    while(true) {
         const next = await stream.next();
-        if (next.done) {
+        if(next.done) {
             result = next.value;
             break;
         }
@@ -65,7 +64,7 @@ async function main() {
         const event = next.value;
         events.push(event);
 
-        if (event.type === 'tool_call.delta') {
+        if(event.type === 'tool_call.delta') {
             tool_call_delta_count++;
         }
     }

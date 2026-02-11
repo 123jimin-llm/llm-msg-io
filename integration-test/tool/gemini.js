@@ -1,13 +1,12 @@
-/* eslint-env node */
-//@ts-check
+// @ts-check
 
 /** @import {Message, StepResult} from "../../dist/index.js" */
 
-import { env, exit } from "node:process";
-import { readFileSync } from "node:fs";
+import {env, exit} from "node:process";
+import {readFileSync} from "node:fs";
 
-import { createStepEncoder, createStepDecoder, GeminiGenerateContentCodec } from "../../dist/index.js";
-import { GoogleGenAI } from "@google/genai";
+import {createStepEncoder, createStepDecoder, GeminiGenerateContentCodec} from "../../dist/index.js";
+import {GoogleGenAI} from "@google/genai";
 
 const functions = JSON.parse(readFileSync(new globalThis.URL('functions.json', import.meta.url)).toString());
 
@@ -35,7 +34,7 @@ async function main() {
         ...api_req,
         model: TEST_MODEL,
     });
-    
+
     globalThis.console.log(api_res.candidates?.[0]?.content?.parts[0]?.functionCall);
 
     let res = decode(api_res);

@@ -1,14 +1,13 @@
-/* eslint-env node */
-//@ts-check
+// @ts-check
 
 /** @import {Message, StepResult, StepStreamEvent} from "../../dist/index.js" */
 
-import { assert } from 'chai';
-import { env, exit } from "node:process";
-import { readFileSync } from "node:fs";
+import {assert} from 'chai';
+import {env, exit} from "node:process";
+import {readFileSync} from "node:fs";
 
-import { createStepEncoder, createStepStreamDecoder, GeminiGenerateContentCodec } from "../../dist/index.js";
-import { GoogleGenAI } from "@google/genai";
+import {createStepEncoder, createStepStreamDecoder, GeminiGenerateContentCodec} from "../../dist/index.js";
+import {GoogleGenAI} from "@google/genai";
 
 const functions = JSON.parse(readFileSync(new globalThis.URL('functions.json', import.meta.url)).toString());
 
@@ -44,9 +43,9 @@ async function main() {
     /** @type {StepResult} */
     let result;
 
-    while (true) {
+    while(true) {
         const next = await stream.next();
-        if (next.done) {
+        if(next.done) {
             result = next.value;
             break;
         }
@@ -89,14 +88,14 @@ async function main() {
 
     // Each tool call should have a valid name from our function set
     const valid_names = new Set(functions.map((/** @type {typeof functions[number]} */ f) => f.name));
-    for (const tc of tool_calls) {
+    for(const tc of tool_calls) {
         assert.isTrue(valid_names.has(tc.name), `unexpected tool name: ${tc.name}`);
         const args = JSON.parse(/** @type {string} */ (tc.arguments));
         assert.isString(args.city);
     }
 
     globalThis.console.log(`Parallel tool calls: ${tool_calls.length}`);
-    for (const tc of tool_calls) {
+    for(const tc of tool_calls) {
         globalThis.console.log(`  ${tc.name}(${tc.arguments})`);
     }
 }

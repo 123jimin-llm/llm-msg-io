@@ -1,4 +1,3 @@
-/* eslint-env node */
 //@ts-check
 
 /** @import {Message} from "../dist/index.js" */

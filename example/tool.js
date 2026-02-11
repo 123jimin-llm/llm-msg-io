@@ -1,4 +1,3 @@
-/* eslint-env node */
 //@ts-check
 /** @import { MessageArray } from "../dist/index.js" */
 import { createDecoder, createEncoder, OpenAIResponseCodec } from "../dist/index.js";

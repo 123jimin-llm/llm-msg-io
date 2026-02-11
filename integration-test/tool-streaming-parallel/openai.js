@@ -1,13 +1,12 @@
-/* eslint-env node */
-//@ts-check
+// @ts-check
 
 /** @import {Message, StepResult, StepStreamEvent} from "../../dist/index.js" */
 
-import { assert } from 'chai';
-import { env, exit } from "node:process";
-import { readFileSync } from "node:fs";
+import {assert} from 'chai';
+import {env, exit} from "node:process";
+import {readFileSync} from "node:fs";
 
-import { createStepEncoder, createStepStreamDecoder, OpenAIChatCodec } from "../../dist/index.js";
+import {createStepEncoder, createStepStreamDecoder, OpenAIChatCodec} from "../../dist/index.js";
 import OpenAI from "openai";
 
 const functions = JSON.parse(readFileSync(new globalThis.URL('functions.json', import.meta.url)).toString());
@@ -21,8 +20,8 @@ const TEST_MODEL = "gpt-4.1-nano";
 /** @param {typeof functions} fns */
 function toOpenAITools(fns) {
     return fns.map((/** @type {typeof functions[number]} */ fn) => ({
-        type: /** @type {const} */ ('function'),
-        function: fn,
+        "type": /** @type {const} */ ('function'),
+        "function": fn,
     }));
 }
 
@@ -54,9 +53,9 @@ async function main() {
     /** @type {StepResult} */
     let result;
 
-    while (true) {
+    while(true) {
         const next = await stream.next();
-        if (next.done) {
+        if(next.done) {
             result = next.value;
             break;
         }
@@ -100,7 +99,7 @@ async function main() {
 
     // Each tool call should have a valid name from our function set
     const valid_names = new Set(functions.map((/** @type {typeof functions[number]} */ f) => f.name));
-    for (const tc of tool_calls) {
+    for(const tc of tool_calls) {
         assert.isTrue(valid_names.has(tc.name), `unexpected tool name: ${tc.name}`);
         assert.isString(tc.id);
         const args = JSON.parse(/** @type {string} */ (tc.arguments));
@@ -112,7 +111,7 @@ async function main() {
     assert.equal(ids.size, tool_calls.length, "each tool call should have a unique id");
 
     globalThis.console.log(`Parallel tool calls: ${tool_calls.length}`);
-    for (const tc of tool_calls) {
+    for(const tc of tool_calls) {
         globalThis.console.log(`  ${tc.name}(${tc.arguments})`);
     }
 }

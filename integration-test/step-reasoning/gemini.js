@@ -1,12 +1,11 @@
-/* eslint-env node */
-//@ts-check
+// @ts-check
 
 /** @import {Message} from "../../dist/index.js" */
 
-import { env, exit } from "node:process";
+import {env, exit} from "node:process";
 
-import { createStepEncoder, createStepDecoder, GeminiGenerateContentCodec } from "../../dist/index.js";
-import { GoogleGenAI } from "@google/genai";
+import {createStepEncoder, createStepDecoder, GeminiGenerateContentCodec} from "../../dist/index.js";
+import {GoogleGenAI} from "@google/genai";
 
 const api = new GoogleGenAI({
     apiKey: env['GEMINI_API_KEY'],
@@ -33,7 +32,7 @@ async function main() {
                 includeThoughts: true,
                 thinkingBudget: 8000,
             },
-        }
+        },
     });
     let res = decode(api_res);
 

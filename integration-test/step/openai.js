@@ -1,12 +1,11 @@
-/* eslint-env node */
-//@ts-check
+// @ts-check
 
 /** @import {Message, StepResult} from "../../dist/index.js" */
 
-import { assert } from 'chai';
-import { env, exit } from "node:process";
+import {assert} from 'chai';
+import {env, exit} from "node:process";
 
-import { createStepEncoder, createStepDecoder, OpenAIChatCodec } from "../../dist/index.js";
+import {createStepEncoder, createStepDecoder, OpenAIChatCodec} from "../../dist/index.js";
 import OpenAI from "openai";
 
 const api = new OpenAI({
@@ -16,7 +15,7 @@ const api = new OpenAI({
 const TEST_MODEL = "gpt-4.1-nano";
 
 /**
- * @param {StepResult} res 
+ * @param {StepResult} res
  * @param {RegExp} match
  */
 function check(res, match) {

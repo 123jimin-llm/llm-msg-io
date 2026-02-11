@@ -1,13 +1,12 @@
-/* eslint-env node */
-//@ts-check
+// @ts-check
 
 /** @import {Message, StepResult} from "../../dist/index.js" */
 
-import { assert } from 'chai';
-import { env, exit } from "node:process";
+import {assert} from 'chai';
+import {env, exit} from "node:process";
 
-import { createStepEncoder, createStepDecoder, GeminiGenerateContentCodec, getMessageExtraGemini } from "../../dist/index.js";
-import { GoogleGenAI } from "@google/genai";
+import {createStepEncoder, createStepDecoder, GeminiGenerateContentCodec, getMessageExtraGemini} from "../../dist/index.js";
+import {GoogleGenAI} from "@google/genai";
 
 const api = new GoogleGenAI({
     apiKey: env['GEMINI_API_KEY'],
@@ -16,7 +15,7 @@ const api = new GoogleGenAI({
 const TEST_MODEL = "gemini-3-flash-preview";
 
 /**
- * @param {StepResult} res 
+ * @param {StepResult} res
  * @param {RegExp} match
  */
 function check(res, match) {
