@@ -1,0 +1,35 @@
+[
+    {
+        "name": "get_current_weather",
+        "description": "Get the current weather in a given city. Must be called once per city.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string",
+                    "description": "The city name"
+                },
+                "unit": {
+                    "type": "string",
+                    "enum": ["celsius", "fahrenheit"],
+                    "description": "The temperature unit"
+                }
+            },
+            "required": ["city", "unit"]
+        }
+    },
+    {
+        "name": "get_local_time",
+        "description": "Get the current local time in a given city. Must be called once per city.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string",
+                    "description": "The city name"
+                }
+            },
+            "required": ["city"]
+        }
+    }
+]
