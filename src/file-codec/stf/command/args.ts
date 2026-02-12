@@ -112,7 +112,7 @@ export function parseCommandArgs(args_text: string, line_no: number = 0): Comman
                 value = parsed;
             } catch (e) {
                 const msg = e instanceof Error ? e.message : String(e);
-                throw new SyntaxError(`Line ${line_no + 1}: Invalid quoted string: ${msg}`);
+                throw new SyntaxError(`Line ${line_no + 1}: Invalid quoted string: ${msg}`, {cause: e});
             }
 
             i = end;
