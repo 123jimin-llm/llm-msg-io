@@ -1,1 +1,81 @@
-export const ClaudeMessagesResponseCodec = {};
+import type {
+    Message as ClaudeMessage,
+} from "@anthropic-ai/sdk/resources/messages";
+
+import type {StepResult, WithCreateStepDecoder} from "../../api-codec-lib/index.ts";
+import type {Message, ToolCall} from "../../message/index.ts";
+import {concatContentsTo, type MessageContent} from "../../message/index.ts";
+import {getMessageExtraClaude, type ClaudeRedactedThinkingBlock, type ClaudeThinkingBlock} from "./extra.ts";
+
+export function fromClaudeStopReason(stop_reason: string | null): string {
+    switch(stop_reason) {
+        case 'end_turn': return 'stop';
+        case 'max_tokens': return 'length';
+        case 'stop_sequence': return 'stop';
+        case 'tool_use': return 'tool_calls';
+        case 'pause_turn': return 'stop';
+        case 'refusal': return 'content_filter';
+        default: return 'stop';
+    }
+}
+
+export function fromClaudeMessage(api_message: ClaudeMessage): Message {
+    const thinking_blocks: (ClaudeThinkingBlock | ClaudeRedactedThinkingBlock)[] = [];
+    const reasoning_arr: string[] = [];
+    const tool_calls: ToolCall[] = [];
+    let content: MessageContent = "";
+
+    for(const block of api_message.content) {
+        switch(block.type) {
+            case 'text':
+                content = concatContentsTo(content, block.text);
+                break;
+            case 'thinking':
+                thinking_blocks.push({type: 'thinking', thinking: block.thinking, signature: block.signature});
+                reasoning_arr.push(block.thinking);
+                break;
+            case 'redacted_thinking':
+                thinking_blocks.push({type: 'redacted_thinking', data: block.data});
+                break;
+            case 'tool_use':
+                tool_calls.push({
+                    id: block.id,
+                    name: block.name,
+                    arguments: JSON.stringify(block.input),
+                });
+                break;
+            default:
+                // server_tool_use, web_search_tool_result, etc. — skip for now.
+                break;
+        }
+    }
+
+    const message: Message = {
+        role: 'assistant',
+        content,
+    };
+
+    if(reasoning_arr.length) {
+        message.reasoning = reasoning_arr.join('\n');
+    }
+
+    if(tool_calls.length) {
+        message.tool_calls = tool_calls;
+    }
+
+    if(thinking_blocks.length) {
+        const extra = getMessageExtraClaude(message, true);
+        extra.thinking_blocks = thinking_blocks;
+    }
+
+    return message;
+}
+
+export const ClaudeMessagesResponseCodec = {
+    createStepDecoder: () => (api_res) => {
+        const res: StepResult = {
+            messages: [fromClaudeMessage(api_res)],
+        };
+        return res;
+    },
+} satisfies WithCreateStepDecoder<ClaudeMessage>;
