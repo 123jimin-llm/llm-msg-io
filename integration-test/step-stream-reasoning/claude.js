@@ -82,7 +82,7 @@ async function main() {
     const extra = getMessageExtraClaude(msg);
     assert.isNotNull(extra, "expected claude extra");
     assert.isArray(extra?.thinking_blocks);
-    assert.isAbove(/** @type {unknown[]} */ (extra?.thinking_blocks).length, 0, "expected thinking blocks");
+    assert.isAbove(/** @type {unknown[]} */ (extra?.thinking_blocks ?? []).length, 0, "expected thinking blocks");
 
     const thinking_block = extra?.thinking_blocks?.find((b) => b.type === 'thinking');
     assert.isNotNull(thinking_block, "expected at least one thinking block");
