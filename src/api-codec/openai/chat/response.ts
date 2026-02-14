@@ -8,7 +8,8 @@ import type {
 import {unreachable, type Nullable} from "../../../util/type.ts";
 import {Message, ToolCall, type ContentPart, type MessageContent} from "../../../message/index.js";
 import type {WithCreateDecoder} from "../../../file-codec-lib/decoder.ts";
-import type {WithCreateStepDecoder} from "../../../api-codec-lib/step/response.ts";
+import type {StepResult, TokenUsage, WithCreateStepDecoder} from "../../../api-codec-lib/step/response.ts";
+import type {CompletionUsage} from "openai/resources/completions";
 
 function fromChatCompletionContent(content: Nullable<OpenAIChatInputMessage['content']>): MessageContent {
     if(!content) return "";
@@ -88,9 +89,29 @@ export const OpenAIChatMessagesCodec = {
     },
 } satisfies WithCreateDecoder<OpenAIChatOutputMessage[]>;
 
+export function fromOpenAIUsage(usage: Nullable<CompletionUsage>): TokenUsage | null {
+    if(!usage) return null;
+
+    const token_usage: TokenUsage = {
+        input_tokens: usage.prompt_tokens,
+        output_tokens: usage.completion_tokens,
+        total_tokens: usage.total_tokens,
+    };
+
+    if(usage.prompt_tokens_details?.cached_tokens != null) {
+        token_usage.cache_read_tokens = usage.prompt_tokens_details.cached_tokens;
+    }
+
+    if(usage.completion_tokens_details?.reasoning_tokens != null) {
+        token_usage.reasoning_tokens = usage.completion_tokens_details.reasoning_tokens;
+    }
+
+    return token_usage;
+}
+
 export const OpenAIChatResponseCodec = {
-    createStepDecoder: () => ({id, created, model, choices}) => {
-        return {
+    createStepDecoder: () => ({id, created, model, choices, usage}) => {
+        const res: StepResult & {metadata: object} = {
             metadata: {
                 id,
                 created_at: new Date(created*1000),
@@ -98,5 +119,10 @@ export const OpenAIChatResponseCodec = {
             },
             messages: OpenAIChatMessagesCodec.createDecoder()(choices.map(({message}) => message)).messages,
         };
+
+        const token_usage = fromOpenAIUsage(usage ?? null);
+        if(token_usage) res.token_usage = token_usage;
+
+        return res;
     },
 } satisfies WithCreateStepDecoder<ChatCompletion>;

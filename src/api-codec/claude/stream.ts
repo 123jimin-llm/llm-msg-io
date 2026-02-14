@@ -1,10 +1,10 @@
 import type {RawMessageStreamEvent} from "@anthropic-ai/sdk/resources/messages";
 
-import type {StepResult, WithCreateStepStreamDecoder} from "../../api-codec-lib/index.ts";
+import type {StepResult, TokenUsage, WithCreateStepStreamDecoder} from "../../api-codec-lib/index.ts";
 import type {StepStreamEvent, StreamEndEvent, ToolCallDelta} from "../../message/index.ts";
 import {applyDeltaToStepStreamState, createStepStreamState, finalizeStepStreamState, stepStreamStateToResult} from "../../message/index.ts";
 
-import {fromClaudeStopReason} from "./response.ts";
+import {fromClaudeStopReason, fromClaudeUsage} from "./response.ts";
 import {getMessageExtraClaude, type ClaudeRedactedThinkingBlock, type ClaudeThinkingBlock} from "./extra.ts";
 
 export type ClaudeMessageStream = AsyncIterable<RawMessageStreamEvent>;
@@ -23,6 +23,7 @@ export const ClaudeMessagesStreamCodec = {
 
         let started = false;
         let finish_reason = '';
+        let token_usage: TokenUsage | null = null;
 
         for await (const event of await api_stream) {
             switch(event.type) {
@@ -37,6 +38,8 @@ export const ClaudeMessagesStreamCodec = {
                         type: 'stream.start',
                         metadata,
                     };
+
+                    token_usage = fromClaudeUsage(event.message.usage);
 
                     yield* applyDeltaToStepStreamState(state, {
                         role: event.message.role,
@@ -131,6 +134,16 @@ export const ClaudeMessagesStreamCodec = {
                     if(event.delta.stop_reason) {
                         finish_reason = fromClaudeStopReason(event.delta.stop_reason);
                     }
+
+                    if(event.usage) {
+                        if(token_usage) {
+                            token_usage.output_tokens = event.usage.output_tokens;
+                        }
+
+                        if(event.usage.cache_read_input_tokens != null) {
+                            if(token_usage) token_usage.cache_read_tokens = event.usage.cache_read_input_tokens;
+                        }
+                    }
                     break;
                 }
 
@@ -163,6 +176,8 @@ export const ClaudeMessagesStreamCodec = {
         if(finish_reason) stream_end_event.finish_reason = finish_reason;
         yield stream_end_event;
 
-        return stepStreamStateToResult(state);
+        const result = stepStreamStateToResult(state);
+        if(token_usage) result.token_usage = token_usage;
+        return result;
     },
 } satisfies WithCreateStepStreamDecoder<ClaudeMessageStream>;

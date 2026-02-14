@@ -1,13 +1,29 @@
 import type {
     Message as ClaudeMessage,
+    Usage as ClaudeUsage,
 } from "@anthropic-ai/sdk/resources/messages";
 
-import type {StepResult, WithCreateStepDecoder} from "../../api-codec-lib/index.ts";
+import type {StepResult, TokenUsage, WithCreateStepDecoder} from "../../api-codec-lib/index.ts";
 import type {Message, ToolCall} from "../../message/index.ts";
 import {concatContentsTo, type MessageContent} from "../../message/index.ts";
 import {getMessageExtraClaude, type ClaudeRedactedThinkingBlock, type ClaudeThinkingBlock} from "./extra.ts";
 
-export function fromClaudeStopReason(stop_reason: string | null): string {
+import type {Nullable} from "../../util/type.ts";
+
+export function fromClaudeUsage(usage: ClaudeUsage): TokenUsage {
+    const token_usage: TokenUsage = {
+        input_tokens: usage.input_tokens,
+        output_tokens: usage.output_tokens,
+    };
+
+    if(usage.cache_read_input_tokens != null) {
+        token_usage.cache_read_tokens = usage.cache_read_input_tokens;
+    }
+
+    return token_usage;
+}
+
+export function fromClaudeStopReason(stop_reason: Nullable<string>): string {
     switch(stop_reason) {
         case 'end_turn': return 'stop';
         case 'max_tokens': return 'length';
@@ -75,6 +91,7 @@ export const ClaudeMessagesResponseCodec = {
     createStepDecoder: () => (api_res) => {
         const res: StepResult = {
             messages: [fromClaudeMessage(api_res)],
+            token_usage: fromClaudeUsage(api_res.usage),
         };
         return res;
     },

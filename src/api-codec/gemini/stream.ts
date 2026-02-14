@@ -1,9 +1,9 @@
 import type {GenerateContentResponse} from "@google/genai";
-import type {StepResult, WithCreateStepStreamDecoder} from "../../api-codec-lib/index.ts";
+import type {StepResult, TokenUsage, WithCreateStepStreamDecoder} from "../../api-codec-lib/index.ts";
 import type {StepStreamEvent, StreamEndEvent, StreamStartEvent, ToolCallDelta} from "../../message/index.ts";
 import {applyDeltaToStepStreamState, createStepStreamState, finalizeStepStreamState, stepStreamStateToResult} from "../../message/index.ts";
 
-import {fromGeminiContent, fromGeminiFinishReason} from "./response.ts";
+import {fromGeminiContent, fromGeminiFinishReason, fromGeminiUsageMetadata} from "./response.ts";
 import {getMessageExtraGemini, mergeMessageExtraGemini} from "./extra.ts";
 
 export const GeminiGenerateContentStreamCodec = {
@@ -12,6 +12,7 @@ export const GeminiGenerateContentStreamCodec = {
 
         let started = false;
         let finish_reason = "";
+        let token_usage: TokenUsage | null = null;
 
         for await (const chunk of await api_stream) {
             const candidate = chunk.candidates?.[0];
@@ -50,6 +51,9 @@ export const GeminiGenerateContentStreamCodec = {
             if(candidate.finishReason) {
                 finish_reason = fromGeminiFinishReason(candidate.finishReason);
             }
+
+            const chunk_usage = fromGeminiUsageMetadata(chunk.usageMetadata);
+            if(chunk_usage) token_usage = chunk_usage;
         }
 
         yield* finalizeStepStreamState(state);
@@ -58,6 +62,8 @@ export const GeminiGenerateContentStreamCodec = {
         if(finish_reason) stream_end_event.finish_reason = finish_reason;
         yield stream_end_event;
 
-        return stepStreamStateToResult(state);
+        const result = stepStreamStateToResult(state);
+        if(token_usage) result.token_usage = token_usage;
+        return result;
     },
 } satisfies WithCreateStepStreamDecoder<AsyncGenerator<GenerateContentResponse>>;

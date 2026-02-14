@@ -1,9 +1,12 @@
 import type {ChatCompletionChunk} from "openai/resources/chat/completions";
+import type {CompletionUsage} from "openai/resources/completions";
 
-import type {StepResult, WithCreateStepStreamDecoder} from "../../../api-codec-lib/step/index.ts";
+import type {StepResult, TokenUsage, WithCreateStepStreamDecoder} from "../../../api-codec-lib/step/index.ts";
 import type {MessageDelta, ToolCallDelta, StepStreamEvent, StreamEndEvent} from "../../../message/index.ts";
 import {applyDeltaToStepStreamState, createStepStreamState, finalizeStepStreamState, stepStreamStateToResult} from "../../../message/index.ts";
 import type {Stream} from "openai/streaming";
+
+import {fromOpenAIUsage} from "./response.ts";
 
 export type OpenAIChatCompletionStream = Stream<ChatCompletionChunk>;
 type OpenAIDelta = ChatCompletionChunk.Choice.Delta & {reasoning?: string};
@@ -38,6 +41,7 @@ export const OpenAIChatStreamCodec = {
 
         let started = false;
         let finish_reason = "";
+        let token_usage: TokenUsage | null = null;
 
         for await (const chunk of await api_stream) {
             if(!started) {
@@ -52,13 +56,23 @@ export const OpenAIChatStreamCodec = {
             }
 
             const choice = chunk.choices[0];
-            if(choice == null) continue;
+            if(choice == null) {
+                // Final chunk with stream_options.include_usage has no choices but has usage.
+                if(chunk.usage) {
+                    token_usage = fromOpenAIUsage(chunk.usage as CompletionUsage);
+                }
+                continue;
+            }
 
             const delta = fromOpenAIDelta(choice.delta);
             yield* applyDeltaToStepStreamState(state, delta);
 
             if(choice.finish_reason) {
                 finish_reason = choice.finish_reason;
+            }
+
+            if(chunk.usage) {
+                token_usage = fromOpenAIUsage(chunk.usage as CompletionUsage);
             }
         }
 
@@ -68,6 +82,8 @@ export const OpenAIChatStreamCodec = {
         if(finish_reason) stream_end_event.finish_reason = finish_reason;
         yield stream_end_event;
 
-        return stepStreamStateToResult(state);
+        const result = stepStreamStateToResult(state);
+        if(token_usage) result.token_usage = token_usage;
+        return result;
     },
 } satisfies WithCreateStepStreamDecoder<OpenAIChatCompletionStream>;

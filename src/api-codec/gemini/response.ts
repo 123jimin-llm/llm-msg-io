@@ -1,9 +1,34 @@
-import type {Content, FinishReason, GenerateContentResponse, Blob as GeminiBlob} from "@google/genai";
+import type {Content, FinishReason, GenerateContentResponse, GenerateContentResponseUsageMetadata, Blob as GeminiBlob} from "@google/genai";
 
-import type {StepResult, WithCreateStepDecoder} from "../../api-codec-lib/index.ts";
+import type {StepResult, TokenUsage, WithCreateStepDecoder} from "../../api-codec-lib/index.ts";
 import type {ContentPart, Message, MessageContent, ToolCall} from "../../message/index.ts";
 import {concatContentsTo} from "../../message/index.ts";
 import {getMessageExtraGemini} from "./extra.ts";
+import type {Nullable} from "../../util/type.ts";
+
+export function fromGeminiUsageMetadata(usage: Nullable<GenerateContentResponseUsageMetadata>): TokenUsage | null {
+    if(usage == null) return null;
+    if(usage.promptTokenCount == null && usage.candidatesTokenCount == null) return null;
+
+    const token_usage: TokenUsage = {
+        input_tokens: usage.promptTokenCount ?? 0,
+        output_tokens: usage.candidatesTokenCount ?? 0,
+    };
+
+    if(usage.totalTokenCount != null) {
+        token_usage.total_tokens = usage.totalTokenCount;
+    }
+
+    if(usage.cachedContentTokenCount != null) {
+        token_usage.cache_read_tokens = usage.cachedContentTokenCount;
+    }
+
+    if(usage.thoughtsTokenCount != null) {
+        token_usage.reasoning_tokens = usage.thoughtsTokenCount;
+    }
+
+    return token_usage;
+}
 
 // Converts to OpenAI-compatible finish reason.
 export function fromGeminiFinishReason(finish_reason: FinishReason): string {
@@ -100,6 +125,9 @@ export const GeminiGenerateContentResponseCodec = {
         if(candidate?.content) {
             res.messages.push(fromGeminiContent(candidate.content));
         }
+
+        const token_usage = fromGeminiUsageMetadata(api_res.usageMetadata ?? null);
+        if(token_usage) res.token_usage = token_usage;
 
         return res;
     },

@@ -5,7 +5,8 @@ Generic types and helpers for API step codecs. Everything lives under `step/`.
 ### Core Types
 
 - `StepParams` — `{messages: Message[], functions?: FunctionDefinition[]}`. Input to a step encoder.
-- `StepResult` — `{messages: Message[]}`. Output of a step decoder.
+- `StepResult` — `{messages: Message[], token_usage?: TokenUsage}`. Output of a step decoder.
+- `TokenUsage` — `{input_tokens, output_tokens, total_tokens?, cache_read_tokens?, reasoning_tokens?}`. Normalized token usage across providers.
 - `FunctionDefinition` — `{name, description, parameters}` (arktype-validated, ignores undeclared keys).
 
 ### Encoder/Decoder Pattern
