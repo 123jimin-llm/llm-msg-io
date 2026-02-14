@@ -1,39 +1,45 @@
-# llm-msg-io
+## AGENTS.md for llm-msg-io
 
-Always read this file thoroughly before starting work.
+Read this file thoroughly before starting work.
 
-## Summary
-
-An npm package (`@jiminp/llm-msg-io`) for converting LLM messages to various formats, including a text-based format called [STF](./docs/stf/README.md).
+An npm package for converting LLM messages between a canonical schema and various formats: file formats (JSON, NDJSON, TOML, [STF](./docs/stf/README.md)) and API formats (OpenAI, Gemini, Claude).
 
 **Tech stack:** TypeScript, `pnpm`, `eslint`, `chai`/`mocha`, `arktype`.
 
 ## File Structure
 
-- `/docs/stf` — STF format specification.
-- `/src/util` — Utilities (e.g. `exportType` for sanitizing ArkType types).
-- `/src/message` — Canonical message schema (`arktype`), generic codec types, and helpers.
-- `/src/file-codec` — Codecs for serialized file formats (JSON, NDJSON, TOML, STF).
-- `/src/api-codec` — Codecs for API formats (OpenAI, Gemini).
-- `/example` — Example usage.
-- `AGENTS.md` — LLM onboarding guide. Must stay brief while covering all essential context.
+- `/docs` — Format specifications. `stf/` is the STF spec; `msg.md` and `json.md` document message normalization and JSON serialization.
+- `/src/util` — Shared utilities: `exportType` (sanitizes ArkType types for public API), `Nullable`, `unreachable`, UID counter.
+- `/src/message/` — Canonical message schema and helpers. Has own AGENTS.md.
+- `/src/file-codec-lib/` — Generic file-codec types (`FileCodec`, `MessageEncoder`, `MessageDecoder`, `createEncoder`, `createDecoder`).
+- `/src/file-codec/` — File-codec implementations (JSON, NDJSON, TOML, STF). STF has own AGENTS.md.
+- `/src/api-codec-lib/` — Generic API-codec types (`APIStepCodec`, `StepParams`, `StepResult`, `StepStreamDecoder`, etc.). Has own AGENTS.md.
+- `/src/api-codec/` — API-codec implementations (OpenAI, Gemini, Claude). Each provider has `request`, `response`, `stream`, and optionally `extra` modules.
+- `/example` — Interactive example scripts (chat, chat-stream, tool).
+- `/integration-test/` — Non-interactive integration tests against real APIs. Has own AGENTS.md.
 
 ## Architecture
 
-- **Message schema** (`src/message/schema/`): Defines `Message`, `ContentPart`, etc. with `arktype`.
-- **Codec types** (`src/message/`): Generic `Codec` type (= `WithCreateEncoder` & `WithCreateDecoder`), plus `MessageEncoder`, `MessageDecoder`, and related types. `createEncoder`/`createDecoder` helpers build encoder/decoder functions from a codec.
-- **Codec implementations**: `src/file-codec` for file formats, `src/api-codec` for API I/O.
+Two codec families, each with a `*-lib` (generic types + helpers) and a sibling directory (implementations):
+
+1. **File codecs** (`file-codec-lib` → `file-codec`): Serialize/deserialize `Message[]` + optional metadata to/from string or structured data.
+   - `FileCodec<EncodedType>` = `WithCreateEncoder` & `WithCreateDecoder`.
+   - `createEncoder(codec)` / `createDecoder(codec)` — helper functions that accept either a codec object or a factory function.
+
+2. **API codecs** (`api-codec-lib` → `api-codec`): Encode `StepParams` (messages + optional function defs) into provider-specific API requests, decode responses/streams back.
+   - `APIStepCodecWithStream` = `WithCreateStepEncoder` & `WithCreateStepDecoder` & `WithCreateStepStreamDecoder`.
+   - Stream decoding produces `StepStreamEvent` via `AsyncGenerator`, built on `StepStreamState` (in `src/message/stream/`).
+
+Provider codecs compose partial codec objects (`*RequestCodec`, `*ResponseCodec`, `*StreamCodec`) via spread into a single satisfying object (e.g. `OpenAIChatCodec`).
+
+## `exportType` Convention
+
+ArkType types are wrapped with `exportType()` before export, producing `PublicType<T>`. This erases internal ArkType type complexity from the public API surface while preserving runtime validation via `.assert()`.
 
 ## Testing
 
-Tests use `chai`/`mocha`. Run `pnpm test` (builds first, then runs `dist/**/*.spec.js`).
+Unit tests use `chai`/`mocha`. Run `pnpm test` (builds first, then runs `dist/**/*.spec.js`).
 
 ## Integration Tests
 
-`/integration-test` — Non-interactive integration tests that hit real APIs (OpenAI, Gemini). Structure is informal and incomplete; not as rigid as `/src`.
-
-- Run individual tests directly: `node integration-test/<subdir>/<provider>.js`.
-- API keys are set via env variables (`OPENAI_API_KEY`, `GEMINI_API_KEY`). See `integration-test/README.md`.
-- Subdirectories test different codec scenarios: `step/` (basic step), `step-reasoning/` (reasoning models), `tool/` (function calling).
-- Each subdirectory has per-provider files (e.g. `gemini.js`, `openai.js`).
-- Gemini 3 models return `thought_signatures` in message extras; these must be preserved through encode/decode.
+See `/integration-test/AGENTS.md`.
