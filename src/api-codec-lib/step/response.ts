@@ -1,7 +1,25 @@
 import type {Message} from "../../message/index.ts";
 
+export interface TokenUsage {
+    /** Number of input/prompt tokens. */
+    input_tokens: number;
+
+    /** Number of output/completion tokens. */
+    output_tokens: number;
+
+    /** Total tokens (may include reasoning, caching overhead, etc.). */
+    total_tokens?: number;
+
+    /** Input tokens served from cache. */
+    cache_read_tokens?: number;
+
+    /** Tokens consumed by reasoning/thinking. */
+    reasoning_tokens?: number;
+}
+
 export interface StepResult {
     messages: Message[];
+    token_usage?: TokenUsage;
 }
 
 export type StepDecoder<EncodedType, DecodedType extends StepResult = StepResult> = (api_res: EncodedType) => DecodedType;
