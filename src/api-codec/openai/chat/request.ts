@@ -4,6 +4,7 @@ import type {
     ChatCompletionMessageToolCall,
     ChatCompletionCreateParams,
 } from "openai/resources/chat/completions";
+import type {ResponseFormatJSONSchema} from "openai/resources";
 
 import type {Nullable} from "../../../util/type.ts";
 import type {StepParams, WithCreateStepEncoder} from "../../../api-codec-lib/index.ts";
@@ -114,13 +115,19 @@ export const OpenAIChatRequestCodec = {
         };
 
         if(req.response_schema) {
+            const json_schema: ResponseFormatJSONSchema['json_schema'] = {
+                name: req.response_schema.name ?? 'response',
+                schema: req.response_schema.schema as Record<string, unknown>,
+                strict: req.response_schema.strict ?? true,
+            };
+
+            if(req.response_schema.description != null) {
+                json_schema.description = req.response_schema.description;
+            }
+
             api_req.response_format = {
                 type: 'json_schema',
-                json_schema: {
-                    name: req.response_schema.name,
-                    schema: req.response_schema.schema as Record<string, unknown>,
-                    strict: true,
-                },
+                json_schema,
             };
         }
 

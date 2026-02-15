@@ -6,7 +6,9 @@ export const JSONSchema = type("unknown");
 export type JSONSchema = typeof JSONSchema.infer;
 
 export const ResponseSchema = exportType(type({
-    name: "string",
+    name: "string?",
+    description: "string?",
+    strict: "boolean?",
     schema: JSONSchema,
 }));
 export type ResponseSchema = typeof ResponseSchema.infer;
