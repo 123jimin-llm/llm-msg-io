@@ -207,6 +207,16 @@ export const ClaudeMessagesRequestCodec = {
             api_req.tools = req.functions.map((fn) => toClaudeTool(fn));
         }
 
+        if(req.response_schema) {
+            // TODO: Claude structured output via `output_config.format` (type: 'json_schema').
+            // The SDK's `MessageCreateParamsNonStreaming` may not yet expose `output_config`;
+            // use a cast to `Record<string, unknown>` and set:
+            //   (api_req as Record<string, unknown>).output_config = {
+            //       format: { type: 'json_schema', schema: req.response_schema.schema },
+            //   };
+            // Verify against the latest @anthropic-ai/sdk types before shipping.
+        }
+
         return api_req;
     },
 } satisfies WithCreateStepEncoder<MessageCreateParamsNonStreaming, StepParams, ClaudeMessagesRequestEncodeOptions>;

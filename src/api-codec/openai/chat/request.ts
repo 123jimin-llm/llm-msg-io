@@ -78,7 +78,7 @@ export interface OpenAIChatRequestEncodeOptions {
 
 export const OpenAIChatRequestCodec = {
     createStepEncoder: ({model = "gpt-5-nano"} = {}) => (req): ChatCompletionCreateParams => {
-        const api_messages = req.messages.map((message): OpenAIChatInputMessage => {
+        const api_messages: OpenAIChatInputMessage[] = req.messages.map((message): OpenAIChatInputMessage => {
             const role = message.role as OpenAIChatInputMessage['role'];
             if(role === 'tool') {
                 return {
@@ -107,10 +107,23 @@ export const OpenAIChatRequestCodec = {
             return msg;
         });
 
-        return {
+        const api_req: ChatCompletionCreateParams = {
             model,
             messages: api_messages,
             stream: false,
         };
+
+        if(req.response_schema) {
+            api_req.response_format = {
+                type: 'json_schema',
+                json_schema: {
+                    name: req.response_schema.name,
+                    schema: req.response_schema.schema as Record<string, unknown>,
+                    strict: true,
+                },
+            };
+        }
+
+        return api_req;
     },
 } satisfies WithCreateStepEncoder<ChatCompletionCreateParams, StepParams, OpenAIChatRequestEncodeOptions>;

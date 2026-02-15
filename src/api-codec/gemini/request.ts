@@ -114,6 +114,11 @@ export const GeminiGenerateContentRequestCodec = {
             }];
         }
 
+        if(req.response_schema) {
+            api_req.config.responseMimeType = 'application/json';
+            api_req.config.responseJsonSchema = req.response_schema.schema;
+        }
+
         return api_req;
     },
 } satisfies WithCreateStepEncoder<GenerateContentParameters, StepParams, GeminiGenerateContentRequestEncodeOptions>;

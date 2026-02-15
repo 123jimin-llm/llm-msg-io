@@ -1,8 +1,10 @@
 import type {Message} from "../../message/index.ts";
 import type {FunctionDefinition} from "./function.ts";
+import type {ResponseSchema} from "./schema.ts";
 
 export interface StepParams {
     functions?: FunctionDefinition[];
+    response_schema?: ResponseSchema;
     messages: Message[];
 }
 
