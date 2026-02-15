@@ -208,13 +208,12 @@ export const ClaudeMessagesRequestCodec = {
         }
 
         if(req.response_schema) {
-            // TODO: Claude structured output via `output_config.format` (type: 'json_schema').
-            // The SDK's `MessageCreateParamsNonStreaming` may not yet expose `output_config`;
-            // use a cast to `Record<string, unknown>` and set:
-            //   (api_req as Record<string, unknown>).output_config = {
-            //       format: { type: 'json_schema', schema: req.response_schema.schema },
-            //   };
-            // Verify against the latest @anthropic-ai/sdk types before shipping.
+            api_req.output_config = {
+                format: {
+                    type: 'json_schema',
+                    schema: req.response_schema.schema as Record<string, unknown>,
+                },
+            };
         }
 
         return api_req;
