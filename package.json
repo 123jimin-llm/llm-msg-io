@@ -38,7 +38,7 @@
     "@anthropic-ai/sdk": "^0.74.0",
     "@eslint/js": "^10.0.1",
     "@google/genai": "^1.41.0",
-    "@jiminp/eslint-config": "^1.1.0",
+    "@jiminp/eslint-config": "^1.1.1",
     "@stylistic/eslint-plugin": "^5.8.0",
     "@types/chai": "^5.2.3",
     "@types/mocha": "^10.0.10",
@@ -46,7 +46,7 @@
     "chai": "^6.2.2",
     "eslint": "^10.0.0",
     "mocha": "^11.7.5",
-    "openai": "^6.21.0",
+    "openai": "^6.22.0",
     "rimraf": "^6.1.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.55.0"
