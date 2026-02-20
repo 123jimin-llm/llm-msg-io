@@ -1,6 +1,6 @@
 {
   "name": "llm-msg-io",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A small library for serializing and deserializing LLM messages.",
   "type": "module",
   "sideEffects": false,
