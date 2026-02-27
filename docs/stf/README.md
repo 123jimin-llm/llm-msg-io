@@ -1,10 +1,10 @@
-# Simple Text Format Specification
+# Simple Text Format (STF) Specification
 
-## Introduction
+STF is a line-oriented plain-text format for storing LLM messages, designed to be readable and editable by humans in any text editor.
 
-Simple Text Format (STF) is a text-based format for storing LLM messages.
+For the catalogue of commands, see [command.md](./command.md).
 
-### Example
+## Example
 
 ```text
 ;user
@@ -13,141 +13,122 @@ Hi! Who are you?
 Hello, I'm an AI, based on a large language model.
 ```
 
-### Goals
+## Goals
 
-STF aims to be an intuitive text-based format that's easy to be edited by a human with a text editor, without much hassle.
+- **Human-editable**: easy to read and write in a text editor.
+- **Use cases**: chat UIs, prompt libraries / templates, browseable chat archives.
 
-STF is expected to be used for the following scenarios:
+## Non-Goals
 
-- Chat UI, for the user to input and edit multiple messages in a text-based manner.
-- Prompt library for LLM applications, to be used in/as templates.
-- Chat history archive which can be easily browsed by a human.
+- Not a template language (use Jinja, Nunjucks, etc. alongside STF).
+- Does not parse or translate tokenizer-specific special tokens (e.g. `<|start|>`).
+- Does not validate message semantics (e.g. role names).
+- Not designed to resist injection attacks.
 
-### Non-Goals
+## Terminology
 
-STF is not a template language by itself.
-A template language, such as Jinja, may be used in conjunction with STF.
-
-STF does not attempt to parse or translate special tokens (such as `<|start|>` or `<|end|>` a tokenizer may use).
-
-STF does not handle message validation, such as checking for valid role types.
-
-STF's design is not intended to be resistant to accidental injection attacks (like SQLi).
-
-### Terminology
-
-- A **line separator** is a line feed `\n`.
-  - In particular, a carriage return `\r` or a CRLF `\r\n` is not considered as a line separator.
-- A **blank character** is either a space `\x20` or a tab `\t`.
-  - In particular, a line feed, a carriage return, a vertical tab, or a form feed is not considered as a blank character.
-- **Blanks** is one or more blank characters, matching the regular expression `[ \t]+`.
+- **Line separator**: `\n` only. `\r` and `\r\n` are not recognized.
+- **Blank character**: space (`\x20`) or tab (`\t`). No other whitespace qualifies.
+- **Blanks**: one or more blank characters (`[ \t]+`).
 
 ## File Structure
 
-An STF file is a text file, written and read (mostly) line-by-line.
-
-- An STF file should use UTF-8 encoding, with `\n` as line separators.
-- An STF file may end with an empty line, which will be ignored.
+UTF-8 text, read line-by-line. A file may end with an empty line, which is ignored.
 
 ### Line Types
 
-- If a line is not prefixed with `;`, then it's a **data line**.
-- If a line is prefixed with `;`, then it's a **command line**.
-  - No blanks are allowed before the first `;`, as that would be a data line instead.
-  - This first `;` is called the **header** of the command.
-  - Some command lines specify comments, as described later.
-- If a line is prefixed with `;;`, then it's a **data line**, where the initial `;;` is interpreted as a single `;`.
+Every line is classified by its first character(s):
+
+| Prefix     | Classification          | Notes                                                                     |
+| ---------- | ----------------------- | ------------------------------------------------------------------------- |
+| *(no `;`)* | **Data line**           | A line like `␣;foo` (where `␣` is a space) is a data line, not a command. |
+| `;`        | **Command line**        | The leading `;` is the command **header**.                                |
+| `;;`       | **Data line** (escaped) | The initial `;;` is read as a literal `;`.                                |
 
 ### Message State
 
-When an STF file is being read, it maintains a **message state**, which is either a nil or a message.
+The parser maintains a **message state**: either *nil* or a *message*.
 
-When the message state is nil:
+- **Nil state**: blank/empty data lines are ignored. A non-empty data line or a command that requires a message is an error (unless `default_role` is set — see [Decoder options](#decoder-options)).
+- **Message state**: data lines are appended to the current message's content.
 
-- An empty data line, including data line with only blanks, will be ignored.
-- A non-empty data line, or a command line that expects a non-nil message, results in an error.
+## Data Lines
 
-When the message state is a message:
+Consecutive data lines form a string value: the lines joined by `\n`. The final line's trailing newline is **not** included — append an empty line to produce one:
 
-- Data lines append a string value to the message's content, as specified below.
+```text
+;user
+Hello
 
-## Data Line
+```
 
-A continuous chunk of data lines specify a string value, which is the concatenation of the lines with a single line feed `\n` between them.
-
-The last line's line feed will be ignored. To specify a string value with a trailing line feed, the last line should be followed by an empty line.
+Decodes as `"Hello\n"` (the empty line after `Hello` adds the trailing newline; the file's final empty line is ignored per file-structure rules).
 
 ## Comments
 
-If a command line's header is followed (optionally with blanks in between) by `#`, `//`, `/*`, or `*/`, then it's a **comment line**.
+A command line whose header is followed (with optional blanks) by `#`, `//`, `/*`, or `*/` is a **comment line**.
 
-`#` and `//`  are line comments, where the whole line is ignored.
+| Marker    | Scope                                       |
+| --------- | ------------------------------------------- |
+| `#`, `//` | Line comment — the entire line is ignored.  |
+| `/*`      | Opens a block comment. Block comments nest. |
+| `*/`      | Closes the innermost block comment.         |
 
-`/*` and `*/` are block comments. A comment line with `*/` finishes a block comment started by a *matching* `/*`.
+Inside a block comment, **all** lines (data and command) are ignored — except `; /*` and `; */`, which adjust nesting depth. Unmatched `/*` or `*/` is an error.
 
-```
-# This is *NOT* a comment.
-/* Neither is this! */
+```text
+;# line comment
+; // also a line comment
 
-;# This is a comment.
-; // This is also a comment.
+; /* block start
+ignored
+;/* nested block
+;*/ closes inner
+;*/ closes outer
 
-; /* A comment block is starting.
-This line is ignored.
-
-;/* A nested comment block is starting. Note that the trailing `*/` is ignored. */
-This line is ignored.
-
-;*/
-Still inside a comment block.
-; */ All comment blocks are now closed. Still, any text after `*/` is also ignored.
-
-This line is not ignored.
+not ignored
 ```
 
-It is an error to put an unmatched `/*` or `*/` comment line.
+## Command Lines
 
-Excluding comments, a command line will be ignored, even when it's an `end` command.
+Structure: **header** (`;`) → optional blanks → **name** (`[a-z][a-z0-9]*`) → **arguments**.
 
-## Command Line
-
-A command line consists of three part: the **header** `;`, the **name**, and the **arguments**.
-
-Blanks may present between the header and the name.
-
-For a complete list of commands, [see this document](./command.md).
-
-### Command Name
-
-The command name is identified by its name `[a-z][a-z0-9]*` following the header.
+For the full command catalogue, see [command.md](./command.md).
 
 ### Command Arguments
 
-There are two ways to supply arguments to a command.
+Two syntaxes (some commands, like `end`, use neither):
 
-> [!NOTE]
-> Some special commands, such as `end`, may use a different way of providing arguments.
+#### `key=value` pairs
 
-#### by `key=value`
+Pairs separated by blanks.
 
-The first way of providing arguments is to provide them as a list of `key=value`s separated by blanks.
+- Keys: `[a-z][a-z0-9]*`.
+- Values: unquoted (no blanks, not starting/ending with `'`/`"`), or JSON5-style quoted string (single line only).
 
-- All keys should match `^[a-z][a-z0-9]*$`.
-- All values should be one of the followings:
-  - An arbitrary string without any blank characters, and neither starts nor ends with `'` or `"`.
-  - A quoted string (like a JSON5 string), with either `'` or `"` as the quote character.
-    - The string must stay on a single line; no `\` followed by a line feed is allowed.
-
-```
+```text
 ;msg role=user name="John Doe"
 ```
 
-#### by JSON5
+#### JSON5 object
 
-The second way is to append a [JSON5](https://json5.org/) object after the name, with or without blanks in between.
+A single-line JSON5 object literal after the name.
 
-It must stay on a single line, and the top-level object must be an object literal. Otherwise, anything is allowed, including comments.
-
-```
+```text
 ;msg {role:'user', name:"John Doe"}
 ```
+
+## Encoding
+
+When encoding `Message` objects to STF:
+
+- Known roles use shorthand commands: `user` → `;user`, `assistant` → `;ai`, `system` → `;sys`, `developer` → `;dev`, `tool` → `;tool`. Other roles use `;msg role=<role>`.
+- `name` and `id` fields are emitted as command arguments when present.
+- Data lines starting with `;` are escaped to `;;`.
+- Messages with non-string content (i.e. `ContentPart[]`) fall back to `;raw` + JSON5.
+
+## Decoder Options
+
+| Option         | Description                                                                                             |
+| -------------- | ------------------------------------------------------------------------------------------------------- |
+| `default_role` | When set, data lines encountered in nil state auto-create a message with this role instead of erroring. |
