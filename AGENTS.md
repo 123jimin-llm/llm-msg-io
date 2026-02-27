@@ -6,17 +6,12 @@ An npm package for converting LLM messages between a canonical schema and variou
 
 **Tech stack:** TypeScript, `pnpm`, `eslint`, `chai`/`mocha`, `arktype`.
 
-## File Structure
+## Nested AGENTS.md
 
-- `/docs` — Format specifications. `stf/` is the STF spec; `msg.md` and `json.md` document message normalization and JSON serialization.
-- `/src/util` — Shared utilities: `exportType` (sanitizes ArkType types for public API), `Nullable`, `unreachable`, UID counter.
-- `/src/message/` — Canonical message schema and helpers. Has own AGENTS.md.
-- `/src/file-codec-lib/` — Generic file-codec types (`FileCodec`, `MessageEncoder`, `MessageDecoder`, `createEncoder`, `createDecoder`).
-- `/src/file-codec/` — File-codec implementations (JSON, NDJSON, TOML, STF). STF has own AGENTS.md.
-- `/src/api-codec-lib/` — Generic API-codec types (`APIStepCodec`, `StepParams`, `StepResult`, `StepStreamDecoder`, etc.). Has own AGENTS.md.
-- `/src/api-codec/` — API-codec implementations (OpenAI, Gemini, Claude). Each provider has `request`, `response`, `stream`, and optionally `extra` modules.
-- `/example` — Interactive example scripts (chat, chat-stream, tool).
-- `/integration-test/` — Non-interactive integration tests against real APIs. Has own AGENTS.md.
+- `src/message/AGENTS.md` — Canonical message schema, streaming, helpers.
+- `src/api-codec-lib/AGENTS.md` — Generic API-codec types.
+- `src/file-codec/stf/AGENTS.md` — STF file-codec.
+- `integration-test/AGENTS.md` — Integration tests against real APIs.
 
 ## Architecture
 
@@ -24,13 +19,14 @@ Two codec families, each with a `*-lib` (generic types + helpers) and a sibling 
 
 1. **File codecs** (`file-codec-lib` → `file-codec`): Serialize/deserialize `Message[]` + optional metadata to/from string or structured data.
    - `FileCodec<EncodedType>` = `WithCreateEncoder` & `WithCreateDecoder`.
-   - `createEncoder(codec)` / `createDecoder(codec)` — helper functions that accept either a codec object or a factory function.
+   - `createEncoder(codec)` / `createDecoder(codec)` accept either a codec object or a factory function.
+   - Decoder pipeline: `CodecDecoder` returns a `RawMessageDecoder` (raw deserialization); `createDecoder` wraps it with `asDecodedData` validation and optional metadata validation.
 
-2. **API codecs** (`api-codec-lib` → `api-codec`): Encode `StepParams` (messages + optional function defs) into provider-specific API requests, decode responses/streams back.
+2. **API codecs** (`api-codec-lib` → `api-codec`): Encode `StepParams` (messages + optional function defs + optional response schema) into provider-specific API requests, decode responses/streams back.
    - `APIStepCodecWithStream` = `WithCreateStepEncoder` & `WithCreateStepDecoder` & `WithCreateStepStreamDecoder`.
-   - Stream decoding produces `StepStreamEvent` via `AsyncGenerator`, built on `StepStreamState` (in `src/message/stream/`).
+   - Stream decoding produces `StepStreamEvent` via `AsyncGenerator` (`StepStreamEventGenerator`), built on `StepStreamState` (in `src/message/stream/`).
 
-Provider codecs compose partial codec objects (`*RequestCodec`, `*ResponseCodec`, `*StreamCodec`) via spread into a single satisfying object (e.g. `OpenAIChatCodec`).
+Provider codecs compose partial codec objects (`*RequestCodec`, `*ResponseCodec`, `*StreamCodec`) via spread into a single `satisfies` object. OpenAI nests under `chat/`; Gemini and Claude are flat.
 
 ## `exportType` Convention
 
@@ -39,7 +35,3 @@ ArkType types are wrapped with `exportType()` before export, producing `PublicTy
 ## Testing
 
 Unit tests use `chai`/`mocha`. Run `pnpm test` (builds first, then runs `dist/**/*.spec.js`).
-
-## Integration Tests
-
-See `/integration-test/AGENTS.md`.

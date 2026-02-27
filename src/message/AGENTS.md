@@ -6,26 +6,30 @@ Canonical message schema, streaming infrastructure, and message utilities.
 
 Defines core types with `arktype`, all exported via `exportType()`:
 
-- `Message` — Role, content, optional reasoning/refusal/tool_calls/extra. Both an interface and a runtime validator.
-- `MessageContent` — `string | ContentPart[]`. Content parts: `text`, `image`, `audio`, `file`.
-- `ContentPart` — Union of `ContentPartText`, `ContentPartImage`, `ContentPartAudio`, `ContentPartFile`.
+- `Message` — Dual-natured: TypeScript `interface` for typing AND runtime `PublicType` validator. Fields: `role`, `content`, optional `id`, `call_id`, `name`, `reasoning`, `refusal`, `tool_calls`, `extra`.
+- `MessageContent` — `string | ContentPart[]`.
+- `ContentPart` — Union of `ContentPartText`, `ContentPartImage`, `ContentPartAudio`, `ContentPartFile`. File-like parts share a base type with `format?`, `file_id?`, `name?`, `url?`, `data?`.
 - `ToolCall` — `{name, arguments, id?, call_id?, extra?}`.
-- `MessageDelta` — Partial message for streaming; `tool_calls` uses `ToolCallDelta[]` (indexed).
+- `MessageDelta` — `Partial<Omit<Message, 'tool_calls'>> & {tool_calls?: ToolCallDelta[]}`. `ToolCallDelta` is index-keyed.
 - `MessageArray` — Validated `Message[]`.
+
+`content.ts` also exports helpers: `textToContentPart`, `textToContentPartArray`, `messageContentToText`, `messageContentToTextArray`, `concatContents`, `concatContentsTo`. `concatContentsTo` mutates `ContentPart[]` targets in-place.
 
 ### `stream/`
 
 Streaming event system for incremental message construction:
 
 - `StepStreamEvent` — Discriminated union: `content.delta`, `reasoning.delta`, `refusal.delta`, `tool_call.start/delta/end`, `role`, `stream.start/end/error`.
-- `StepStreamState` — Mutable accumulator: `{message, tool_calls: Map, tool_call_started: Set}`.
-- `createStepStreamState()` → fresh state. `applyDeltaToStepStreamState()` yields events from a `MessageDelta`. `finalizeStepStreamState()` yields `tool_call.end` events and assembles final `message.tool_calls`.
+- `StepStreamState` — Mutable accumulator: `{message, tool_calls: Map<number, ToolCall>, tool_call_started: Set<number>}`.
+- `createStepStreamState()` → fresh state. `applyDeltaToStepStreamState()` yields events from a `MessageDelta`. `finalizeStepStreamState()` yields `tool_call.end` events, assembles `message.tool_calls` sorted by index, and defaults role to `'assistant'`.
 
 ### `util.ts`
 
-Message-level helpers. Key functions:
+Message-level helpers:
 
-- `asMessageArray` / `isMessageArray` — Normalize `Message | Message[]`.
-- `getMessageExtra<T>(message, key, init?)` — Typed access into `message.extra` object by key. `init=true` auto-creates.
-- `stripMessageId(s)` / `mapMessageId(s)` — ID manipulation.
-- `mapMessageText(s)` / `asyncMapMessageText(s)` — Transform text content parts.
+- `isMessageArray` / `asMessageArray` — Normalize `Message | Message[]`.
+- `getMessageExtra<T>(message, key, init?)` — Typed access into `message.extra` by key. `init=true` auto-creates nested object.
+- `stripMessageId` / `stripMessageIds` — Remove IDs (single / batch).
+- `mapMessageId` / `mapMessageIds` — Remap IDs via `Map` or `Record` (single / batch).
+- `mapMessageText` / `mapMessageTexts` — Transform text content parts (single / batch).
+- `asyncMapMessageText` / `asyncMapMessageTexts` — Async variant.

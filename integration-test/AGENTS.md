@@ -8,25 +8,25 @@ node integration-test/<subdir>/<provider>.js
 
 ### Credentials
 
-| Provider  | Env Variable       |
-|-----------|--------------------|
-| OpenAI    | `OPENAI_API_KEY`   |
-| Gemini    | `GEMINI_API_KEY`   |
+| Provider  | Env Variable        |
+| --------- | ------------------- |
+| OpenAI    | `OPENAI_API_KEY`    |
+| Gemini    | `GEMINI_API_KEY`    |
 | Anthropic | `ANTHROPIC_API_KEY` |
 
 ### Test Subdirectories
 
-| Directory                  | Scenario                                   |
-|----------------------------|--------------------------------------------|
-| `step/`                    | Basic non-streaming step                   |
-| `step-reasoning/`         | Reasoning models (extended thinking)       |
-| `step-stream/`            | Basic streaming step                       |
-| `step-stream-reasoning/`  | Streaming with reasoning models            |
-| `tool/`                    | Function calling (non-streaming)           |
-| `tool-streaming/`         | Function calling (streaming)               |
-| `tool-streaming-parallel/`| Parallel function calls (streaming)        |
+Each subdirectory has per-provider `.js` files. Not every provider appears in every subdirectory (e.g., reasoning dirs lack `openai.js`).
 
-Each subdirectory has per-provider files (e.g. `openai.js`, `gemini.js`, `claude.js`). Not every provider appears in every subdirectory.
+| Directory                  | Scenario                             |
+| -------------------------- | ------------------------------------ |
+| `step/`                    | Basic non-streaming step             |
+| `step-reasoning/`          | Reasoning models (extended thinking) |
+| `step-stream/`             | Basic streaming step                 |
+| `step-stream-reasoning/`   | Streaming with reasoning models      |
+| `tool/`                    | Function calling (non-streaming)     |
+| `tool-streaming/`          | Function calling (streaming)         |
+| `tool-streaming-parallel/` | Parallel function calls (streaming)  |
 
 ### Conventions
 

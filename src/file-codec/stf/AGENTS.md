@@ -12,22 +12,24 @@ Data lines starting with `;` are escaped by doubling to `;;`.
 
 ### Decoder (`decoder.ts`)
 
-Line-by-line parser. Maintains `DecodeState` (see `decode-state.ts`) with a current message, buffered data lines, and comment depth.
+Line-by-line parser. Comment depth is tracked as a local variable in the decoder, not in `DecodeState`.
+
+The `end` command and line/block comments (`//`, `#`, `/* */`) are handled directly by the decoder loop, not via the command registry.
 
 Options: `default_role` — if set, data lines before a message command auto-create a message with this role instead of erroring.
 
 ### `decode-state.ts`
 
-`DecodeState` — Parser state: `messages[]`, `curr_message`, `buffered_lines[]`, `invoked` (active polyadic command), comment tracking.
+`DecodeState` — Parser state: `messages[]`, `curr_message`, `buffered_lines[]`, `invoked` (active command being fed data), `default_role`, line number tracking (`curr_command_line_no`, `curr_data_line_no`).
 
-Key helpers: `startNewMessage()`, `flushBufferedLines()` (appends buffered text to current message), `flushDecodeState()`.
+Key helpers: `startNewMessage()`, `flushBufferedLines()` (appends buffered text to current message via `concatContentsTo`), `flushDecodeState()`.
 
 ### `command/`
 
 Command registry and argument parsing:
 
-- `type.ts` — `Command` interface and `CommandMode` enum (`NILADIC`, `MONADIC`, `POLYADIC`).
+- `type.ts` — `Command` interface and `CommandMode` frozen object (`NILADIC: 0`, `MONADIC: 1`, `POLYADIC: -1`).
 - `args.ts` — `parseCommandArgs()`: parses `key=value` pairs or a JSON5 object from command arguments. Supports quoted strings.
-- `message.ts` — Role commands (`system`/`sys`, `developer`/`dev`, `user`, `assistant`/`ai`, `tool`), `message`/`msg`, `raw`.
+- `message.ts` — Role commands (`system`/`sys`, `developer`/`dev`, `user`, `assistant`/`ai`, `tool`), `message`/`msg`, `raw`. `raw` is polyadic and parses buffered lines as JSON5.
 - `misc.ts` — `flush` command.
 - `index.ts` — Builds `COMMAND_LOOKUP` map from all commands + aliases.
