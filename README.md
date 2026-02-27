@@ -108,9 +108,9 @@ Here is the encoded value:
 
 ### Supported Serialization Types
 
-- `JSONCodec`: to/from [JSON](./docs/json.md)
-- `NDJSONCodec`: to/from [NDJSON](./docs/json.md)
-- `TOMLCodec`: to/from TOML, using the same format as `JSONCodec` does.
+- `JSONCodec`: to/from [JSON](./docs/file-codecs.md)
+- `NDJSONCodec`: to/from [NDJSON](./docs/file-codecs.md#ndjson)
+- `TOMLCodec`: to/from [TOML](./docs/file-codecs.md#toml)
 - `STFCodec`: to/from [STF](./docs/stf/README.md)
 
 ### Minimal Dependencies
