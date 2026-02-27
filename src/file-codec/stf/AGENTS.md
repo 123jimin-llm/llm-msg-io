@@ -4,7 +4,9 @@ STF (Simple Text Format) codec. See `/docs/stf/README.md` for the format spec an
 
 ### Encoder (`encoder.ts`)
 
-`stringify(message)` converts a single `Message` to STF text. Falls back to `;raw` + JSON5 for non-string content. `createEncoder` joins `stringify` results with `\n`.
+`stringify(message, options)` converts a single `Message` to STF text. Falls back to `;raw` + JSON5 for non-string content. `createEncoder` resolves `STFEncoderOptions` (merged with defaults) and passes them to `stringify`.
+
+`STFEncoderOptions.extra` (default `true`) controls whether `;extra` blocks are emitted.
 
 Role shorthand map: `user`→`;user`, `assistant`→`;ai`, `system`→`;sys`, `developer`→`;dev`, `tool`→`;tool`. Other roles use `;msg role=<role>`.
 

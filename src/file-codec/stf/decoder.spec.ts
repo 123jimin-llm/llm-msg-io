@@ -7,6 +7,7 @@ import {createEncoder as createSTFEncoder} from "./encoder.ts";
 
 const decoder = createDecoder(createSTFDecoder);
 const encoder = createEncoder(createSTFEncoder);
+const encoderNoExtra = createEncoder(createSTFEncoder, {extra: false});
 
 describe("file-codec/stf", () => {
     describe("STFCodec.createDecoder", () => {
@@ -394,6 +395,22 @@ describe("file-codec/stf", () => {
                 const encoded = encoder(original);
                 const {messages} = decoder(encoded);
                 assert.deepStrictEqual(messages, original);
+            });
+
+            it("should drop extra when encoder option extra=false", () => {
+                const original: Message[] = [
+                    {
+                        role: 'assistant',
+                        content: "Hello!",
+                        extra: {model: 'gpt-4o'},
+                    },
+                ];
+                const encoded = encoderNoExtra(original);
+                assert.notInclude(encoded, ';extra');
+                const {messages} = decoder(encoded);
+                assert.deepStrictEqual(messages, [
+                    {role: 'assistant', content: "Hello!"},
+                ] satisfies Message[]);
             });
         });
 

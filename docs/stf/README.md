@@ -128,8 +128,14 @@ When encoding `Message` objects to STF:
 - Messages with non-string content (i.e. `ContentPart[]`) fall back to `;raw` + JSON5.
 - The `extra` field, when present, is emitted as an `;extra` … `;end` block after the content lines.
 
+## Encoder Options
+
+| Option  | Type      | Default | Description                                          |
+| ------- | --------- | ------- | ---------------------------------------------------- |
+| `extra` | `boolean` | `true`  | Whether to emit `;extra` blocks for `message.extra`. |
+
 ## Decoder Options
 
-| Option         | Description                                                                                             |
-| -------------- | ------------------------------------------------------------------------------------------------------- |
-| `default_role` | When set, data lines encountered in nil state auto-create a message with this role instead of erroring. |
+| Option         | Type             | Default | Description                                                                                             |
+| -------------- | ---------------- | ------- | ------------------------------------------------------------------------------------------------------- |
+| `default_role` | `string \| null` | `null`  | When set, data lines encountered in nil state auto-create a message with this role instead of erroring. |

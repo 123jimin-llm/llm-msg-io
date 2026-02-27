@@ -3,6 +3,18 @@ import JSON5 from "json5";
 import type {Message} from "../../message/index.ts";
 import type {CodecEncoder} from "../../file-codec-lib/index.ts";
 
+export interface STFEncoderOptions {
+    /** Whether to emit `;extra` blocks. Default: `true`. */
+    extra: boolean;
+    // TODO: Add when `;reasoning` and `;refusal` commands are implemented.
+    // reasoning: boolean;
+    // refusal: boolean;
+}
+
+const DEFAULT_ENCODER_OPTIONS: STFEncoderOptions = {
+    extra: true,
+};
+
 const ROLE_COMMAND_MAP: Readonly<Record<string, string>> = {
     user: 'user',
     assistant: 'ai',
@@ -30,7 +42,7 @@ export function escapeStfContent(s: string): string {
     return s.split('\n').map(escapeStfLine).join('\n');
 }
 
-export function stringify(message: Message): string {
+export function stringify(message: Message, options: STFEncoderOptions = DEFAULT_ENCODER_OPTIONS): string {
     if(typeof message.content !== 'string') {
         return [
             ";raw",
@@ -71,7 +83,7 @@ export function stringify(message: Message): string {
         parts.push(escapeStfContent(message.content));
     }
 
-    if(message.extra !== (void 0)) {
+    if(options.extra && message.extra !== (void 0)) {
         parts.push([
             ";extra",
             escapeStfContent(JSON5.stringify(message.extra, null, 2)),
@@ -82,6 +94,9 @@ export function stringify(message: Message): string {
     return parts.join('\n');
 }
 
-export const createEncoder: CodecEncoder<string> = () => (messages): string => {
-    return messages.map((message) => stringify(message)).join('\n');
+export const createEncoder: CodecEncoder<string, STFEncoderOptions> = (options?) => {
+    const resolved = {...DEFAULT_ENCODER_OPTIONS, ...options};
+    return (messages): string => {
+        return messages.map((message) => stringify(message, resolved)).join('\n');
+    };
 };
