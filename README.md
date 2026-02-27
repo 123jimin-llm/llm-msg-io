@@ -37,7 +37,7 @@ const encode = createStepEncoder(OpenAIChatCodec);
 const api_req = encode({messages});
 
 const client = new OpenAI();
-const api_res = client.chat.completions.create({
+const api_res = await client.chat.completions.create({
   ...api_req,
   model: 'gpt-5.2',
 });
@@ -79,8 +79,8 @@ Here is the encoded value:
 
 ## Features
 
-> [!WARNING]
-> This library does not perform any data validations (such as role name sanitization), which must be done by the user.
+> [!NOTE]
+> This library validates message structure via [arktype](https://arktype.io/), but does not sanitize message content (e.g., role names are not restricted beyond schema shape).
 
 - Converting to/from various API message formats.
 - Converting to/from various serialization formats.
@@ -91,7 +91,7 @@ Here is the encoded value:
 
 - `OpenAIChatCodec`: for OpenAI chat completion requests and responses
 - `GeminiGenerateContentCodec`: for Gemini `generateContent` / `generateContentStream`
-- (TODO) `ClaudeMessagesCodec`: for Claude `messages.create`.
+- `ClaudeMessagesCodec`: for Claude `messages.create`.
 
 #### Stream Events
 
@@ -121,14 +121,14 @@ Here's the result of running `pnpm ls -P --depth 99` on the root directory:
 
 ```text
 dependencies:
-arktype 2.1.25
-├─┬ @ark/schema 0.53.0
-│ └── @ark/util 0.53.0
-├── @ark/util 0.53.0
-└─┬ arkregex 0.0.2
-  └── @ark/util 0.53.0
+arktype 2.1.29
+├─┬ @ark/schema 0.56.0
+│ └── @ark/util 0.56.0
+├── @ark/util 0.56.0
+└─┬ arkregex 0.0.5
+  └── @ark/util 0.56.0
 json5 2.2.3
-smol-toml 1.4.2
+smol-toml 1.6.0
 ```
 
 ## Development
@@ -137,8 +137,7 @@ This project uses [pnpm](https://pnpm.io/) for package management.
 
 - `pnpm build` – compile TypeScript from `src/` into `dist/`.
   - `pnpm build:watch` – recompile on every file change.
-- `pnpm test` – run unit tests from `src/**/*.spec.ts`.
-  - Don't forget to run `pnpm build` before running tests!
+- `pnpm test` – build, then run unit tests (`dist/**/*.spec.js`).
 - `pnpm lint` – run ESLint on the source code.
 - `pnpm clean` – remove the `dist/` directory.
 
