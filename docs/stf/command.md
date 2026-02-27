@@ -24,7 +24,7 @@ It is an error to attempt to use a value from the previous message if it is nil.
 
 The `message` (`msg` for alias) command starts a new message.
 
-The command accepts following optional argument:
+The command accepts the following optional arguments:
 
 - `role`: The role of the message. If not provided, role of the previous message is used.
 - `name`: The name of the sender of the message.
@@ -39,13 +39,13 @@ The command accepts following optional argument:
 
 For commonly used roles (taken from OpenAI Harmony Response Format), the following commands are provided.
 
-| Name | Alias |
-| ---- | ----- |
-| `system` | `sys` |
+| Name        | Alias |
+| ----------- | ----- |
+| `system`    | `sys` |
 | `developer` | `dev` |
-| `user` | |
-| `assistant` | `ai` |
-| `tool` | |
+| `user`      |       |
+| `assistant` | `ai`  |
+| `tool`      |       |
 
 For example, `;assistant` and `;ai` both are equivalent to `;msg role=assistant`.
 
@@ -66,12 +66,6 @@ To provide a raw message in JSON5 format, use this command.
 ;end
 ```
 
-### Channel Commands
-
-- Mode: **niladic**
-
-## Appending Message Parts
-
 ## Miscellaneous
 
 ### `flush`
@@ -82,7 +76,7 @@ This command clears the message state, setting it to the nil value.
 
 ### `end`
 
-`end` is a special command, marking end of data line arguments for a polyadic argument.
+`end` is a special command that marks the end of data lines for a polyadic command.
 
-Arguments for `end` does not follow the syntax for other commands.
+Arguments for `end` do not follow the syntax of other commands.
 Any string following `end` is allowed, as long as the first character is not `[0-9a-zA-Z]`.
