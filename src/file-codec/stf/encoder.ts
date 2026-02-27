@@ -19,20 +19,22 @@ function quoteValue(value: string): string {
     return value;
 }
 
-function escapeDataLine(line: string): string {
+/** Escape a single line for STF data output (`;;` prefix for lines starting with `;`). */
+export function escapeStfLine(line: string): string {
     if(line[0] === ';') return ";" + line;
     return line;
 }
 
-function escapeDataLines(s: string): string {
-    return s.split('\n').map(escapeDataLine).join('\n');
+/** Escape a multi-line string for STF data output, applying `escapeStfLine` to each line. */
+export function escapeStfContent(s: string): string {
+    return s.split('\n').map(escapeStfLine).join('\n');
 }
 
 export function stringify(message: Message): string {
     if(typeof message.content !== 'string') {
         return [
             ";raw",
-            escapeDataLines(JSON5.stringify(message, null, 2)),
+            escapeStfContent(JSON5.stringify(message, null, 2)),
             ";end",
         ].join('\n');
     }
@@ -60,7 +62,7 @@ export function stringify(message: Message): string {
     const command_line = command_parts.join(' ');
     if(message.content === "") return command_line;
 
-    const content_lines = escapeDataLines(message.content);
+    const content_lines = escapeStfContent(message.content);
     return `${command_line}\n${content_lines}`;
 }
 
