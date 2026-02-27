@@ -7,6 +7,7 @@ import {type Command, CommandMode} from "./type.ts";
 const RoleCommandArgs = type({
     id: "string?",
     name: "string?",
+    call_id: "string?",
 });
 
 const MessageArgs = RoleCommandArgs.merge({
@@ -19,6 +20,7 @@ function createNewMessageParams(args: typeof MessageArgs.infer): Partial<NewMess
     if(args.role != null) ret.role = args.role;
     if(args.id != null) ret.id = args.id;
     if(args.name != null) ret.name = args.name;
+    if(args.call_id != null) ret.call_id = args.call_id;
 
     return ret;
 }

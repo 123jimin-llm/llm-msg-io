@@ -103,7 +103,7 @@ Two syntaxes (some commands, like `end`, use neither):
 
 Pairs separated by blanks.
 
-- Keys: `[a-z][a-z0-9]*`.
+- Keys: `[a-z][a-z0-9_]*`.
 - Values: unquoted (no blanks, not starting/ending with `'`/`"`), or JSON5-style quoted string (single line only).
 
 ```text
@@ -123,7 +123,7 @@ A single-line JSON5 object literal after the name.
 When encoding `Message` objects to STF:
 
 - Known roles use shorthand commands: `user` → `;user`, `assistant` → `;ai`, `system` → `;sys`, `developer` → `;dev`, `tool` → `;tool`. Other roles use `;msg role=<role>`.
-- `name` and `id` fields are emitted as command arguments when present.
+- `name`, `id`, and `call_id` fields are emitted as command arguments when present.
 - Data lines starting with `;` are escaped to `;;`.
 - Messages with non-string content (i.e. `ContentPart[]`) fall back to `;raw` + JSON5.
 

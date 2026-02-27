@@ -50,6 +50,7 @@ export interface NewMessageParams {
     role: string;
     id: string;
     name: string;
+    call_id: string;
 }
 
 export function startNewMessage(state: DecodeState, params: Partial<NewMessageParams>): Message {
@@ -67,6 +68,10 @@ export function startNewMessage(state: DecodeState, params: Partial<NewMessagePa
 
     if(params.name !== (void 0)) {
         message.name = params.name;
+    }
+
+    if(params.call_id !== (void 0)) {
+        message.call_id = params.call_id;
     }
 
     state.curr_message = message;

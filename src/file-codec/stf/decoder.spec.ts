@@ -1,10 +1,12 @@
 import {assert} from 'chai';
 
 import {type Message} from "../../message/index.ts";
-import {createDecoder} from '../../file-codec-lib/index.ts';
+import {createDecoder, createEncoder} from '../../file-codec-lib/index.ts';
 import {createDecoder as createSTFDecoder} from "./decoder.ts";
+import {createEncoder as createSTFEncoder} from "./encoder.ts";
 
 const decoder = createDecoder(createSTFDecoder);
+const encoder = createEncoder(createSTFEncoder);
 
 describe("file-codec/stf", () => {
     describe("STFCodec.createDecoder", () => {
@@ -206,6 +208,40 @@ describe("file-codec/stf", () => {
                         content: "",
                     },
                 ] satisfies Message[]);
+            });
+
+            it("should decode call_id on a tool role command", () => {
+                const serialized = ";tool call_id=abc123";
+                const {messages} = decoder(serialized);
+                assert.deepStrictEqual(messages, [
+                    {
+                        role: 'tool',
+                        call_id: 'abc123',
+                        content: "",
+                    },
+                ] satisfies Message[]);
+            });
+
+            it("should decode call_id on a msg command", () => {
+                const serialized = ";msg role=tool call_id=abc123 id=msg1";
+                const {messages} = decoder(serialized);
+                assert.deepStrictEqual(messages, [
+                    {
+                        role: 'tool',
+                        call_id: 'abc123',
+                        id: 'msg1',
+                        content: "",
+                    },
+                ] satisfies Message[]);
+            });
+
+            it("should round-trip a message with call_id", () => {
+                const original: Message[] = [
+                    {role: 'tool', call_id: 'call_42', content: "result"},
+                ];
+                const encoded = encoder(original);
+                const {messages} = decoder(encoded);
+                assert.deepStrictEqual(messages, original);
             });
         });
 

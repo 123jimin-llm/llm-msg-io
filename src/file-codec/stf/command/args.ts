@@ -84,7 +84,7 @@ export function parseCommandArgs(args_text: string, line_no: number = 0): Comman
         }
 
         ++i;
-        while(i < n && /[a-z0-9]/i.test(args_text[i]!)) ++i;
+        while(i < n && /[a-z0-9_]/i.test(args_text[i]!)) ++i;
         const key = args_text.slice(key_start, i);
 
         i = scanBlank(args_text, i);

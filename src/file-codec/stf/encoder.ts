@@ -59,6 +59,10 @@ export function stringify(message: Message): string {
         command_parts.push(`id=${quoteValue(message.id)}`);
     }
 
+    if(message.call_id != null) {
+        command_parts.push(`call_id=${quoteValue(message.call_id)}`);
+    }
+
     const command_line = command_parts.join(' ');
     if(message.content === "") return command_line;
 

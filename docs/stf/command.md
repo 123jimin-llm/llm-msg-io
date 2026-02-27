@@ -29,6 +29,7 @@ The command accepts the following optional arguments:
 - `role`: The role of the message. If not provided, role of the previous message is used.
 - `name`: The name of the sender of the message.
 - `id`: Unique ID for a message.
+- `call_id`: The ID of the tool call this message is responding to.
 
 > [!NOTE]
 > STF does *not* enforce uniqueness of a message ID.
