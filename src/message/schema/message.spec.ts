@@ -1,6 +1,6 @@
 import {assert} from 'chai';
 
-import {Message, MessageArray} from "./message.ts";
+import {Message} from "./message.ts";
 
 describe("Message", () => {
     it("should assert valid messages", () => {
@@ -28,13 +28,3 @@ describe("Message", () => {
     });
 });
 
-describe("MessageArray", () => {
-    it("should allow optional fields set to undefined", () => {
-        const msg: Record<string, string> = {role: 'assistant', content: "Hello!"};
-
-        for(const field of ['id', 'name', 'reasoning', 'tool_calls']) {
-            const msg_with_undefined: unknown = {...msg, [field]: (void 0)};
-            assert.doesNotThrow(() => MessageArray.assert([msg_with_undefined]));
-        }
-    });
-});
