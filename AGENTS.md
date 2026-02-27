@@ -2,31 +2,22 @@
 
 Read this file thoroughly before starting work.
 
-An npm package for converting LLM messages between a canonical schema and various formats: file formats (JSON, NDJSON, TOML, [STF](./docs/stf/README.md)) and API formats (OpenAI, Gemini, Claude).
-
-**Tech stack:** TypeScript, `pnpm`, `eslint`, `chai`/`mocha`, `arktype`.
-
 ## Nested AGENTS.md
 
-- `src/message/AGENTS.md` — Canonical message schema, streaming, helpers.
-- `src/api-codec-lib/AGENTS.md` — Generic API-codec types.
-- `src/file-codec/stf/AGENTS.md` — STF file-codec.
-- `integration-test/AGENTS.md` — Integration tests against real APIs.
+- `src/message/AGENTS.md` — Canonical message schema design.
+- `src/api-codec-lib/AGENTS.md` — API-codec layering pattern.
+- `src/file-codec/stf/AGENTS.md` — STF codec gotchas.
+- `integration-test/AGENTS.md` — Running integration tests.
 
 ## Architecture
 
-Two codec families, each with a `*-lib` (generic types + helpers) and a sibling directory (implementations):
+Two codec families, each split into `*-lib` (generic types + helpers) and a sibling directory (concrete implementations):
 
-1. **File codecs** (`file-codec-lib` → `file-codec`): Serialize/deserialize `Message[]` + optional metadata to/from string or structured data.
-   - `FileCodec<EncodedType>` = `WithCreateEncoder` & `WithCreateDecoder`.
-   - `createEncoder(codec)` / `createDecoder(codec)` accept either a codec object or a factory function.
-   - Decoder pipeline: `CodecDecoder` returns a `RawMessageDecoder` (raw deserialization); `createDecoder` wraps it with `asDecodedData` validation and optional metadata validation.
+1. **File codecs** (`file-codec-lib` → `file-codec`): Decoder pipeline separates raw deserialization (`RawMessageDecoder`) from validation (`asDecodedData` + optional metadata validation), composed by `createDecoder`.
 
-2. **API codecs** (`api-codec-lib` → `api-codec`): Encode `StepParams` (messages + optional function defs + optional response schema) into provider-specific API requests, decode responses/streams back.
-   - `APIStepCodecWithStream` = `WithCreateStepEncoder` & `WithCreateStepDecoder` & `WithCreateStepStreamDecoder`.
-   - Stream decoding produces `StepStreamEvent` via `AsyncGenerator` (`StepStreamEventGenerator`), built on `StepStreamState` (in `src/message/stream/`).
+2. **API codecs** (`api-codec-lib` → `api-codec`): Stream decoding produces `StepStreamEvent` via `AsyncGenerator`, built on `StepStreamState` (in `src/message/stream/`).
 
-Provider codecs compose partial codec objects (`*RequestCodec`, `*ResponseCodec`, `*StreamCodec`) via spread into a single `satisfies` object. OpenAI nests under `chat/`; Gemini and Claude are flat.
+Provider codecs compose partial objects (`*RequestCodec`, `*ResponseCodec`, `*StreamCodec`) via spread into a single `satisfies` expression. OpenAI nests under `chat/`; Gemini and Claude are flat.
 
 ## `exportType` Convention
 
@@ -34,4 +25,4 @@ ArkType types are wrapped with `exportType()` before export, producing `PublicTy
 
 ## Testing
 
-Unit tests use `chai`/`mocha`. Run `pnpm test` (builds first, then runs `dist/**/*.spec.js`).
+Run `pnpm test` — builds first, then runs `dist/**/*.spec.js`.
