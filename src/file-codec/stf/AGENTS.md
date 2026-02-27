@@ -31,5 +31,6 @@ Command registry and argument parsing:
 - `type.ts` — `Command` interface and `CommandMode` frozen object (`NILADIC: 0`, `MONADIC: 1`, `POLYADIC: -1`).
 - `args.ts` — `parseCommandArgs()`: parses `key=value` pairs or a JSON5 object from command arguments. Supports quoted strings.
 - `message.ts` — Role commands (`system`/`sys`, `developer`/`dev`, `user`, `assistant`/`ai`, `tool`), `message`/`msg`, `raw`. `raw` is polyadic and parses buffered lines as JSON5.
+- `field.ts` — `extra` command (polyadic, JSON5). Shallow-merges into `message.extra` when both sides are plain objects.
 - `misc.ts` — `flush` command.
 - `index.ts` — Builds `COMMAND_LOOKUP` map from all commands + aliases.

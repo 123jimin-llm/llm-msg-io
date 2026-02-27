@@ -67,6 +67,30 @@ To provide a raw message in JSON5 format, use this command.
 ;end
 ```
 
+## Message Fields
+
+These commands set additional fields on the current message.
+It is an error to use them when the message state is nil.
+
+### `extra`
+
+- Mode: **polyadic**
+
+Sets the `extra` field on the current message. The data lines between `extra` and `end` are parsed as a JSON5 value.
+
+If the current message already has an `extra` value that is a plain object, and the parsed value is also a plain object, the two are shallow-merged (the new value's keys take precedence). Otherwise, the parsed value replaces the existing one.
+
+```
+;ai
+Hello!
+;extra
+{
+  model: "gpt-4o",
+  usage: {prompt_tokens: 10, completion_tokens: 3},
+}
+;end
+```
+
 ## Miscellaneous
 
 ### `flush`

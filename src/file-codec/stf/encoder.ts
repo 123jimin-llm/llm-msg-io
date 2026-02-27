@@ -64,10 +64,22 @@ export function stringify(message: Message): string {
     }
 
     const command_line = command_parts.join(' ');
-    if(message.content === "") return command_line;
 
-    const content_lines = escapeStfContent(message.content);
-    return `${command_line}\n${content_lines}`;
+    const parts: string[] = [command_line];
+
+    if(message.content !== "") {
+        parts.push(escapeStfContent(message.content));
+    }
+
+    if(message.extra !== (void 0)) {
+        parts.push([
+            ";extra",
+            escapeStfContent(JSON5.stringify(message.extra, null, 2)),
+            ";end",
+        ].join('\n'));
+    }
+
+    return parts.join('\n');
 }
 
 export const createEncoder: CodecEncoder<string> = () => (messages): string => {

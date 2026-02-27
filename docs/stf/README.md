@@ -126,6 +126,7 @@ When encoding `Message` objects to STF:
 - `name`, `id`, and `call_id` fields are emitted as command arguments when present.
 - Data lines starting with `;` are escaped to `;;`.
 - Messages with non-string content (i.e. `ContentPart[]`) fall back to `;raw` + JSON5.
+- The `extra` field, when present, is emitted as an `;extra` … `;end` block after the content lines.
 
 ## Decoder Options
 
