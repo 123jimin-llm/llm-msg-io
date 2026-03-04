@@ -67,6 +67,27 @@ To provide a raw message in JSON5 format, use this command.
 ;end
 ```
 
+## File-Level Metadata
+
+### `meta`
+
+- Mode: **polyadic**
+
+Sets file-level metadata. The data lines between `meta` and `end` are parsed as a JSON5 value. This command does not require an active message.
+
+If the file already has metadata that is a plain object, and the parsed value is also a plain object, the two are shallow-merged (the new value's keys take precedence). Otherwise, the parsed value replaces the existing one.
+
+```
+;meta
+{
+  title: "My Chat",
+  created: "2025-01-15",
+}
+;end
+;user
+Hello!
+```
+
 ## Message Fields
 
 These commands set additional fields on the current message.

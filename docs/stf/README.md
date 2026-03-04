@@ -127,12 +127,14 @@ When encoding `Message` objects to STF:
 - Data lines starting with `;` are escaped to `;;`.
 - Messages with non-string content (i.e. `ContentPart[]`) fall back to `;raw` + JSON5.
 - The `extra` field, when present, is emitted as an `;extra` … `;end` block after the content lines.
+- File-level metadata, when provided, is emitted as a `;meta` … `;end` block before any messages.
 
 ## Encoder Options
 
-| Option  | Type      | Default | Description                                          |
-| ------- | --------- | ------- | ---------------------------------------------------- |
-| `extra` | `boolean` | `true`  | Whether to emit `;extra` blocks for `message.extra`. |
+| Option     | Type      | Default | Description                                          |
+| ---------- | --------- | ------- | ---------------------------------------------------- |
+| `extra`    | `boolean` | `true`  | Whether to emit `;extra` blocks for `message.extra`. |
+| `metadata` | `boolean` | `true`  | Whether to emit the `;meta` block.                   |
 
 ## Decoder Options
 

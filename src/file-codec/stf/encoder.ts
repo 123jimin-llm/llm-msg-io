@@ -6,6 +6,8 @@ import type {CodecEncoder} from "../../file-codec-lib/index.ts";
 export interface STFEncoderOptions {
     /** Whether to emit `;extra` blocks. Default: `true`. */
     extra: boolean;
+    /** Whether to emit `;meta` block for file-level metadata. Default: `true`. */
+    metadata: boolean;
     // TODO: Add when `;reasoning` and `;refusal` commands are implemented.
     // reasoning: boolean;
     // refusal: boolean;
@@ -13,6 +15,7 @@ export interface STFEncoderOptions {
 
 const DEFAULT_ENCODER_OPTIONS: STFEncoderOptions = {
     extra: true,
+    metadata: true,
 };
 
 const ROLE_COMMAND_MAP: Readonly<Record<string, string>> = {
@@ -96,7 +99,21 @@ export function stringify(message: Message, options: STFEncoderOptions = DEFAULT
 
 export const createEncoder: CodecEncoder<string, STFEncoderOptions> = (options?) => {
     const resolved = {...DEFAULT_ENCODER_OPTIONS, ...options};
-    return (messages): string => {
-        return messages.map((message) => stringify(message, resolved)).join('\n');
+    return (messages, metadata?): string => {
+        const parts: string[] = [];
+
+        if(resolved.metadata && metadata !== (void 0)) {
+            parts.push([
+                ";meta",
+                escapeStfContent(JSON5.stringify(metadata, null, 2)),
+                ";end",
+            ].join('\n'));
+        }
+
+        for(const message of messages) {
+            parts.push(stringify(message, resolved));
+        }
+
+        return parts.join('\n');
     };
 };

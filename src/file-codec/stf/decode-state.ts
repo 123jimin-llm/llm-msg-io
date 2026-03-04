@@ -6,6 +6,9 @@ export interface DecodeState {
     /** List of messages. */
     readonly messages: Message[];
 
+    /** File-level metadata. */
+    metadata: unknown;
+
     /** Default role for a new message without role. */
     default_role: string|null;
 
@@ -31,6 +34,7 @@ export interface DecodeState {
 export function createDecodeState(): DecodeState {
     return {
         messages: [],
+        metadata: void 0,
 
         default_role: null,
         curr_message: null,

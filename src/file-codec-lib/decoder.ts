@@ -62,7 +62,7 @@ export type CodecDecoderLike<EncodedType = string, DecodeOptions extends object 
 /** Invokes the function that returns a raw deserializer. */
 export function createRawDecoder<EncodedType = string, DecodeOptions extends object = object>(
     codec: CodecDecoderLike<EncodedType, DecodeOptions>,
-    options?: DecodeOptions,
+    options?: Partial<DecodeOptions>,
 ): RawMessageDecoder<EncodedType> {
     return (typeof codec === 'function' ? codec : codec.createDecoder)(options);
 }
@@ -70,12 +70,12 @@ export function createRawDecoder<EncodedType = string, DecodeOptions extends obj
 /** Invokes the function that returns a decoder. */
 export function createDecoder<EncodedType = string, DecodeOptions extends object = object, MetadataType = unknown>(
     codec: CodecDecoderLike<EncodedType, DecodeOptions>,
-    options?: DecodeOptions,
+    options?: Partial<DecodeOptions>,
     validateMetadata?: (metadata: unknown) => MetadataType,
 ): MessageDecoder<EncodedType, MetadataType> {
     return (encoded: EncodedType) => {
         const {messages, metadata} = asDecodedData(createRawDecoder(codec, options)(encoded));
-        const validated_metadata: MetadataType = validateMetadata ? validateMetadata(metadata) : (validateMetadata as MetadataType);
+        const validated_metadata: MetadataType = validateMetadata ? validateMetadata(metadata) : (metadata as MetadataType);
 
         const decoded_data: DecodedData<MetadataType> = {messages};
         if(validated_metadata !== (void 0)) decoded_data.metadata = validated_metadata;

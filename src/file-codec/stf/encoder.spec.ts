@@ -8,6 +8,7 @@ import {createEncoder as createSTFEncoder} from "./encoder.ts";
 const decoder = createDecoder(createSTFDecoder);
 const encoder = createEncoder(createSTFEncoder);
 const encoderNoExtra = createEncoder(createSTFEncoder, {extra: false});
+const encoderNoMeta = createEncoder(createSTFEncoder, {metadata: false});
 
 describe("file-codec/stf", () => {
     describe("STFCodec.createEncoder", () => {
@@ -47,6 +48,35 @@ describe("file-codec/stf", () => {
             assert.deepStrictEqual(messages, [
                 {role: 'assistant', content: "Hello!"},
             ] satisfies Message[]);
+        });
+
+        it("should round-trip metadata", () => {
+            const messages: Message[] = [
+                {role: 'user', content: "Hello!"},
+            ];
+            const metadata = {title: 'Test', version: 2};
+            const encoded = encoder(messages, metadata);
+            const result = decoder(encoded);
+            assert.deepStrictEqual(result.metadata, metadata);
+            assert.deepStrictEqual(result.messages, messages);
+        });
+
+        it("should not emit meta block when no metadata is provided", () => {
+            const messages: Message[] = [
+                {role: 'user', content: "Hello!"},
+            ];
+            const encoded = encoder(messages);
+            assert.notInclude(encoded, ';meta');
+        });
+
+        it("should drop metadata when option metadata=false", () => {
+            const messages: Message[] = [
+                {role: 'user', content: "Hello!"},
+            ];
+            const encoded = encoderNoMeta(messages, {title: 'Ignored'});
+            assert.notInclude(encoded, ';meta');
+            const result = decoder(encoded);
+            assert.notProperty(result, 'metadata');
         });
     });
 });

@@ -145,7 +145,13 @@ export const createDecoder: CodecDecoder<string, Partial<STFDecoderOptions>> = (
 
     flushDecodeState(state);
 
-    return {
+    const result: {messages: typeof state.messages; metadata?: unknown} = {
         messages: state.messages,
     };
+
+    if(state.metadata !== (void 0)) {
+        result.metadata = state.metadata;
+    }
+
+    return result;
 };

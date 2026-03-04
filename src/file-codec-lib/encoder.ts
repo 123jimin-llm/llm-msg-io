@@ -19,7 +19,7 @@ export type CodecEncoderLike<EncodedType = string, EncodeOptions extends object 
 /** Invokes the function that returns an encoder. */
 export function createEncoder<EncodedType = string, EncodeOptions extends object = object, MetadataType = unknown>(
     codec: CodecEncoderLike<EncodedType, EncodeOptions, MetadataType>,
-    options?: EncodeOptions,
+    options?: Partial<EncodeOptions>,
 ): MessageEncoder<EncodedType, MetadataType> {
     return (typeof codec === 'function' ? codec : codec.createEncoder)(options);
 }
