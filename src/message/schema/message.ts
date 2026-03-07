@@ -1,6 +1,6 @@
 import {type} from "arktype";
 
-import {exportType, type PublicType} from "../../util/type.ts";
+import {exportType} from "../../util/type.ts";
 import {MessageContent} from "./content.ts";
 
 export const ToolCall = exportType(type({
@@ -41,7 +41,7 @@ export interface Message {
     extra?: unknown;
 }
 
-export const Message: PublicType<Message> = exportType(type({
+export const Message = exportType(type({
     "id?": "string|undefined",
     "call_id?": "string|undefined",
     "name?": "string|undefined",
