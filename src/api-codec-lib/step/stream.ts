@@ -1,6 +1,6 @@
 import type {ToolCallDelta} from "../../message/index.ts";
-import {applyDeltaToStepStreamState, finalizeStepStreamState, createStepStreamState} from "../../message/stream/index.ts";
 import type {StepStreamEvent} from "../../message/stream/index.ts";
+import {applyDeltaToStepStreamState, createStepStreamState, finalizeStepStreamState} from "../../message/stream/index.ts";
 import type {StepResult} from "./response.ts";
 
 export type StepStreamEventGenerator<DecodedType extends StepResult = StepResult> = AsyncGenerator<StepStreamEvent, DecodedType>;

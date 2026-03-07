@@ -6,9 +6,8 @@ import type {
 import type {StepResult, TokenUsage, WithCreateStepDecoder} from "../../api-codec-lib/index.ts";
 import type {Message, ToolCall} from "../../message/index.ts";
 import {concatContentsTo, type MessageContent} from "../../message/index.ts";
-import {getMessageExtraClaude, type ClaudeRedactedThinkingBlock, type ClaudeThinkingBlock} from "./extra.ts";
-
 import type {Nullable} from "../../util/type.ts";
+import {type ClaudeRedactedThinkingBlock, type ClaudeThinkingBlock, getMessageExtraClaude} from "./extra.ts";
 
 export function fromClaudeUsage(usage: ClaudeUsage): TokenUsage {
     const token_usage: TokenUsage = {

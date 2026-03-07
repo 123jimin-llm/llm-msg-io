@@ -1,14 +1,14 @@
-import type {
-    ChatCompletionMessageParam as OpenAIChatInputMessage,
-    ChatCompletionContentPart,
-    ChatCompletionMessageToolCall,
-    ChatCompletionCreateParams,
-} from "openai/resources/chat/completions";
 import type {ResponseFormatJSONSchema} from "openai/resources";
+import type {
+    ChatCompletionContentPart,
+    ChatCompletionCreateParams,
+    ChatCompletionMessageParam as OpenAIChatInputMessage,
+    ChatCompletionMessageToolCall,
+} from "openai/resources/chat/completions";
 
-import type {Nullable} from "../../../util/type.ts";
 import type {StepParams, WithCreateStepEncoder} from "../../../api-codec-lib/index.ts";
-import {messageContentToText, type MessageContent, type ToolCall} from "../../../message/index.ts";
+import {type MessageContent, messageContentToText, type ToolCall} from "../../../message/index.ts";
+import type {Nullable} from "../../../util/type.ts";
 
 function toChatCompletionContent(content: Nullable<MessageContent>): OpenAIChatInputMessage['content'] {
     if(content == null) return null;

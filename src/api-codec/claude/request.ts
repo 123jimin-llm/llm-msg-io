@@ -1,20 +1,20 @@
 import type {
-    MessageParam as ClaudeMessageParam,
     ContentBlockParam as ClaudeContentBlockParam,
-    TextBlockParam,
     ImageBlockParam,
+    MessageCreateParamsNonStreaming,
+    MessageParam as ClaudeMessageParam,
+    RedactedThinkingBlockParam,
+    TextBlockParam,
+    ThinkingBlockParam,
+    Tool as ClaudeTool,
     ToolResultBlockParam,
     ToolUseBlockParam,
-    ThinkingBlockParam,
-    RedactedThinkingBlockParam,
-    MessageCreateParamsNonStreaming,
-    Tool as ClaudeTool,
 } from "@anthropic-ai/sdk/resources/messages";
 
-import type {Nullable} from "../../util/type.ts";
 import type {FunctionDefinition, StepParams, WithCreateStepEncoder} from "../../api-codec-lib/index.ts";
-import {messageContentToText, type Message, type MessageContent, type ToolCall} from "../../message/index.ts";
-import {getMessageExtraClaude, type ClaudeExtra} from "./extra.ts";
+import {type Message, type MessageContent, messageContentToText, type ToolCall} from "../../message/index.ts";
+import type {Nullable} from "../../util/type.ts";
+import {type ClaudeExtra, getMessageExtraClaude} from "./extra.ts";
 
 export function isClaudeSystemRole(role: string): boolean {
     switch(role) {

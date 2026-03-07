@@ -1,4 +1,5 @@
 import {type} from 'arktype';
+
 import {exportType, type Nullable} from "../../util/type.ts";
 
 export const ContentPartText = exportType(type({

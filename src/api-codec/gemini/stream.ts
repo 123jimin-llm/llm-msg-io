@@ -1,10 +1,10 @@
 import type {GenerateContentResponse} from "@google/genai";
+
 import type {StepResult, TokenUsage, WithCreateStepStreamDecoder} from "../../api-codec-lib/index.ts";
 import type {StepStreamEvent, StreamEndEvent, StreamStartEvent, ToolCallDelta} from "../../message/index.ts";
 import {applyDeltaToStepStreamState, createStepStreamState, finalizeStepStreamState, stepStreamStateToResult} from "../../message/index.ts";
-
-import {fromGeminiContent, fromGeminiFinishReason, fromGeminiUsageMetadata} from "./response.ts";
 import {getMessageExtraGemini, mergeMessageExtraGemini} from "./extra.ts";
+import {fromGeminiContent, fromGeminiFinishReason, fromGeminiUsageMetadata} from "./response.ts";
 
 export const GeminiGenerateContentStreamCodec = {
     createStepStreamDecoder: () => async function* (api_stream): AsyncGenerator<StepStreamEvent, StepResult> {

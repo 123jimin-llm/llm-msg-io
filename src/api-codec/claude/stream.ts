@@ -3,9 +3,8 @@ import type {RawMessageStreamEvent} from "@anthropic-ai/sdk/resources/messages";
 import type {StepResult, TokenUsage, WithCreateStepStreamDecoder} from "../../api-codec-lib/index.ts";
 import type {StepStreamEvent, StreamEndEvent, ToolCallDelta} from "../../message/index.ts";
 import {applyDeltaToStepStreamState, createStepStreamState, finalizeStepStreamState, stepStreamStateToResult} from "../../message/index.ts";
-
+import {type ClaudeRedactedThinkingBlock, type ClaudeThinkingBlock, getMessageExtraClaude} from "./extra.ts";
 import {fromClaudeStopReason, fromClaudeUsage} from "./response.ts";
-import {getMessageExtraClaude, type ClaudeRedactedThinkingBlock, type ClaudeThinkingBlock} from "./extra.ts";
 
 export type ClaudeMessageStream = AsyncIterable<RawMessageStreamEvent>;
 

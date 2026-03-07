@@ -1,4 +1,5 @@
 import {assert} from 'chai';
+
 import {parseCommandArgs} from './args.js';
 
 describe("file-codec/stf/command/args", () => {

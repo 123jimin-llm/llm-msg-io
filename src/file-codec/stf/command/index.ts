@@ -1,11 +1,10 @@
 export * from "./args.ts";
 export * from "./type.ts";
 
-import type {Command} from "./type.ts";
-
 import {FIELD_COMMANDS} from "./field.ts";
 import {MESSAGE_COMMANDS} from "./message.ts";
 import {MISC_COMMANDS} from "./misc.ts";
+import type {Command} from "./type.ts";
 
 export const COMMANDS: Command[] = [
     ...MESSAGE_COMMANDS,

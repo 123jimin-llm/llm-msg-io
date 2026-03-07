@@ -1,6 +1,6 @@
 import {type} from "arktype";
-import {exportType, type PublicType} from "../../util/type.ts";
 
+import {exportType, type PublicType} from "../../util/type.ts";
 import {MessageContent} from "./content.ts";
 
 export const ToolCall = exportType(type({

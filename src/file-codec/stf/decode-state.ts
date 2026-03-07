@@ -1,5 +1,4 @@
 import {concatContentsTo, type Message} from "../../message/index.ts";
-
 import type {Command, CommandArgs} from "./command/index.ts";
 
 export interface DecodeState {

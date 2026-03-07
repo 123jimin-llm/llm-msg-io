@@ -1,11 +1,10 @@
 import type {ChatCompletionChunk} from "openai/resources/chat/completions";
 import type {CompletionUsage} from "openai/resources/completions";
-
-import type {StepResult, TokenUsage, WithCreateStepStreamDecoder} from "../../../api-codec-lib/step/index.ts";
-import type {MessageDelta, ToolCallDelta, StepStreamEvent, StreamEndEvent} from "../../../message/index.ts";
-import {applyDeltaToStepStreamState, createStepStreamState, finalizeStepStreamState, stepStreamStateToResult} from "../../../message/index.ts";
 import type {Stream} from "openai/streaming";
 
+import type {StepResult, TokenUsage, WithCreateStepStreamDecoder} from "../../../api-codec-lib/step/index.ts";
+import type {MessageDelta, StepStreamEvent, StreamEndEvent, ToolCallDelta} from "../../../message/index.ts";
+import {applyDeltaToStepStreamState, createStepStreamState, finalizeStepStreamState, stepStreamStateToResult} from "../../../message/index.ts";
 import {fromOpenAIUsage} from "./response.ts";
 
 export type OpenAIChatCompletionStream = Stream<ChatCompletionChunk>;

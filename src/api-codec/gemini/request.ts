@@ -2,8 +2,8 @@ import type {Content, FunctionDeclaration, GenerateContentParameters, Part} from
 
 import type {FunctionDefinition, StepParams, WithCreateStepEncoder} from "../../api-codec-lib/index.ts";
 import {Message, messageContentToTextArray} from "../../message/index.ts";
-import {getMessageExtraGemini, type GeminiExtra} from "./extra.ts";
-import {unreachable, type Nullable} from "../../util/type.ts";
+import {type Nullable, unreachable} from "../../util/type.ts";
+import {type GeminiExtra, getMessageExtraGemini} from "./extra.ts";
 
 export function isGeminiSystemRole(role: string): boolean {
     switch(role) {

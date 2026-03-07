@@ -1,10 +1,10 @@
-import type {Content, FinishReason, GenerateContentResponse, GenerateContentResponseUsageMetadata, Blob as GeminiBlob} from "@google/genai";
+import type {Blob as GeminiBlob, Content, FinishReason, GenerateContentResponse, GenerateContentResponseUsageMetadata} from "@google/genai";
 
 import type {StepResult, TokenUsage, WithCreateStepDecoder} from "../../api-codec-lib/index.ts";
 import type {ContentPart, Message, MessageContent, ToolCall} from "../../message/index.ts";
 import {concatContentsTo} from "../../message/index.ts";
-import {getMessageExtraGemini} from "./extra.ts";
 import type {Nullable} from "../../util/type.ts";
+import {getMessageExtraGemini} from "./extra.ts";
 
 export function fromGeminiUsageMetadata(usage: Nullable<GenerateContentResponseUsageMetadata>): TokenUsage | null {
     if(usage == null) return null;

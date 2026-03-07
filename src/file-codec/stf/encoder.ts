@@ -1,7 +1,7 @@
 import JSON5 from "json5";
 
-import type {Message} from "../../message/index.ts";
 import type {CodecEncoder} from "../../file-codec-lib/index.ts";
+import type {Message} from "../../message/index.ts";
 
 export interface STFEncoderOptions {
     /** Whether to emit `;extra` blocks. Default: `true`. */

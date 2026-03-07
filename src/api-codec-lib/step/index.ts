@@ -1,8 +1,8 @@
+export * from "./function.ts";
 export * from "./request.ts";
 export * from "./response.ts";
-export * from "./stream.ts";
-export * from "./function.ts";
 export * from "./schema.ts";
+export * from "./stream.ts";
 
 import type {StepParams, WithCreateStepEncoder} from "./request.ts";
 import type {StepResult, WithCreateStepDecoder} from "./response.ts";

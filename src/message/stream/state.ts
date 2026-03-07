@@ -1,7 +1,7 @@
 import type {StepResult} from "../../api-codec-lib/index.ts";
 import type {Nullable} from "../../util/type.ts";
-import {concatContentsTo, ToolCall} from "../schema/index.ts";
 import type {Message, MessageDelta} from "../schema/index.ts";
+import {concatContentsTo, ToolCall} from "../schema/index.ts";
 import type {StepStreamEvent, ToolCallStartEvent} from "./event.ts";
 
 export type StepStreamState = {

@@ -1,15 +1,15 @@
 import type {
-    ChatCompletionMessageParam as OpenAIChatInputMessage,
-    ChatCompletionMessage as OpenAIChatOutputMessage,
     ChatCompletion,
+    ChatCompletionMessage as OpenAIChatOutputMessage,
+    ChatCompletionMessageParam as OpenAIChatInputMessage,
     ChatCompletionMessageToolCall,
 } from "openai/resources/chat/completions";
-
-import {unreachable, type Nullable} from "../../../util/type.ts";
-import {Message, ToolCall, type ContentPart, type MessageContent} from "../../../message/index.js";
-import type {WithCreateDecoder} from "../../../file-codec-lib/decoder.ts";
-import type {StepResult, TokenUsage, WithCreateStepDecoder} from "../../../api-codec-lib/step/response.ts";
 import type {CompletionUsage} from "openai/resources/completions";
+
+import type {StepResult, TokenUsage, WithCreateStepDecoder} from "../../../api-codec-lib/step/response.ts";
+import type {WithCreateDecoder} from "../../../file-codec-lib/decoder.ts";
+import {type ContentPart, Message, type MessageContent, ToolCall} from "../../../message/index.js";
+import {type Nullable, unreachable} from "../../../util/type.ts";
 
 function fromChatCompletionContent(content: Nullable<OpenAIChatInputMessage['content']>): MessageContent {
     if(!content) return "";

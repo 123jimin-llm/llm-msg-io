@@ -1,4 +1,5 @@
 import JSON5 from "json5";
+
 import {type Command, CommandMode} from "./type.ts";
 
 const COMMAND_EXTRA: Command = {

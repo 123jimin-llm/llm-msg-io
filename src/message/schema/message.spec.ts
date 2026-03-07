@@ -27,4 +27,3 @@ describe("Message", () => {
         assert.doesNotThrow(() => Message.assert(msg));
     });
 });
-

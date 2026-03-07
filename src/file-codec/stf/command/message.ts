@@ -1,5 +1,6 @@
 import {type} from "arktype";
 import JSON5 from "json5";
+
 import {Message} from "../../../message/index.ts";
 import {type NewMessageParams, startNewMessage} from "../decode-state.ts";
 import {type Command, CommandMode} from "./type.ts";

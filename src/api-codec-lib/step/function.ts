@@ -1,4 +1,5 @@
 import {type} from "arktype";
+
 import {exportType} from "../../util/type.ts";
 import {JSONSchema} from "./schema.ts";
 

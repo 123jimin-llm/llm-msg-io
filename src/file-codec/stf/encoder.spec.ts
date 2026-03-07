@@ -1,7 +1,7 @@
 import {assert} from 'chai';
 
-import {type Message} from "../../message/index.ts";
 import {createDecoder, createEncoder} from '../../file-codec-lib/index.ts';
+import {type Message} from "../../message/index.ts";
 import {createDecoder as createSTFDecoder} from "./decoder.ts";
 import {createEncoder as createSTFEncoder} from "./encoder.ts";
 
