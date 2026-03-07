@@ -22,7 +22,6 @@
 
 ## DX
 
-- [ ] All three provider SDKs are required peer dependencies. Add `peerDependenciesMeta` with `"optional": true` for each.
 - [ ] OpenAI stream codec relies on `chunk.usage` but the request encoder never sets `stream_options: { include_usage: true }`. Document this or provide a stream-aware encode path.
 
 ## Tests

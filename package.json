@@ -57,6 +57,17 @@
     "@google/genai": "^1",
     "openai": "^6"
   },
+  "peerDependenciesMeta": {
+    "@anthropic-ai/sdk": {
+      "optional": true
+    },
+    "@google/genai": {
+      "optional": true
+    },
+    "openai": {
+      "optional": true
+    }
+  },
   "dependencies": {
     "arktype": "^2.2.0",
     "json5": "^2.2.3",
