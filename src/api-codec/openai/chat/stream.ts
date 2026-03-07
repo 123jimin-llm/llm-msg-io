@@ -42,37 +42,41 @@ export const OpenAIChatStreamCodec = {
         let finish_reason = "";
         let token_usage: TokenUsage | null = null;
 
-        for await (const chunk of await api_stream) {
-            if(!started) {
-                started = true;
-                yield {
-                    type: 'stream.start',
-                    metadata: {
-                        id: chunk.id,
-                        model: chunk.model,
-                    },
-                };
-            }
+        try {
+            for await (const chunk of await api_stream) {
+                if(!started) {
+                    started = true;
+                    yield {
+                        type: 'stream.start',
+                        metadata: {
+                            id: chunk.id,
+                            model: chunk.model,
+                        },
+                    };
+                }
 
-            const choice = chunk.choices[0];
-            if(choice == null) {
-                // Final chunk with stream_options.include_usage has no choices but has usage.
+                const choice = chunk.choices[0];
+                if(choice == null) {
+                    // Final chunk with stream_options.include_usage has no choices but has usage.
+                    if(chunk.usage) {
+                        token_usage = fromOpenAIUsage(chunk.usage as CompletionUsage);
+                    }
+                    continue;
+                }
+
+                const delta = fromOpenAIDelta(choice.delta);
+                yield* applyDeltaToStepStreamState(state, delta);
+
+                if(choice.finish_reason) {
+                    finish_reason = choice.finish_reason;
+                }
+
                 if(chunk.usage) {
                     token_usage = fromOpenAIUsage(chunk.usage as CompletionUsage);
                 }
-                continue;
             }
-
-            const delta = fromOpenAIDelta(choice.delta);
-            yield* applyDeltaToStepStreamState(state, delta);
-
-            if(choice.finish_reason) {
-                finish_reason = choice.finish_reason;
-            }
-
-            if(chunk.usage) {
-                token_usage = fromOpenAIUsage(chunk.usage as CompletionUsage);
-            }
+        } catch (err) {
+            yield {type: 'stream.error', error: err instanceof Error ? err : new Error(String(err))};
         }
 
         yield* finalizeStepStreamState(state);

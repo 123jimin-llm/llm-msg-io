@@ -24,130 +24,134 @@ export const ClaudeMessagesStreamCodec = {
         let finish_reason = '';
         let token_usage: TokenUsage | null = null;
 
-        for await (const event of await api_stream) {
-            switch(event.type) {
-                case 'message_start': {
-                    started = true;
+        try {
+            for await (const event of await api_stream) {
+                switch(event.type) {
+                    case 'message_start': {
+                        started = true;
 
-                    const metadata: {id?: string; model?: string} = {};
-                    if(event.message.id) metadata.id = event.message.id;
-                    if(event.message.model) metadata.model = event.message.model;
+                        const metadata: {id?: string; model?: string} = {};
+                        if(event.message.id) metadata.id = event.message.id;
+                        if(event.message.model) metadata.model = event.message.model;
 
-                    yield {
-                        type: 'stream.start',
-                        metadata,
-                    };
+                        yield {
+                            type: 'stream.start',
+                            metadata,
+                        };
 
-                    token_usage = fromClaudeUsage(event.message.usage);
+                        token_usage = fromClaudeUsage(event.message.usage);
 
-                    yield* applyDeltaToStepStreamState(state, {
-                        role: event.message.role,
-                    });
-                    break;
-                }
-
-                case 'content_block_start': {
-                    const block = event.content_block;
-                    block_types.set(event.index, block.type);
-
-                    switch(block.type) {
-                        case 'thinking':
-                            pending_thinking = {thinking: '', signature: ''};
-                            break;
-                        case 'redacted_thinking':
-                            thinking_blocks.push({type: 'redacted_thinking', data: block.data});
-                            break;
-                        case 'tool_use': {
-                            const tc_index = tool_call_counter++;
-                            block_to_tool_index.set(event.index, tc_index);
-
-                            const tc_delta: ToolCallDelta = {
-                                index: tc_index,
-                                id: block.id,
-                                name: block.name,
-                            };
-                            yield* applyDeltaToStepStreamState(state, {
-                                tool_calls: [tc_delta],
-                            });
-                            break;
-                        }
-                        // text, server_tool_use, web_search_tool_result — nothing to do on start.
-                    }
-                    break;
-                }
-
-                case 'content_block_delta': {
-                    const delta = event.delta;
-
-                    switch(delta.type) {
-                        case 'text_delta':
-                            yield* applyDeltaToStepStreamState(state, {
-                                content: delta.text,
-                            });
-                            break;
-                        case 'thinking_delta':
-                            if(pending_thinking) {
-                                pending_thinking.thinking += delta.thinking;
-                            }
-                            yield* applyDeltaToStepStreamState(state, {
-                                reasoning: delta.thinking,
-                            });
-                            break;
-                        case 'signature_delta':
-                            if(pending_thinking) {
-                                pending_thinking.signature += delta.signature;
-                            }
-                            break;
-                        case 'input_json_delta': {
-                            const tc_index = block_to_tool_index.get(event.index);
-                            if(tc_index != null) {
-                                yield* applyDeltaToStepStreamState(state, {
-                                    tool_calls: [{
-                                        index: tc_index,
-                                        arguments: delta.partial_json,
-                                    }],
-                                });
-                            }
-                            break;
-                        }
-                        // citations_delta — skip for now.
-                    }
-                    break;
-                }
-
-                case 'content_block_stop': {
-                    const block_type = block_types.get(event.index);
-
-                    if(block_type === 'thinking' && pending_thinking) {
-                        thinking_blocks.push({
-                            type: 'thinking',
-                            thinking: pending_thinking.thinking,
-                            signature: pending_thinking.signature,
+                        yield* applyDeltaToStepStreamState(state, {
+                            role: event.message.role,
                         });
-                        pending_thinking = null;
-                    }
-                    break;
-                }
-
-                case 'message_delta': {
-                    if(event.delta.stop_reason) {
-                        finish_reason = fromClaudeStopReason(event.delta.stop_reason);
+                        break;
                     }
 
-                    if(event.usage) {
-                        if(token_usage) {
-                            token_usage.output_tokens = event.usage.output_tokens;
+                    case 'content_block_start': {
+                        const block = event.content_block;
+                        block_types.set(event.index, block.type);
+
+                        switch(block.type) {
+                            case 'thinking':
+                                pending_thinking = {thinking: '', signature: ''};
+                                break;
+                            case 'redacted_thinking':
+                                thinking_blocks.push({type: 'redacted_thinking', data: block.data});
+                                break;
+                            case 'tool_use': {
+                                const tc_index = tool_call_counter++;
+                                block_to_tool_index.set(event.index, tc_index);
+
+                                const tc_delta: ToolCallDelta = {
+                                    index: tc_index,
+                                    id: block.id,
+                                    name: block.name,
+                                };
+                                yield* applyDeltaToStepStreamState(state, {
+                                    tool_calls: [tc_delta],
+                                });
+                                break;
+                            }
+                            // text, server_tool_use, web_search_tool_result — nothing to do on start.
+                        }
+                        break;
+                    }
+
+                    case 'content_block_delta': {
+                        const delta = event.delta;
+
+                        switch(delta.type) {
+                            case 'text_delta':
+                                yield* applyDeltaToStepStreamState(state, {
+                                    content: delta.text,
+                                });
+                                break;
+                            case 'thinking_delta':
+                                if(pending_thinking) {
+                                    pending_thinking.thinking += delta.thinking;
+                                }
+                                yield* applyDeltaToStepStreamState(state, {
+                                    reasoning: delta.thinking,
+                                });
+                                break;
+                            case 'signature_delta':
+                                if(pending_thinking) {
+                                    pending_thinking.signature += delta.signature;
+                                }
+                                break;
+                            case 'input_json_delta': {
+                                const tc_index = block_to_tool_index.get(event.index);
+                                if(tc_index != null) {
+                                    yield* applyDeltaToStepStreamState(state, {
+                                        tool_calls: [{
+                                            index: tc_index,
+                                            arguments: delta.partial_json,
+                                        }],
+                                    });
+                                }
+                                break;
+                            }
+                            // citations_delta — skip for now.
+                        }
+                        break;
+                    }
+
+                    case 'content_block_stop': {
+                        const block_type = block_types.get(event.index);
+
+                        if(block_type === 'thinking' && pending_thinking) {
+                            thinking_blocks.push({
+                                type: 'thinking',
+                                thinking: pending_thinking.thinking,
+                                signature: pending_thinking.signature,
+                            });
+                            pending_thinking = null;
+                        }
+                        break;
+                    }
+
+                    case 'message_delta': {
+                        if(event.delta.stop_reason) {
+                            finish_reason = fromClaudeStopReason(event.delta.stop_reason);
                         }
 
-                        if(event.usage.cache_read_input_tokens != null) {
-                            if(token_usage) token_usage.cache_read_tokens = event.usage.cache_read_input_tokens;
-                        }
-                    }
-                    break;
-                }
+                        if(event.usage) {
+                            if(token_usage) {
+                                token_usage.output_tokens = event.usage.output_tokens;
+                            }
 
-                // message_stop — nothing to do.
+                            if(event.usage.cache_read_input_tokens != null) {
+                                if(token_usage) token_usage.cache_read_tokens = event.usage.cache_read_input_tokens;
+                            }
+                        }
+                        break;
+                    }
+
+                    // message_stop — nothing to do.
+                }
             }
+        } catch (err) {
+            yield {type: 'stream.error', error: err instanceof Error ? err : new Error(String(err))};
         }
 
         // Flush any incomplete thinking block (shouldn't happen, but be safe).

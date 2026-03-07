@@ -1,7 +1,7 @@
 import type {StepResult} from "../../api-codec-lib/index.ts";
 import type {Nullable} from "../../util/type.ts";
 import type {Message, MessageDelta} from "../schema/index.ts";
-import {concatContentsTo, ToolCall} from "../schema/index.ts";
+import {concatContentsTo, messageContentToText, ToolCall} from "../schema/index.ts";
 import type {StepStreamEvent, ToolCallStartEvent} from "./event.ts";
 
 export type StepStreamState = {
@@ -65,7 +65,7 @@ export function* applyDeltaToStepStreamState(
         message.refusal = concatContentsTo(message.refusal ?? "", delta.refusal);
         yield {
             type: "refusal.delta",
-            delta: "",
+            delta: messageContentToText(delta.refusal),
         };
     }
 

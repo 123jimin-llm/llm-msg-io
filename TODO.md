@@ -1,19 +1,12 @@
 # TODO
 
-## Bugs
-
-- [ ] `refusal.delta` event in `applyDeltaToStepStreamState` emits empty string instead of `delta.refusal`.
-- [ ] `stream.error` event is defined in `StepStreamEvent` but never emitted — no stream codec wraps its `for await` loop in `try/catch`.
-
-## Feature Gaps
-
-### STF
+## STF
 
 - [ ] STF encoder silently drops `reasoning` and `refusal` fields. Add `;reasoning` and `;refusal` polyadic commands (encoder + decoder + spec).
 - [ ] STF encoder silently drops `tool_calls` when `content` is a string. Add `;tool_call` command or force `;raw` fallback when `tool_calls` is present.
 - [ ] Update `docs/stf/command.md` and `docs/stf/README.md` to document any new commands.
 
-### API Codecs
+## API Codecs
 
 - [ ] OpenAI request encoder ignores `req.functions` — never maps them to `tools` in the output. Gemini and Claude codecs both handle this.
 - [ ] OpenAI non-streaming response decoder ignores `reasoning` field. The stream codec handles it, but `OpenAIChatMessagesCodec` does not. Relevant for `o1`/`o3` models.

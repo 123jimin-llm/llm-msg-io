@@ -14,46 +14,50 @@ export const GeminiGenerateContentStreamCodec = {
         let finish_reason = "";
         let token_usage: TokenUsage | null = null;
 
-        for await (const chunk of await api_stream) {
-            const candidate = chunk.candidates?.[0];
-            if(!candidate) continue;
+        try {
+            for await (const chunk of await api_stream) {
+                const candidate = chunk.candidates?.[0];
+                if(!candidate) continue;
 
-            if(!started) {
-                started = true;
+                if(!started) {
+                    started = true;
 
-                const metadata: StreamStartEvent['metadata'] = {};
-                if(chunk.responseId) metadata.id = chunk.responseId;
-                if(chunk.modelVersion) metadata.model = chunk.modelVersion;
+                    const metadata: StreamStartEvent['metadata'] = {};
+                    if(chunk.responseId) metadata.id = chunk.responseId;
+                    if(chunk.modelVersion) metadata.model = chunk.modelVersion;
 
-                yield {
-                    type: 'stream.start',
-                    metadata,
-                };
+                    yield {
+                        type: 'stream.start',
+                        metadata,
+                    };
+                }
+
+                const {content} = candidate;
+                if(content == null) continue;
+
+                const {tool_calls, ...delta} = fromGeminiContent(content);
+                yield* applyDeltaToStepStreamState(state, {
+                    ...delta,
+                    tool_calls: tool_calls?.map((tc, ind): ToolCallDelta => ({
+                        ...tc,
+                        index: state.tool_calls.size + ind,
+                    })),
+                });
+
+                const delta_extra = getMessageExtraGemini(delta);
+                if(delta_extra) {
+                    mergeMessageExtraGemini(getMessageExtraGemini(state.message, true), delta_extra);
+                }
+
+                if(candidate.finishReason) {
+                    finish_reason = fromGeminiFinishReason(candidate.finishReason);
+                }
+
+                const chunk_usage = fromGeminiUsageMetadata(chunk.usageMetadata);
+                if(chunk_usage) token_usage = chunk_usage;
             }
-
-            const {content} = candidate;
-            if(content == null) continue;
-
-            const {tool_calls, ...delta} = fromGeminiContent(content);
-            yield* applyDeltaToStepStreamState(state, {
-                ...delta,
-                tool_calls: tool_calls?.map((tc, ind): ToolCallDelta => ({
-                    ...tc,
-                    index: state.tool_calls.size + ind,
-                })),
-            });
-
-            const delta_extra = getMessageExtraGemini(delta);
-            if(delta_extra) {
-                mergeMessageExtraGemini(getMessageExtraGemini(state.message, true), delta_extra);
-            }
-
-            if(candidate.finishReason) {
-                finish_reason = fromGeminiFinishReason(candidate.finishReason);
-            }
-
-            const chunk_usage = fromGeminiUsageMetadata(chunk.usageMetadata);
-            if(chunk_usage) token_usage = chunk_usage;
+        } catch (err) {
+            yield {type: 'stream.error', error: err instanceof Error ? err : new Error(String(err))};
         }
 
         yield* finalizeStepStreamState(state);
