@@ -2,6 +2,7 @@ import type {ResponseFormatJSONSchema} from "openai/resources";
 import type {
     ChatCompletionContentPart,
     ChatCompletionCreateParams,
+    ChatCompletionFunctionTool,
     ChatCompletionMessageParam as OpenAIChatInputMessage,
     ChatCompletionMessageToolCall,
 } from "openai/resources/chat/completions";
@@ -113,6 +114,13 @@ export const OpenAIChatRequestCodec = {
             messages: api_messages,
             stream: false,
         };
+
+        if(req.functions) {
+            api_req.tools = req.functions.map((func): ChatCompletionFunctionTool => ({
+                "type": 'function',
+                "function": func,
+            }));
+        }
 
         if(req.response_schema) {
             const json_schema: ResponseFormatJSONSchema['json_schema'] = {
