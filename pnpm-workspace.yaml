@@ -1,5 +1,5 @@
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - "@jiminp/eslint-config"
-onlyBuiltDependencies:
-  - protobufjs
+allowBuilds:
+  protobufjs: true
