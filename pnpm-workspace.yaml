@@ -3,3 +3,4 @@ minimumReleaseAgeExclude:
   - "@jiminp/eslint-config"
 allowBuilds:
   protobufjs: true
+  "@google/genai": true
