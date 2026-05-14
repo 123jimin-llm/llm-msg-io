@@ -1,7 +1,7 @@
 import type {Content, FunctionDeclaration, GenerateContentParameters, Part} from "@google/genai";
 
 import type {FunctionDefinition, StepParams, WithCreateStepEncoder} from "../../api-codec-lib/index.ts";
-import {Message, messageContentToTextArray} from "../../message/index.ts";
+import {Message, messageContentToText, messageContentToTextArray} from "../../message/index.ts";
 import {type Nullable, unreachable} from "../../util/type.ts";
 import {type GeminiExtra, getMessageExtraGemini} from "./extra.ts";
 
@@ -51,16 +51,16 @@ export function toGeminiParts(message: Message): Part[] {
                     throw new Error("toGeminiParts: image url must be a data url!");
                 }
 
-                const [header, data] = image_url.split(';', 2);
-                if(!data?.startsWith("base64,")) {
+                const b64_sep = ';base64,';
+                const b64_idx = image_url.indexOf(b64_sep);
+                if(b64_idx === -1) {
                     throw new Error("toGeminiParts: image url must be a base64 data url!");
                 }
 
                 return {
                     inlineData: {
-
-                        mimeType: header!.slice("data:".length),
-                        data: data.slice("base64,".length),
+                        mimeType: image_url.slice("data:".length, b64_idx),
+                        data: image_url.slice(b64_idx + b64_sep.length),
                     },
                 };
             }
@@ -69,6 +69,58 @@ export function toGeminiParts(message: Message): Part[] {
             default: return unreachable(part);
         }
     });
+}
+
+function toGeminiContent(message: Message): Content {
+    if(message.role === 'tool') {
+        const text = messageContentToText(message.content) ?? '';
+        let response: Record<string, unknown>;
+        try {
+            const parsed: unknown = JSON.parse(text);
+            response = (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed))
+                ? parsed as Record<string, unknown>
+                : {result: text};
+        } catch{
+            response = {result: text};
+        }
+
+        const fr: {name: string; response: Record<string, unknown>; id?: string} = {
+            name: message.name ?? '',
+            response,
+        };
+        if(message.call_id) fr.id = message.call_id;
+
+        return {
+            role: 'user',
+            parts: [{functionResponse: fr}],
+        };
+    }
+
+    const parts = toGeminiParts(message);
+
+    if(message.tool_calls?.length) {
+        for(const tc of message.tool_calls) {
+            let args: Record<string, unknown>;
+            try {
+                args = JSON.parse(tc.arguments);
+            } catch{
+                args = {};
+            }
+
+            const fc: {name: string; args: Record<string, unknown>; id?: string} = {
+                name: tc.name,
+                args,
+            };
+            if(tc.id) fc.id = tc.id;
+
+            parts.push({functionCall: fc});
+        }
+    }
+
+    return {
+        role: message.role === 'assistant' ? 'model' : 'user',
+        parts,
+    };
 }
 
 export interface GeminiGenerateContentRequestEncodeOptions {
@@ -88,12 +140,7 @@ export const GeminiGenerateContentRequestCodec = {
                 continue;
             }
 
-            api_messages.push(...req.messages.slice(i).map((message): Content => {
-                return {
-                    role: message.role === 'assistant' ? 'model' : 'user',
-                    parts: toGeminiParts(message),
-                };
-            }));
+            api_messages.push(...req.messages.slice(i).map(toGeminiContent));
             break;
         }
 

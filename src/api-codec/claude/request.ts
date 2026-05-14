@@ -45,14 +45,15 @@ function toClaudeContentBlocks(content: Nullable<MessageContent>): ClaudeContent
                 return {type: 'text', text: part.text} satisfies TextBlockParam;
             case 'image': {
                 if(part.url?.startsWith('data:')) {
-                    const [header, data] = part.url.split(';', 2);
-                    if(data?.startsWith('base64,')) {
+                    const b64_sep = ';base64,';
+                    const b64_idx = part.url.indexOf(b64_sep);
+                    if(b64_idx !== -1) {
                         return {
                             type: 'image',
                             source: {
                                 type: 'base64',
-                                media_type: header!.slice('data:'.length) as ImageBlockParam['source'] extends {media_type: infer M} ? M : never,
-                                data: data.slice('base64,'.length),
+                                media_type: part.url.slice('data:'.length, b64_idx) as ImageBlockParam['source'] extends {media_type: infer M} ? M : never,
+                                data: part.url.slice(b64_idx + b64_sep.length),
                             },
                         } satisfies ImageBlockParam;
                     }

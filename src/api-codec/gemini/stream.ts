@@ -10,6 +10,7 @@ export const GeminiGenerateContentStreamCodec = {
     createStepStreamDecoder: () => async function* (api_stream): AsyncGenerator<StepStreamEvent, StepResult> {
         const state = createStepStreamState();
 
+        let tool_call_counter = 0;
         let started = false;
         let finish_reason = "";
         let token_usage: TokenUsage | null = null;
@@ -35,14 +36,15 @@ export const GeminiGenerateContentStreamCodec = {
                 const {content} = candidate;
                 if(content == null) continue;
 
-                const {tool_calls, ...delta} = fromGeminiContent(content);
+                const {tool_calls: chunk_tool_calls, ...delta} = fromGeminiContent(content);
                 yield* applyDeltaToStepStreamState(state, {
                     ...delta,
-                    tool_calls: tool_calls?.map((tc, ind): ToolCallDelta => ({
+                    tool_calls: chunk_tool_calls?.map((tc, ind): ToolCallDelta => ({
                         ...tc,
-                        index: state.tool_calls.size + ind,
+                        index: tool_call_counter + ind,
                     })),
                 });
+                if(chunk_tool_calls?.length) tool_call_counter += chunk_tool_calls.length;
 
                 const delta_extra = getMessageExtraGemini(delta);
                 if(delta_extra) {

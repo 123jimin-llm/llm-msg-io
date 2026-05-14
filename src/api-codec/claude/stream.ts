@@ -163,16 +163,15 @@ export const ClaudeMessagesStreamCodec = {
             });
         }
 
+        if(!started) {
+            yield {type: 'stream.start'};
+        }
+
         yield* finalizeStepStreamState(state);
 
         if(thinking_blocks.length) {
             const extra = getMessageExtraClaude(state.message, true);
             extra.thinking_blocks = thinking_blocks;
-        }
-
-        // Emit stream.start if we never got a message_start (shouldn't happen).
-        if(!started) {
-            yield {type: 'stream.start'};
         }
 
         const stream_end_event: StreamEndEvent = {type: 'stream.end'};

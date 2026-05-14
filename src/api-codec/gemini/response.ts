@@ -85,7 +85,7 @@ export function fromGeminiContent(api_content: Content): Message {
             tool_calls.push(tc);
         }
 
-        if(!part.text) continue;
+        if(part.text == null) continue;
 
         if(part.thought) {
             reasoning_arr.push(part.text);

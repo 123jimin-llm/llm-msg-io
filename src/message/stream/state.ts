@@ -80,7 +80,7 @@ export function* applyDeltaToStepStreamState(
             }
 
             if(tc.id) existing.id = tc.id;
-            if(tc.name) existing.name += tc.name;
+            if(tc.name) existing.name = tc.name;
             if(tc.arguments) existing.arguments += tc.arguments;
 
             if(!tool_call_started.has(ind) && existing.name) {
